@@ -1832,6 +1832,7 @@ const put_raw_data: Operation = {
     await ctx.engine.putRawData(p.slug as string, p.source as string, p.data as object, sourceOpts);
     return { status: 'ok' };
   },
+  cliHints: { name: 'put-raw-data', positional: ['slug', 'source'], stdin: 'data' },
 };
 
 const get_raw_data: Operation = {
@@ -1847,6 +1848,7 @@ const get_raw_data: Operation = {
     return ctx.engine.getRawData(p.slug as string, p.source as string | undefined, sourceOpts);
   },
   scope: 'read',
+  cliHints: { name: 'get-raw-data', positional: ['slug'] },
 };
 
 // --- Resolution & Chunks ---

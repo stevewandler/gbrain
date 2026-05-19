@@ -2,6 +2,21 @@
 
 All notable changes to GBrain will be documented in this file.
 
+## [0.35.1.1] - 2026-05-18
+
+**`put_raw_data` and `get_raw_data` now have a CLI surface — unblocks shell-based pipelines writing raw payloads alongside pages.**
+
+The transcript pipeline in `gbrain-mcp/doha` shells out to `gbrain` from a cron-run Python script to write G-Brain pages (MCP only works inside Claude Code sessions). The three writes it needed — `put`, `link`, `tag` — already shipped as top-level CLI commands via `cliHints` auto-exposure. The fourth, `put_raw_data` (used to attach full transcript JSON to a meeting page as queryable raw data), did not. Adding `cliHints` for `put_raw_data` and its read counterpart `get_raw_data` brings them into the same auto-dispatched surface as the rest.
+
+### What you can now do
+
+**Write raw JSON payloads to a page from any process.** `cat data.json | gbrain put-raw-data <slug> <source> --json` stores the JSON under the page's raw-data table, the same way the MCP `put_raw_data` tool does. Reads via `gbrain get-raw-data <slug> [--source <name>]`.
+
+### Itemized changes
+
+- `src/core/operations.ts`: `put_raw_data` gets `cliHints: { name: 'put-raw-data', positional: ['slug', 'source'], stdin: 'data' }`. `get_raw_data` gets `cliHints: { name: 'get-raw-data', positional: ['slug'] }`.
+- `src/cli.ts` `parseOpArgs`: when the stdin-target param is typed `'object'`, the stdin string is `JSON.parse`d before being handed to the op handler. Invalid JSON exits 2 with a clear error. Other stdin types (the string-typed `content` for `put_page`) are unchanged.
+
 ## [0.35.1.0] - 2026-05-15
 
 **Embedder shootout prereqs: pricing, public gateway export, and resume-from for long eval runs.**

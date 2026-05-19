@@ -481,7 +481,19 @@ function parseOpArgs(op: Operation, args: string[]): Record<string, unknown> {
       console.error(`Error: stdin content exceeds ${MAX_STDIN} bytes. Split into smaller inputs.`);
       process.exit(1);
     }
-    params[op.cliHints.stdin] = stdinContent;
+    const stdinKey = op.cliHints.stdin;
+    // Object-typed params (e.g. put_raw_data.data) take JSON-on-stdin; parse it here
+    // so the op handler receives the same shape MCP would. Bad JSON exits 2.
+    if (op.params[stdinKey]?.type === 'object') {
+      try {
+        params[stdinKey] = JSON.parse(stdinContent);
+      } catch (e) {
+        console.error(`Error: --${stdinKey.replace(/_/g, '-')} stdin must be valid JSON: ${e instanceof Error ? e.message : String(e)}`);
+        process.exit(2);
+      }
+    } else {
+      params[stdinKey] = stdinContent;
+    }
   }
 
   return params;
