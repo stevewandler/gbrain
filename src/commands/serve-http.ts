@@ -216,6 +216,7 @@ export async function runServeHttp(engine: BrainEngine, options: ServeHttpOption
     sql,
     tokenTtl,
     dcrDisabled: !enableDcr,
+    issuerUrl: new URL(publicUrl || `http://localhost:${port}`),
   });
 
   // Sweep expired tokens on startup (non-blocking)

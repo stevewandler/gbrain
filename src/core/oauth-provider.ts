@@ -121,6 +121,13 @@ interface GBrainOAuthProviderOptions {
    * before mcpAuthRouter ran).
    */
   dcrDisabled?: boolean;
+  /**
+   * Public issuer URL. Included as `iss` in authorization code redirects
+   * per RFC 9207 (Authorization Server Issuer Identification). Required by
+   * strict OAuth 2.1 clients (e.g., claude.ai) that verify the issuer identity
+   * before exchanging the authorization code.
+   */
+  issuerUrl?: URL;
 }
 
 // ---------------------------------------------------------------------------
@@ -280,6 +287,7 @@ export class GBrainOAuthProvider implements OAuthServerProvider {
   private readonly dcrDisabled: boolean;
   private tokenTtl: number;
   private refreshTtl: number;
+  private issuerUrl?: URL;
 
   constructor(options: GBrainOAuthProviderOptions) {
     this.sql = options.sql;
@@ -287,6 +295,7 @@ export class GBrainOAuthProvider implements OAuthServerProvider {
     this.dcrDisabled = options.dcrDisabled === true;
     this.tokenTtl = options.tokenTtl || 3600;
     this.refreshTtl = options.refreshTtl || 30 * 24 * 3600;
+    this.issuerUrl = options.issuerUrl;
   }
 
   get clientsStore(): OAuthRegisteredClientsStore {
@@ -339,10 +348,12 @@ export class GBrainOAuthProvider implements OAuthServerProvider {
               ${params.resource?.toString() || null}, ${expiresAt})
     `;
 
-    // Redirect back with the code
+    // Redirect back with the code. RFC 9207: include `iss` so strict OAuth 2.1
+    // clients (e.g., claude.ai) can verify the issuer before exchanging the code.
     const redirectUrl = new URL(params.redirectUri);
     redirectUrl.searchParams.set('code', code);
     if (params.state) redirectUrl.searchParams.set('state', params.state);
+    if (this.issuerUrl) redirectUrl.searchParams.set('iss', this.issuerUrl.href);
     res.redirect(redirectUrl.toString());
   }
 
