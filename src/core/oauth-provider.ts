@@ -353,7 +353,9 @@ export class GBrainOAuthProvider implements OAuthServerProvider {
     const redirectUrl = new URL(params.redirectUri);
     redirectUrl.searchParams.set('code', code);
     if (params.state) redirectUrl.searchParams.set('state', params.state);
-    if (this.issuerUrl) redirectUrl.searchParams.set('iss', this.issuerUrl.href);
+    // RFC 8414 / RFC 9207: issuer must not have a trailing slash. Use .origin
+    // rather than .href — URL always normalizes root URLs to include one.
+    if (this.issuerUrl) redirectUrl.searchParams.set('iss', this.issuerUrl.origin);
     res.redirect(redirectUrl.toString());
   }
 

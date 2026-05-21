@@ -357,6 +357,12 @@ export async function runServeHttp(engine: BrainEngine, options: ServeHttpOption
         if (body?.grant_types_supported && !body.grant_types_supported.includes('client_credentials')) {
           body.grant_types_supported.push('client_credentials');
         }
+        // RFC 8414 §3.3: issuer must not have a trailing slash. The URL
+        // constructor always normalizes root URLs to include one, so we strip
+        // it here before the discovery doc reaches any client.
+        if (typeof body?.issuer === 'string' && body.issuer.endsWith('/')) {
+          body.issuer = body.issuer.slice(0, -1);
+        }
         return origJson(body);
       };
     }
