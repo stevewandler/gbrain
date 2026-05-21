@@ -256,6 +256,16 @@ export async function runServeHttp(engine: BrainEngine, options: ServeHttpOption
   // CORS
   // ---------------------------------------------------------------------------
   app.use('/mcp', cors());
+  // MCP SDK's StreamableHTTPServerTransport returns 406 when the client omits
+  // Accept: application/json, text/event-stream. Anthropic's post-OAuth
+  // connection-verify request doesn't include this header, causing the
+  // connector setup to fail. Inject it when absent so the SDK doesn't 406.
+  app.use('/mcp', (req: Request, _res: Response, next: NextFunction) => {
+    if (req.method === 'POST' && !req.headers['accept']) {
+      req.headers['accept'] = 'application/json, text/event-stream';
+    }
+    next();
+  });
   app.use('/token', cors());
   app.use('/authorize', cors());
   app.use('/register', cors());
