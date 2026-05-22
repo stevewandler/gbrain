@@ -1094,25 +1094,26 @@ export async function runServeHttp(engine: BrainEngine, options: ServeHttpOption
     try {
       const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined as any });
       await server.connect(transport);
-      // Hono's Node→WebStandard conversion reads req.rawHeaders (the raw
-      // socket byte array), NOT req.headers (the parsed object). Patching only
-      // req.headers is invisible to Hono. We must patch rawHeaders too so the
-      // Web Standard Request the SDK receives has the correct Accept value.
-      // Anthropic's server-to-server verify sends Accept: */* which fails the
-      // SDK's check for both application/json and text/event-stream.
+      // Hono (used by StreamableHTTPServerTransport) reads incoming.rawHeaders
+      // to build the Web Standard Headers object — not req.headers (the parsed
+      // object). We must replace rawHeaders entirely so Hono sees the correct
+      // Accept value. Anthropic's server-to-server verify sends Accept: */*
+      // which fails the SDK's check for both application/json and text/event-stream.
       const accept = (req.headers['accept'] as string) ?? '';
       if (!accept.includes('application/json') || !accept.includes('text/event-stream')) {
         const target = 'application/json, text/event-stream';
         req.headers['accept'] = target;
+        const newRaw = [...req.rawHeaders];
         let found = false;
-        for (let i = 0; i < req.rawHeaders.length - 1; i += 2) {
-          if (req.rawHeaders[i].toLowerCase() === 'accept') {
-            req.rawHeaders[i + 1] = target;
+        for (let i = 0; i < newRaw.length - 1; i += 2) {
+          if (newRaw[i].toLowerCase() === 'accept') {
+            newRaw[i + 1] = target;
             found = true;
             break;
           }
         }
-        if (!found) req.rawHeaders.push('Accept', target);
+        if (!found) newRaw.push('Accept', target);
+        Object.defineProperty(req, 'rawHeaders', { value: newRaw, configurable: true, writable: true });
       }
       await transport.handleRequest(req, res, req.body);
     } catch (e) {
