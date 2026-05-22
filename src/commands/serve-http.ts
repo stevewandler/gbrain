@@ -1094,27 +1094,23 @@ export async function runServeHttp(engine: BrainEngine, options: ServeHttpOption
     try {
       const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined as any });
       await server.connect(transport);
-      // Hono (used by StreamableHTTPServerTransport) reads incoming.rawHeaders
-      // to build the Web Standard Headers object — not req.headers (the parsed
-      // object). We must replace rawHeaders entirely so Hono sees the correct
-      // Accept value. Anthropic's server-to-server verify sends Accept: */*
-      // which fails the SDK's check for both application/json and text/event-stream.
-      const accept = (req.headers['accept'] as string) ?? '';
-      if (!accept.includes('application/json') || !accept.includes('text/event-stream')) {
-        const target = 'application/json, text/event-stream';
-        req.headers['accept'] = target;
-        const newRaw = [...req.rawHeaders];
-        let found = false;
-        for (let i = 0; i < newRaw.length - 1; i += 2) {
-          if (newRaw[i].toLowerCase() === 'accept') {
-            newRaw[i + 1] = target;
-            found = true;
-            break;
-          }
+      // Anthropic's server-to-server verify sends Accept: */* which fails the
+      // SDK's check for both application/json and text/event-stream. All header-
+      // patching approaches on the Node.js IncomingMessage are bypassed by Bun's
+      // native rawHeaders implementation. Instead, intercept handlePostRequest on
+      // the underlying WebStandard transport to fix the header on the Web Standard
+      // Request object before the check runs.
+      const webTransport = (transport as any)._webStandardTransport;
+      const origHandlePost = webTransport.handlePostRequest.bind(webTransport);
+      webTransport.handlePostRequest = async (webReq: Request, opts: unknown) => {
+        const accept = webReq.headers.get('accept') ?? '';
+        if (!accept.includes('application/json') || !accept.includes('text/event-stream')) {
+          const newHeaders = new Headers(webReq.headers);
+          newHeaders.set('accept', 'application/json, text/event-stream');
+          webReq = new Request(webReq, { headers: newHeaders });
         }
-        if (!found) newRaw.push('Accept', target);
-        Object.defineProperty(req, 'rawHeaders', { value: newRaw, configurable: true, writable: true });
-      }
+        return origHandlePost(webReq, opts);
+      };
       await transport.handleRequest(req, res, req.body);
     } catch (e) {
       console.error('MCP request handler error:', e instanceof Error ? e.message : e);
