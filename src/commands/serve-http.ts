@@ -1094,6 +1094,13 @@ export async function runServeHttp(engine: BrainEngine, options: ServeHttpOption
     try {
       const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined as any });
       await server.connect(transport);
+      // Hono's Node→WebStandard conversion reads req.headers at call time.
+      // Ensure the Accept header satisfies the SDK's check regardless of what
+      // the client sent (Anthropic's server-to-server verify sends Accept: */*).
+      const accept = (req.headers['accept'] as string) ?? '';
+      if (!accept.includes('application/json') || !accept.includes('text/event-stream')) {
+        req.headers['accept'] = 'application/json, text/event-stream';
+      }
       await transport.handleRequest(req, res, req.body);
     } catch (e) {
       console.error('MCP request handler error:', e instanceof Error ? e.message : e);
