@@ -261,8 +261,11 @@ export async function runServeHttp(engine: BrainEngine, options: ServeHttpOption
   // connection-verify request doesn't include this header, causing the
   // connector setup to fail. Inject it when absent so the SDK doesn't 406.
   app.use('/mcp', (req: Request, _res: Response, next: NextFunction) => {
-    if (req.method === 'POST' && !req.headers['accept']) {
-      req.headers['accept'] = 'application/json, text/event-stream';
+    if (req.method === 'POST') {
+      const accept = req.headers['accept'] ?? '';
+      if (!accept.includes('application/json') || !accept.includes('text/event-stream')) {
+        req.headers['accept'] = 'application/json, text/event-stream';
+      }
     }
     next();
   });
