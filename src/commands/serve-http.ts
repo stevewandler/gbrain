@@ -1094,12 +1094,25 @@ export async function runServeHttp(engine: BrainEngine, options: ServeHttpOption
     try {
       const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined as any });
       await server.connect(transport);
-      // Hono's Node→WebStandard conversion reads req.headers at call time.
-      // Ensure the Accept header satisfies the SDK's check regardless of what
-      // the client sent (Anthropic's server-to-server verify sends Accept: */*).
+      // Hono's Node→WebStandard conversion reads req.rawHeaders (the raw
+      // socket byte array), NOT req.headers (the parsed object). Patching only
+      // req.headers is invisible to Hono. We must patch rawHeaders too so the
+      // Web Standard Request the SDK receives has the correct Accept value.
+      // Anthropic's server-to-server verify sends Accept: */* which fails the
+      // SDK's check for both application/json and text/event-stream.
       const accept = (req.headers['accept'] as string) ?? '';
       if (!accept.includes('application/json') || !accept.includes('text/event-stream')) {
-        req.headers['accept'] = 'application/json, text/event-stream';
+        const target = 'application/json, text/event-stream';
+        req.headers['accept'] = target;
+        let found = false;
+        for (let i = 0; i < req.rawHeaders.length - 1; i += 2) {
+          if (req.rawHeaders[i].toLowerCase() === 'accept') {
+            req.rawHeaders[i + 1] = target;
+            found = true;
+            break;
+          }
+        }
+        if (!found) req.rawHeaders.push('Accept', target);
       }
       await transport.handleRequest(req, res, req.body);
     } catch (e) {
