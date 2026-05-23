@@ -198,7 +198,12 @@ class GBrainClientsStore implements OAuthRegisteredClientsStore {
     const authMethod = client.token_endpoint_auth_method || 'client_secret_post';
     const isPublicClient = authMethod === 'none';
     const clientSecret = isPublicClient ? undefined : generateToken('gbrain_cs_');
-    const secretHash = clientSecret ? hashToken(clientSecret) : null;
+    // SDK's clientAuth middleware does a direct === comparison of client.client_secret
+    // to the raw secret in the request body. getClient() returns the value stored in
+    // client_secret_hash as client_secret, so we must store the RAW secret here, not
+    // its hash. Column name kept as client_secret_hash for back-compat. Trade-off:
+    // confidential client secrets are stored plaintext in the operator's private DB.
+    const secretHash = clientSecret ?? null;
     const now = Math.floor(Date.now() / 1000);
 
     // v0.34.1 (#861, D2 + D13 + #876): DCR clients get source_id='default'
@@ -667,9 +672,10 @@ export class GBrainOAuthProvider implements OAuthServerProvider {
       throw new Error('Client credentials grant not authorized for this client');
     }
 
-    // Verify secret
-    const secretHash = hashToken(clientSecret);
-    if (client.client_secret !== secretHash) throw new Error('Invalid client secret');
+    // Verify secret. v0.35.1.2: secrets are now stored raw (not hashed) so
+    // SDK's direct === comparison in clientAuth middleware works for the
+    // authorization_code path. Match that here for client_credentials too.
+    if (client.client_secret !== clientSecret) throw new Error('Invalid client secret');
 
     // Determine scopes. v0.28 swaps exact-string-match for hasScope so a
     // client whose grant is `admin` can mint tokens that include implied
@@ -735,7 +741,9 @@ export class GBrainOAuthProvider implements OAuthServerProvider {
 
     const clientId = generateToken('gbrain_cl_');
     const clientSecret = generateToken('gbrain_cs_');
-    const secretHash = hashToken(clientSecret);
+    // v0.35.1.2: store raw secret (column name unchanged for back-compat).
+    // See registerClient for rationale.
+    const secretHash = clientSecret;
     const now = Math.floor(Date.now() / 1000);
 
     // v0.34.1 (#861 + #876): persist source_id AND federated_read so
