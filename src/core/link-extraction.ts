@@ -91,6 +91,28 @@ const QUALIFIED_WIKILINK_RE = new RegExp(
 );
 
 /**
+ * Flat-slug wikilink `[[slug]]` or `[[slug|Display Text]]` where the target is
+ * a bare page id with NO `dir/` prefix — e.g. `[[steve-wandler]]`,
+ * `[[meeting-2026-05-27-foo]]`. Brains migrated to a flat slug scheme author
+ * links this way, and the DIR_PATTERN-anchored WIKILINK_RE misses them
+ * entirely — which silently drops every meeting-page `[[person]]` reference and
+ * leaves the graph almost fully orphaned.
+ *
+ * The slug charset is kebab-case (lowercase alnum + hyphen) with NO `/` and NO
+ * `:`, so this never collides with dir-prefixed (`[[people/x]]`) or qualified
+ * (`[[wiki:concepts/x]]`) wikilinks; those spans are also masked out before
+ * this pass runs. An optional `#anchor` is stripped. Unlike bare-prose slug
+ * matching we can't whitelist by DIR_PATTERN here, but a `[[...]]` wikilink is
+ * EXPLICIT authoring intent and every caller validates target-page existence
+ * before writing an edge (runAutoLink + extract drop refs to missing pages),
+ * so a flat token that isn't a real page simply yields no edge.
+ */
+const FLAT_WIKILINK_RE = new RegExp(
+  `\\[\\[([a-z0-9][a-z0-9-]*)(?:#[^|\\]]*)?(?:\\|([^\\]]+?))?\\]\\]`,
+  'g',
+);
+
+/**
  * Strip fenced code blocks (```...```) and inline code (`...`) from markdown,
  * replacing them with whitespace of equivalent length. Preserves byte offsets
  * for any caller that cares about positions; for our extractors this is just
@@ -261,9 +283,12 @@ export function extractEntityRefs(content: string): EntityRef[] {
     qualifiedRanges.push([match.index, match.index + match[0].length]);
   }
 
-  // 2b. Unqualified Obsidian wikilinks: [[path]] or [[path|Display Text]]
-  //     Same shape rule: omit sourceId when unqualified.
+  // 2b. Unqualified dir-prefixed Obsidian wikilinks: [[dir/path]] or
+  //     [[dir/path|Display Text]]. Same shape rule: omit sourceId when
+  //     unqualified. Record matched spans so the flat-slug pass (2c) can't
+  //     re-scan inside a link an earlier pass already claimed.
   const unmasked = maskRanges(stripped, qualifiedRanges);
+  const dirWikilinkRanges: Array<[number, number]> = [];
   const wikiPattern = new RegExp(WIKILINK_RE.source, WIKILINK_RE.flags);
   while ((match = wikiPattern.exec(unmasked)) !== null) {
     let slug = match[1].trim();
@@ -273,6 +298,20 @@ export function extractEntityRefs(content: string): EntityRef[] {
     const displayName = (match[2] || slug).trim();
     const dir = slug.split('/')[0];
     refs.push({ name: displayName, slug, dir });
+    dirWikilinkRanges.push([match.index, match.index + match[0].length]);
+  }
+
+  // 2c. Flat-slug Obsidian wikilinks: [[steve-wandler]] or [[meeting-x|Label]].
+  //     For flat-slug brains (no `dir/` prefix). dir is '' since there is no
+  //     directory segment. Mask the qualified + dir-prefixed spans first so a
+  //     flat token inside an already-matched link isn't double-emitted.
+  const flatHaystack = maskRanges(unmasked, dirWikilinkRanges);
+  const flatPattern = new RegExp(FLAT_WIKILINK_RE.source, FLAT_WIKILINK_RE.flags);
+  while ((match = flatPattern.exec(flatHaystack)) !== null) {
+    const slug = match[1].trim();
+    if (!slug) continue;
+    const displayName = (match[2] || slug).trim();
+    refs.push({ name: displayName, slug, dir: '' });
   }
 
   return refs;
@@ -622,8 +661,9 @@ export const FRONTMATTER_LINK_MAP: FrontmatterFieldMapping[] = [
     dirHint: ['companies', 'funds', 'people'] },
   { fields: ['lead'], pageType: 'deal', type: 'led_round', direction: 'incoming',
     dirHint: ['companies', 'funds', 'people'] },
-  // Meeting pages
-  { fields: ['attendees'], pageType: 'meeting', type: 'attended', direction: 'incoming', dirHint: 'people' },
+  // Meeting pages. `participants` is the field this brain's transcript ingest
+  // writes; `attendees` is the gbrain-canonical alias — accept both.
+  { fields: ['attendees', 'participants'], pageType: 'meeting', type: 'attended', direction: 'incoming', dirHint: 'people' },
   // Any page type
   { fields: ['sources'], type: 'discussed_in', direction: 'incoming', dirHint: ['source', 'media'] },
   { fields: ['source'], type: 'source', direction: 'outgoing', dirHint: '' /* already slug-shaped */ },
@@ -682,6 +722,23 @@ export function makeResolver(
         if (page) {
           cache.set(cacheKey, trimmed);
           return trimmed;
+        }
+      }
+
+      // Step 1b (flat-slug brains): the value may already BE a flat page id
+      // with no `dir/` prefix — e.g. meeting `participants: [raju-datla]` or a
+      // `related: [board-update-2026-05-29]` ref. Try a direct lookup on the
+      // slugified name before dir-hint expansion, so flat brains bind to the
+      // canonical page instead of failing to resolve or matching a legacy
+      // dir-prefixed duplicate. Returns ONLY on an exact page hit, so
+      // dir-prefixed brains (no flat page at that slug) fall straight through
+      // after one indexed PK lookup.
+      const flatSlug = norm(trimmed);
+      if (flatSlug) {
+        const page = await engine.getPage(flatSlug);
+        if (page) {
+          cache.set(cacheKey, flatSlug);
+          return flatSlug;
         }
       }
 
