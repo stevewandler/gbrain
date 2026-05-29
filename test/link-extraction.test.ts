@@ -829,3 +829,130 @@ describe("v0.18.0 migration v22 — links_resolution_type", () => {
   });
 });
 
+// ─────────────────────────────────────────────────────────────────
+// Flat-slug wikilinks [[steve-wandler]] — brains with no dir/ prefix.
+// Without this, a flat-slug brain's meeting pages (every [[person]] in a
+// `## Linked` block) extract zero links and the graph sits ~96% orphaned.
+// ─────────────────────────────────────────────────────────────────
+describe("extractEntityRefs — flat-slug wikilinks", () => {
+  test("extracts a bare [[slug]] with no dir prefix (dir is '')", () => {
+    const refs = extractEntityRefs("Met with [[steve-wandler]] today.");
+    expect(refs).toHaveLength(1);
+    expect(refs[0]).toEqual({ name: "steve-wandler", slug: "steve-wandler", dir: "" });
+  });
+
+  test("extracts flat wikilink with display label", () => {
+    const refs = extractEntityRefs("See [[meeting-2026-05-27-foo|the Roger meeting]].");
+    expect(refs).toHaveLength(1);
+    expect(refs[0].slug).toBe("meeting-2026-05-27-foo");
+    expect(refs[0].name).toBe("the Roger meeting");
+  });
+
+  test("strips #anchor from a flat wikilink", () => {
+    const refs = extractEntityRefs("jump to [[raju-dalta#commitments]].");
+    expect(refs).toHaveLength(1);
+    expect(refs[0].slug).toBe("raju-dalta");
+  });
+
+  test("extracts multiple flat wikilinks (the `## Linked` line pattern)", () => {
+    const refs = extractEntityRefs("People: [[raju-dalta]] · [[roger-stringer]] · [[steve-wandler]]");
+    expect(refs.map(r => r.slug)).toEqual(["raju-dalta", "roger-stringer", "steve-wandler"]);
+  });
+
+  test("dir-prefixed and flat wikilinks coexist without double-emit", () => {
+    const refs = extractEntityRefs("[[people/alice]] and [[bob-jones]]");
+    expect(refs.map(r => r.slug).sort()).toEqual(["bob-jones", "people/alice"]);
+  });
+
+  test("does NOT match a qualified [[source:dir/slug]] as a flat slug", () => {
+    const refs = extractEntityRefs("[[wiki:concepts/ai]]");
+    expect(refs).toHaveLength(1);
+    expect(refs[0].sourceId).toBe("wiki");
+    expect(refs[0].slug).toBe("concepts/ai");
+  });
+
+  test("flat wikilink coexists with markdown link + dir wikilink", () => {
+    const refs = extractEntityRefs("[Alice](people/alice) met [[people/bob]] and [[carol-diaz]].");
+    expect(refs.map(r => r.slug).sort()).toEqual(["carol-diaz", "people/alice", "people/bob"]);
+  });
+
+  test("uppercase-leading token is not matched (slugs are lowercase kebab)", () => {
+    const refs = extractEntityRefs("[[NotASlug]] but [[real-slug]]");
+    expect(refs.map(r => r.slug)).toEqual(["real-slug"]);
+  });
+});
+
+describe("extractPageLinks — flat wikilinks materialize as candidates", () => {
+  test("meeting page flat [[person]] refs become attended candidates", async () => {
+    const { candidates } = await extractPageLinks(
+      "meeting-2026-05-27-raju",
+      "## Linked\nPeople: [[raju-dalta]] · [[steve-wandler]]",
+      {}, "meeting" as never, nullResolver,
+    );
+    const slugs = candidates.map(c => c.targetSlug).sort();
+    expect(slugs).toContain("raju-dalta");
+    expect(slugs).toContain("steve-wandler");
+    for (const c of candidates) expect(c.linkType).toBe("attended");
+  });
+});
+
+describe("makeResolver — flat-slug Step 1b", () => {
+  function makeFlatEngine(slugs: string[]): BrainEngine {
+    const lookup = new Set(slugs);
+    return {
+      async getPage(slug: string) { return lookup.has(slug) ? { slug } as any : null; },
+      async findByTitleFuzzy() { return null; },
+      async searchKeyword() { return []; },
+    } as unknown as BrainEngine;
+  }
+
+  test("resolves a flat participant slug to the canonical flat page", async () => {
+    const engine = makeFlatEngine(["raju-dalta"]);
+    const r = makeResolver(engine);
+    // dirHint 'people' builds people/raju-dalta (absent); Step 1b finds the flat page.
+    expect(await r.resolve("raju-dalta", "people")).toBe("raju-dalta");
+  });
+
+  test("exact dir-prefixed slug (Step 1) still wins over flat fallback", async () => {
+    const engine = makeFlatEngine(["people/pedro"]);
+    const r = makeResolver(engine);
+    expect(await r.resolve("people/pedro", "people")).toBe("people/pedro");
+  });
+
+  test("returns null when neither flat nor dir-hinted page exists", async () => {
+    const engine = makeFlatEngine([]);
+    const r = makeResolver(engine, { mode: "batch" });
+    expect(await r.resolve("ghost-person", "people")).toBeNull();
+  });
+});
+
+describe("FRONTMATTER_LINK_MAP — participants alias", () => {
+  test("participants is an alias of attendees → INCOMING attended on meeting", () => {
+    const m = FRONTMATTER_LINK_MAP.find(m => m.fields.includes("participants"));
+    expect(m).toBeDefined();
+    expect(m!.fields).toContain("attendees");
+    expect(m!.direction).toBe("incoming");
+    expect(m!.pageType).toBe("meeting");
+    expect(m!.type).toBe("attended");
+  });
+
+  test("meeting.participants (flat slugs) → INCOMING attended edges", async () => {
+    // Resolver that treats bare slugs as flat pages (mirrors makeResolver Step 1b).
+    const flat: SlugResolver = {
+      async resolve(name: string) {
+        return /^[a-z0-9][a-z0-9-]*$/.test(name) ? name : null;
+      },
+    };
+    const { candidates } = await extractFrontmatterLinks(
+      "meeting-x", "meeting" as never,
+      { participants: ["raju-dalta", "steve-wandler"] }, flat,
+    );
+    expect(candidates).toHaveLength(2);
+    for (const c of candidates) {
+      expect(c.targetSlug).toBe("meeting-x");
+      expect(c.linkType).toBe("attended");
+      expect(["raju-dalta", "steve-wandler"]).toContain(c.fromSlug!);
+    }
+  });
+});
+
