@@ -86,7 +86,6 @@ describe('GIT_SSRF_FLAGS', () => {
       '-c', 'http.followRedirects=false',
       '-c', 'protocol.file.allow=never',
       '-c', 'protocol.ext.allow=never',
-      '--no-recurse-submodules',
     ]);
   });
 });
@@ -231,7 +230,11 @@ describe('cloneRepo', () => {
     const argv = calls[0];
     // Pin the SSRF flags before the 'clone' verb (codex Q2 invariant).
     expect(argv.slice(0, GIT_SSRF_FLAGS.length)).toEqual([...GIT_SSRF_FLAGS]);
-    expect(argv).toContain('clone');
+    const cloneIdx = argv.indexOf('clone');
+    expect(cloneIdx).toBeGreaterThan(-1);
+    // --no-recurse-submodules must come after 'clone' (it's a subcommand flag, not a global flag).
+    const noRecurseIdx = argv.indexOf('--no-recurse-submodules');
+    expect(noRecurseIdx).toBeGreaterThan(cloneIdx);
     expect(argv).toContain('--depth=1');
     expect(argv).toContain('https://example.com/repo');
     expect(argv[argv.length - 1]).toBe(dest);

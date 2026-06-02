@@ -24,13 +24,14 @@ import { isInternalUrl } from './url-safety.ts';
  * - http.followRedirects=false: closes DNS rebinding via redirect chains
  * - protocol.file.allow=never: no local-file URLs (defense in depth)
  * - protocol.ext.allow=never: no external helpers (`git-remote-foo`)
- * - --no-recurse-submodules: .gitmodules cannot become a second fetch surface
+ *
+ * Note: --no-recurse-submodules is a clone-subcommand flag, not a global git
+ * flag. It is added after 'clone' in cloneRepo rather than here.
  */
 export const GIT_SSRF_FLAGS = [
   '-c', 'http.followRedirects=false',
   '-c', 'protocol.file.allow=never',
   '-c', 'protocol.ext.allow=never',
-  '--no-recurse-submodules',
 ] as const;
 
 export type RemoteUrlErrorCode =
@@ -153,7 +154,7 @@ export function cloneRepo(url: string, destDir: string, opts: CloneOpts = {}): v
     }
   }
 
-  const args: string[] = [...GIT_SSRF_FLAGS, 'clone'];
+  const args: string[] = [...GIT_SSRF_FLAGS, 'clone', '--no-recurse-submodules'];
   if (opts.depth !== 0) {
     args.push(`--depth=${opts.depth ?? 1}`);
   }
