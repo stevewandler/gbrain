@@ -60,7 +60,7 @@ export async function extractTimelineFromMeetings(
   const sourceFilter = opts.sourceIdFilter ? `AND source_id = $1` : '';
   const meetingParams = opts.sourceIdFilter ? [opts.sourceIdFilter] : [];
   const meetings = await engine.executeRaw<MeetingRow>(
-    `SELECT slug, source_id, title, effective_date, updated_at,
+    `SELECT slug, source_id, title, effective_date::date::text AS effective_date, updated_at,
             compiled_truth, COALESCE(timeline, '') AS timeline
        FROM pages
       WHERE type = 'meeting'
@@ -112,8 +112,10 @@ export async function extractTimelineFromMeetings(
     if (!dryRun) {
       try {
         entriesCreated += await engine.addTimelineEntriesBatch(batch);
-      } catch {
-        // batch error — drop; per-meeting progress continues
+      } catch (e) {
+        // Surface batch failures to stderr (was previously silent, which masked
+        // a total-failure bug). Per-meeting progress still continues.
+        console.error('[extract-timeline-from-meetings] batch flush failed:', (e as any)?.message ?? e);
       }
     } else {
       entriesCreated += batch.length;
