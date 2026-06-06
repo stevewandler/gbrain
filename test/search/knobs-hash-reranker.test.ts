@@ -2,7 +2,8 @@
  * v0.35.0.0 — knobsHash reranker-field participation tests.
  *
  * Pins:
- *  - KNOBS_HASH_VERSION === 2 (bumped from 1; CDX1-F14).
+ *  - KNOBS_HASH_VERSION === 3 (bumped 1→2 v0.35.0.0 for reranker; 2→3 v0.35.6.0
+ *    for floor_ratio — codex outside-voice T1 cross-floor cache contamination).
  *  - All 5 new reranker fields participate in the hash:
  *      reranker_enabled, reranker_model, reranker_top_n_in,
  *      reranker_top_n_out, reranker_timeout_ms.
@@ -42,8 +43,21 @@ function baseKnobs(): ResolvedSearchKnobs {
 }
 
 describe('KNOBS_HASH_VERSION + version invariants', () => {
-  test('version is 2 (CDX1-F14: bumped from 1 to fold reranker fields in)', () => {
-    expect(KNOBS_HASH_VERSION).toBe(2);
+  test('version is 9 (…; 6→7 title_boost; 7→8 autocut; 8→9 archive-demote #1777)', () => {
+    // v0.35.0.0: 1→2 to fold reranker fields. v0.35.6.0: 2→3 to fold
+    // floor_ratio. v0.36 wave: piggybacks on v=3 with 7 cross-modal knobs
+    // (D2) PLUS column + provider context (D8/CDX-2 cross-column isolation).
+    // v0.40.4 (salem) + v0.39 T21 (master): 3→4 to fold graph_signals AND
+    // schema_pack name + version (graph-on cache write cannot be served to
+    // graph-off; cross-pack contamination structurally impossible).
+    // v0.40.3.0 (D8): 4→5 to fold contextual_retrieval + kill switch,
+    // sequenced behind salem's v=4 graph-signals.
+    // v0.41.22.0 (type-unification): 5→6 to fold the alias_resolved
+    // post-fusion boost. Cache rows written before the boost stage
+    // cannot leak past the new stage. T2: 6→7 title_boost. v0.42.3.0: 7→8
+    // autocut. issue #1777: 8→9 archive/ demote (search-exclude policy change
+    // isn't in the hash, so the bump invalidates archive-excluded cache rows).
+    expect(KNOBS_HASH_VERSION).toBe(9);
   });
 
   test('hash is 16 hex chars regardless of reranker config', () => {
@@ -148,5 +162,45 @@ describe('append-only convention (CDX2-F13)', () => {
     expect(limIdx).toBeGreaterThan(0);
     expect(rrIdx).toBeGreaterThan(0);
     expect(rrIdx).toBeGreaterThan(limIdx);
+  });
+
+  test('v=3 additions: col= and prov= appear AFTER the reranker block', async () => {
+    // v0.36 D8: cache-key contamination across embedding columns + providers.
+    // The two new tokens must sit at the bottom of parts[] so existing v=2
+    // hashes can only differ in those positions — keeping the append-only
+    // chain auditable for future v=4 readers.
+    const src = await Bun.file(
+      new URL('../../src/core/search/mode.ts', import.meta.url),
+    ).text();
+    const rrtIdx = src.indexOf('rrt=${knobs.reranker_timeout_ms');
+    const colIdx = src.indexOf('col=${ctx?.embeddingColumn');
+    const provIdx = src.indexOf('prov=${ctx?.embeddingModel');
+    expect(rrtIdx).toBeGreaterThan(0);
+    expect(colIdx).toBeGreaterThan(rrtIdx);
+    expect(provIdx).toBeGreaterThan(colIdx);
+  });
+
+  test('v=3 fields participate: column flip changes the hash', () => {
+    const k = baseKnobs();
+    const defaultCol = knobsHash(k, { embeddingColumn: 'embedding', embeddingModel: 'openai:text-embedding-3-large' });
+    const voyageCol = knobsHash(k, { embeddingColumn: 'embedding_voyage', embeddingModel: 'voyage:voyage-3-large' });
+    expect(defaultCol).not.toBe(voyageCol);
+  });
+
+  test('v=3 fields participate: same column + different provider → different hash', () => {
+    const k = baseKnobs();
+    const a = knobsHash(k, { embeddingColumn: 'embedding', embeddingModel: 'openai:text-embedding-3-large' });
+    const b = knobsHash(k, { embeddingColumn: 'embedding', embeddingModel: 'openai:text-embedding-3-small' });
+    expect(a).not.toBe(b);
+  });
+
+  test('v=3 fields fall back to embedding/default when ctx undefined', () => {
+    // Backward-compat: callers that don't know the column (e.g. telemetry
+    // helpers) should still produce a stable hash matching the default
+    // 'embedding' + 'default' provider pair.
+    const k = baseKnobs();
+    const bare = knobsHash(k);
+    const explicit = knobsHash(k, { embeddingColumn: 'embedding', embeddingModel: 'default' });
+    expect(bare).toBe(explicit);
   });
 });
