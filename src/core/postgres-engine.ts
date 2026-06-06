@@ -1571,6 +1571,16 @@ export class PostgresEngine implements BrainEngine {
     } else if (opts?.sourceId) {
       params.push(opts.sourceId);
       sourceClause = `AND p.source_id = $${params.length}`;
+    } else {
+      // v0.42.27 (privacy seal): an UNSCOPED read (local CLI + nightly
+      // dream-cycle, where sourceScopeOpts emits {}) previously matched ALL
+      // sources — including federated:false (isolated) ones. That is the
+      // documented hole at operations.ts:405. Default unscoped reads to
+      // exclude explicitly-isolated sources so a generic/federated search and
+      // the dream-cycle can never surface personal-sensitive content.
+      // Explicit `--source <id>` sets sourceId above and still reaches
+      // isolated sources. Static fragment — no params, no injection surface.
+      sourceClause = `AND p.source_id NOT IN (SELECT id FROM sources WHERE config->>'federated' = 'false')`;
     }
     params.push(innerLimit);
     const innerLimitParam = `$${params.length}`;
@@ -1839,6 +1849,10 @@ export class PostgresEngine implements BrainEngine {
     } else if (opts?.sourceId) {
       params.push(opts.sourceId);
       sourceClause = `AND p.source_id = $${params.length}`;
+    } else {
+      // v0.42.27 (privacy seal): unscoped reads exclude explicitly-isolated
+      // (federated:false) sources. Mirrors searchKeyword — see note there.
+      sourceClause = `AND p.source_id NOT IN (SELECT id FROM sources WHERE config->>'federated' = 'false')`;
     }
     params.push(innerLimit);
     const innerLimitParam = `$${params.length}`;
