@@ -156,9 +156,7 @@ export async function extractFactsFromTurn(input: ExtractInput): Promise<Extract
   cleaned = cleaned.trim();
   if (!cleaned) return [];
 
-  const chatAvailable = isAvailable('chat');
-  console.error(`[extract_facts:debug] isAvailable(chat)=${chatAvailable}`);
-  if (!chatAvailable) {
+  if (!isAvailable('chat')) {
     // No chat gateway → no extraction. Caller still inserts facts via direct
     // `gbrain take add` paths.
     return [];
@@ -166,7 +164,6 @@ export async function extractFactsFromTurn(input: ExtractInput): Promise<Extract
 
   const cap = Math.max(1, Math.min(input.maxFactsPerTurn ?? 10, 25));
   const defaultModel = await getFactsExtractionModel(input.engine);
-  console.error(`[extract_facts:debug] model=${defaultModel} cap=${cap}`);
   let result: ChatResult;
   try {
     result = await chat({
@@ -189,7 +186,6 @@ export async function extractFactsFromTurn(input: ExtractInput): Promise<Extract
     // Re-throw aborts; absorb other errors as "no extraction" — caller's
     // `put_page` backstop will still record the page itself.
     if (isAbort(err)) throw err;
-    console.error(`[extract_facts:debug] chat() threw: ${err instanceof Error ? err.message : String(err)}`);
     return [];
   }
 
