@@ -1,0 +1,17 @@
+node_modules
+.git
+.gbrain
+.playwright-mcp
+*.log
+supabase-password-docs.png
+gbrain
+scripts/_*
+test/
+tests/
+docs/
+evals/
+examples/
+skills/
+recipes/
+tools/
+admin/
