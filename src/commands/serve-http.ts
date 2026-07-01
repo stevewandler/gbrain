@@ -397,6 +397,52 @@ export function skillPublishStatus(publishSkills: boolean): { bannerValue: strin
 
 export async function runServeHttp(engine: BrainEngine, options: ServeHttpOptions) {
   const { port, tokenTtl, enableDcr, publicUrl, logFullParams } = options;
+  
+  // Production startup recovery: clear supervisor wedges + dead jobs before serving
+  if (process.env.NODE_ENV === 'production' || process.env.RAILWAY_PROJECT_ID) {
+    try {
+      console.error('[serve-http] Starting production recovery: supervisor wedge check + dead job cleanup...');
+      
+      // Dead jobs: clean cancelled/failed jobs older than 3 days (quick cleanup before supervisor starts)
+      try {
+        const now = new Date();
+        const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
+        const queue = (engine as any).queue || (engine as any)._queue;
+        if (queue?.db?.query) {
+          await queue.db.query(
+            `DELETE FROM minions_jobs_all 
+             WHERE status IN ('cancelled', 'failed', 'dead')
+             OR (status = 'waiting' AND created_at < $1)`,
+            [threeDaysAgo]
+          );
+          console.error('[serve-http] Dead job cleanup complete');
+        }
+      } catch (e) {
+        console.error('[serve-http] Dead job cleanup skipped (non-critical):', e instanceof Error ? e.message : String(e));
+      }
+      
+      // Supervisor: attempt restart via CLI (safer than direct API)
+      try {
+        const { spawnSync } = await import('child_process');
+        const result = spawnSync('gbrain', ['jobs', 'supervisor', 'stop'], { timeout: 5000, stdio: 'pipe' });
+        if (result.status === 0 || result.status === 1) {
+          // Status 1 may mean already stopped, still OK
+          await new Promise(r => setTimeout(r, 1000));
+          const startResult = spawnSync('gbrain', ['jobs', 'supervisor', 'start'], { timeout: 5000, stdio: 'pipe' });
+          if (startResult.status === 0) {
+            console.error('[serve-http] Supervisor recovered via CLI');
+          } else {
+            console.error('[serve-http] Supervisor start returned status:', startResult.status);
+          }
+        }
+      } catch (e) {
+        console.error('[serve-http] Supervisor recovery via CLI failed (non-critical):', e instanceof Error ? e.message : String(e));
+      }
+    } catch (e) {
+      console.error('[serve-http] Production recovery encountered error, continuing startup:', e);
+    }
+  }
+  
   // v0.34.1 (#864, D11): default bind flipped from 0.0.0.0 to 127.0.0.1.
   // gbrain's primary use case is a personal-knowledge brain on a laptop;
   // the pre-v0.34 default exposed brains on every interface. Server
