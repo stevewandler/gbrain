@@ -26,6 +26,7 @@ import {
   buildContentFlagMarker,
   isQuarantined,
 } from './quarantine.ts';
+import { getEmbeddingModel } from './ai/gateway.ts';
 import { loadConfig, loadConfigWithEngine } from './config.ts';
 import {
   buildContextualPrefix,
@@ -150,6 +151,7 @@ async function extractFencedChunks(
           chunk_index: startChunkIndex + indexOffset++,
           chunk_text: c.text,
           chunk_source: 'fenced_code',
+          model: getEmbeddingModel(),
           language: c.metadata.language,
           symbol_name: c.metadata.symbolName || undefined,
           symbol_type: c.metadata.symbolType,
@@ -641,12 +643,12 @@ export async function importFromContent(
   if (!embedSkipped) {
     if (parsed.compiled_truth.trim()) {
       for (const c of chunkText(parsed.compiled_truth)) {
-        chunks.push({ chunk_index: chunks.length, chunk_text: c.text, chunk_source: 'compiled_truth' });
+        chunks.push({ chunk_index: chunks.length, chunk_text: c.text, chunk_source: 'compiled_truth', model: getEmbeddingModel() });
       }
     }
     if (parsed.timeline?.trim()) {
       for (const c of chunkText(parsed.timeline)) {
-        chunks.push({ chunk_index: chunks.length, chunk_text: c.text, chunk_source: 'timeline' });
+        chunks.push({ chunk_index: chunks.length, chunk_text: c.text, chunk_source: 'timeline', model: getEmbeddingModel() });
       }
     }
 
@@ -1099,6 +1101,7 @@ export async function importCodeFile(
     chunk_index: i,
     chunk_text: c.text,
     chunk_source: 'compiled_truth' as const,
+    model: getEmbeddingModel(),
     language: c.metadata.language,
     symbol_name: c.metadata.symbolName || undefined,
     symbol_type: c.metadata.symbolType,
@@ -1627,6 +1630,7 @@ export async function importImageFile(
     chunk_index: 0,
     chunk_text: ocrText || filename,
     chunk_source: 'image_asset',
+    model: getEmbeddingModel(),
     modality: 'image',
     ...(embedding ? { embedding_image: embedding } : {}),
   };
