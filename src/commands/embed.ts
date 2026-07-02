@@ -6,6 +6,7 @@ import { createProgress, type ProgressReporter } from '../core/progress.ts';
 import { getCliOptions, cliOptsToProgressOptions } from '../core/cli-options.ts';
 import { assertEmbeddingEnabled } from '../core/embedding-dim-check.ts';
 import { loadConfig } from '../core/config.ts';
+import { getEmbeddingModel } from '../core/ai/gateway.ts';
 import { slog, serr } from '../core/console-prefix.ts';
 import { filterOutEmbedSkipped } from '../core/embed-skip.ts';
 import { runSlidingPool } from '../core/worker-pool.ts';
@@ -324,12 +325,12 @@ async function embedPage(
     const inputs: ChunkInput[] = [];
     if (page.compiled_truth.trim()) {
       for (const c of chunkText(page.compiled_truth)) {
-        inputs.push({ chunk_index: inputs.length, chunk_text: c.text, chunk_source: 'compiled_truth' });
+        inputs.push({ chunk_index: inputs.length, chunk_text: c.text, chunk_source: 'compiled_truth', model: getEmbeddingModel() });
       }
     }
     if (page.timeline.trim()) {
       for (const c of chunkText(page.timeline)) {
-        inputs.push({ chunk_index: inputs.length, chunk_text: c.text, chunk_source: 'timeline' });
+        inputs.push({ chunk_index: inputs.length, chunk_text: c.text, chunk_source: 'timeline', model: getEmbeddingModel() });
       }
     }
 
@@ -373,6 +374,7 @@ async function embedPage(
     chunk_index: c.chunk_index,
     chunk_text: c.chunk_text,
     chunk_source: c.chunk_source,
+    model: getEmbeddingModel(),
     embedding: embeddingMap.get(c.chunk_index),
     token_count: c.token_count || Math.ceil(c.chunk_text.length / 4),
   }));
@@ -492,6 +494,7 @@ async function embedAll(
         chunk_index: c.chunk_index,
         chunk_text: c.chunk_text,
         chunk_source: c.chunk_source,
+        model: getEmbeddingModel(),
         embedding: embeddingMap.get(c.chunk_index) ?? undefined,
         token_count: c.token_count || Math.ceil(c.chunk_text.length / 4),
       }));
@@ -702,6 +705,7 @@ async function embedAllStale(
             chunk_index: c.chunk_index,
             chunk_text: c.chunk_text,
             chunk_source: c.chunk_source,
+            model: getEmbeddingModel(),
             embedding: staleIdxToEmbedding.get(c.chunk_index) ?? undefined,
             token_count: c.token_count || Math.ceil(c.chunk_text.length / 4),
           }));
