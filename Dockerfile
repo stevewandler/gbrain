@@ -3,7 +3,8 @@ WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 COPY . .
-RUN mkdir -p /root/.gbrain/schema-packs && cp -r schema-packs/* /root/.gbrain/schema-packs/
+# Explicitly copy schema packs and place them in gbrain's lookup path
+COPY schema-packs/ /root/.gbrain/schema-packs/
 RUN cd admin && bun install --frozen-lockfile && cd .. && bun run build:admin
 ENV PORT=3131
 EXPOSE 3131
