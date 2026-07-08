@@ -1,0 +1,828 @@
+# gbrain-steve-v2 — Steve's founder-brain schema pack
+#
+# Extends gbrain-base-v2 (15-type DRY/MECE canonical) with 2 additions
+# for a founder's knowledge primitives: meeting + personal.
+#
+# Design principles:
+#   1. Stay as close to gbrain-base-v2 as possible — only add what
+#      has genuine structural semantics, not what's just a directory.
+#   2. Every type must serve one of: expert routing, extraction gating,
+#      search filtering with real utility, or structural/timeline semantics.
+#   3. <20 pages → don't codify; 20-100 → alias; 100+ → first-class type.
+#
+# Additions beyond v2:
+#   - meeting (temporal, 1,576 pages): timeline integration, participant
+#     routing, action-item tracking. v2 has email + slack but no meeting.
+#   - personal (concept, 1,210 pages): privacy-scoped, extraction-gated.
+#     The autopilot skips personal-sensitive source — the type enforces this.
+#
+# Collapsed into note (v2 catch-all):
+#   - ideas (1,078 pages) → note subtype:idea path_prefix:wiki/originals/ideas/
+#   - reflections (924 pages) → note subtype:reflection path_prefix:wiki/personal/reflections/
+#   - originals, synthesis, library, ops, inbox, infrastructure, growth,
+#     research, agents, reading, guide, team-shared, reference → note
+#   - drive/ → source (v2 native), wiki/people/ → person (v2 native),
+#     wiki/concepts/ → concept (v2 native)
+#
+# Mapping rules: retype ~43 junk types from gbrain-base era → note
+# with legacy_type preserved for rollback.
+
+api_version: gbrain-schema-pack-v1
+name: gbrain-steve-v2
+version: 1.0.0
+description: Steve's founder-brain pack. 15 v2 canonicals + meeting + personal = 17 types. Successor to gbrain-base-v2.
+gbrain_min_version: 0.42.0
+extends: null
+borrow_from: []
+takes_kinds:
+  - fact
+  - take
+  - bet
+  - hunch
+
+migration_from:
+  pack: gbrain-base-v2
+  version: "1.x"
+
+page_types:
+  # ── v2 canonicals (unchanged) ──────────────────────────────────────
+
+  - name: person
+    primitive: entity
+    path_prefixes:
+      - people/
+      - person/
+      - wiki/people/
+    aliases:
+      - people
+      - contact
+      - individual
+      - founder
+      - partner
+      - partner-profile
+    extractable: false
+    expert_routing: true
+
+  - name: company
+    primitive: entity
+    path_prefixes:
+      - companies/
+      - company/
+      - products/
+      - orgs/
+    subtypes:
+      - name: company
+        when:
+          path_pattern: "^companies/"
+      - name: product
+        when:
+          path_pattern: "^products/"
+      - name: org
+        when:
+          path_pattern: "^orgs/"
+    aliases:
+      - yc-company
+      - product
+      - org
+      - people-org
+      - organization
+      - startup
+      - business
+    extractable: false
+    expert_routing: true
+
+  - name: media
+    primitive: media
+    path_prefixes:
+      - media/
+      - videos/
+      - articles/
+      - essays/
+      - books/
+      - podcasts/
+      - blog/
+      - posts/
+    subtypes:
+      - name: video
+        when:
+          path_pattern: "^videos/"
+      - name: article
+        when:
+          path_pattern: "^articles/"
+      - name: essay
+        when:
+          path_pattern: "^essays/"
+      - name: book
+        when:
+          path_pattern: "^books/"
+      - name: podcast
+        when:
+          path_pattern: "^podcasts/"
+      - name: blog
+        when:
+          path_pattern: "^(blog|posts)/"
+    aliases:
+      - article
+      - video
+      - essay
+      - book
+      - podcast
+      - blog-post
+      - youtube-video
+      - podcast-episode
+      - interview
+    extractable: true
+    expert_routing: false
+
+  - name: tweet
+    primitive: media
+    path_prefixes:
+      - tweets/
+      - twitter/
+    subtypes:
+      - name: single
+        when:
+          frontmatter_field: thread_length
+          frontmatter_value: 1
+      - name: bundle
+        when:
+          frontmatter_field: bundle
+          frontmatter_value: true
+      - name: stub
+        when:
+          frontmatter_field: stub
+          frontmatter_value: true
+    aliases:
+      - tweet-single
+      - tweet-thread
+      - tweet-bundle
+      - tweet-stub
+      - twitter-post
+    extractable: true
+    expert_routing: false
+
+  - name: social-digest
+    primitive: temporal
+    path_prefixes:
+      - digests/social/
+    subtypes:
+      - name: daily
+        when:
+          path_pattern: "/daily/"
+      - name: monthly
+        when:
+          path_pattern: "/monthly/"
+    aliases:
+      - social-digest-daily
+      - social-digest-monthly
+    extractable: false
+    expert_routing: false
+
+  - name: analysis
+    primitive: media
+    path_prefixes:
+      - wiki/analysis/
+      - analysis/
+    aliases:
+      - pricing-analysis
+      - hiring-analysis
+      - market-analysis
+      - competitive-analysis
+      - research
+      - organization-research
+    extractable: true
+    expert_routing: false
+
+  - name: atom
+    primitive: annotation
+    path_prefixes:
+      - atoms/
+    subtypes:
+      - name: extraction
+        when:
+          frontmatter_field: origin
+          frontmatter_value: extraction
+      - name: manual
+        when:
+          frontmatter_field: origin
+          frontmatter_value: manual
+      - name: lore
+        when:
+          frontmatter_field: origin
+          frontmatter_value: lore
+    aliases:
+      - atom-extraction
+      - atom-manual
+      - atom-lore
+      - content-atom
+      - lore
+    extractable: false
+    expert_routing: false
+
+  - name: concept
+    primitive: concept
+    path_prefixes:
+      - wiki/concepts/
+      - wiki/concept/
+    aliases:
+      - concept-stub
+      - definition
+    extractable: true
+    expert_routing: false
+
+  - name: source
+    primitive: media
+    path_prefixes:
+      - sources/
+      - source/
+      - drive/
+      - gdoc/
+    aliases:
+      - sources/article
+      - source/article
+      - transcript
+      - ref
+      - reference
+      - doc
+      - document
+    extractable: true
+    expert_routing: false
+
+  - name: deal
+    primitive: temporal
+    path_prefixes:
+      - deals/
+      - deal/
+    aliases:
+      - investment
+      - term-sheet
+    extractable: false
+    expert_routing: false
+
+  - name: email
+    primitive: temporal
+    path_prefixes:
+      - emails/
+      - email/
+      - gmail/
+    aliases:
+      - email-thread
+    extractable: true
+    expert_routing: false
+
+  - name: slack
+    primitive: temporal
+    path_prefixes:
+      - slack/
+    aliases:
+      - slack-message
+      - slack-thread
+    extractable: true
+    expert_routing: false
+
+  - name: writing
+    primitive: media
+    path_prefixes:
+      - writing/
+    aliases:
+      - draft
+      - post-draft
+    extractable: true
+    expert_routing: false
+
+  - name: project
+    primitive: concept
+    path_prefixes:
+      - projects/
+      - project/
+    aliases:
+      - initiative
+      - workstream
+    extractable: false
+    expert_routing: false
+
+  # ── Steve's additions ──────────────────────────────────────────────
+
+  - name: meeting
+    primitive: temporal
+    path_prefixes:
+      - meetings/
+      - meeting/
+    subtypes:
+      - name: standup
+        when:
+          path_pattern: "stand"
+      - name: one-on-one
+        when:
+          path_pattern: "1-1|one-on-one"
+      - name: sync
+        when:
+          path_pattern: "sync"
+    aliases:
+      - standup
+      - sync
+      - call
+      - session
+    extractable: true
+    expert_routing: false
+
+  - name: personal
+    primitive: concept
+    path_prefixes:
+      - personal/
+    subtypes:
+      - name: memory
+        when:
+          path_pattern: "^personal/memory/"
+      - name: reflection
+        when:
+          path_pattern: "^personal/reflections/"
+      - name: drive-archive
+        when:
+          path_pattern: "^personal/drive-archive/"
+    aliases:
+      - personal-note
+      - private
+    extractable: false
+    expert_routing: false
+
+  # ── Catch-all ──────────────────────────────────────────────────────
+
+  - name: note
+    primitive: concept
+    path_prefixes:
+      - notes/
+      - note/
+      - wiki/originals/ideas/
+      - wiki/originals/
+      - wiki/personal/reflections/
+      - wiki/personal/patterns/
+      - ideas/
+      - reflections/
+      - originals/
+      - synthesis/
+      - ops/
+      - inbox/
+      - infrastructure/
+      - growth/
+      - research/
+      - agents/
+      - reading/
+      - guide/
+      - reference/
+      - team-shared/
+      - dream-cycle-summaries/
+      - library/
+      - extracts/
+      - intel/
+      - ceo-private/
+      - inputs/
+      - bookmarked-strategy/
+      - growth-library/
+    subtypes:
+      - name: idea
+        when:
+          path_pattern: "(wiki/originals/)?ideas/"
+      - name: reflection
+        when:
+          path_pattern: "(wiki/personal/)?reflections/"
+      - name: pattern
+        when:
+          path_pattern: "patterns/"
+      - name: ops
+        when:
+          path_pattern: "^ops/"
+      - name: synthesis
+        when:
+          path_pattern: "^synthesis/"
+      - name: library
+        when:
+          path_pattern: "^library/"
+      - name: strategy
+        when:
+          path_pattern: "strategy/"
+      - name: growth
+        when:
+          path_pattern: "^growth/"
+    aliases:
+      - memo
+      - anecdote
+      - insight
+      - principle
+      - framework
+      - idea
+      - reflection
+      - thought
+      - pattern
+      - original
+      - original-content
+      - extract-receipt
+    extractable: true
+    expert_routing: false
+
+link_types:
+  - name: partner_of
+    inverse: partner_of
+  - name: relates_to
+    inverse: relates_to
+  - name: mentions
+  - name: discusses
+  - name: founded
+    inverse: founded_by
+  - name: works_at
+    inverse: employs
+  - name: invested_in
+    inverse: investor_of
+  - name: sourced_from
+  - name: derived_from
+  - name: supersedes
+  - name: redirects_to
+  - name: attended
+    inverse: attended_by
+  - name: authored
+    inverse: authored_by
+  - name: attributed_to
+
+mapping_rules:
+  # ── v2 mapping rules (unchanged) ───────────────────────────────────
+  # Cluster 1: tweet family
+  - kind: retype
+    from_type: tweet-single
+    to_type: tweet
+    subtype: single
+  - kind: retype
+    from_type: tweet-thread
+    to_type: tweet
+    subtype: bundle
+  - kind: retype
+    from_type: tweet-bundle
+    to_type: tweet
+    subtype: bundle
+  - kind: retype
+    from_type: tweet-stub
+    to_type: tweet
+    subtype: stub
+  - kind: retype
+    from_type: media/x-tweet/bundle
+    to_type: tweet
+    subtype: bundle
+  - kind: retype
+    from_type: media/x-account
+    to_type: social-digest
+  - kind: retype
+    from_type: media/x-account/daily
+    to_type: social-digest
+    subtype: daily
+  - kind: retype
+    from_type: media/x-account/monthly
+    to_type: social-digest
+    subtype: monthly
+
+  # Cluster 2: articles
+  - kind: retype
+    from_type: article
+    to_type: media
+    subtype: article
+  - kind: retype
+    from_type: media/article
+    to_type: media
+    subtype: article
+  - kind: retype
+    from_type: sources/article
+    to_type: source
+  - kind: retype
+    from_type: source/article
+    to_type: source
+
+  # Cluster 3: companies
+  - kind: retype
+    from_type: yc-company
+    to_type: company
+    subtype: company
+  - kind: retype
+    from_type: product
+    to_type: company
+    subtype: product
+  - kind: retype
+    from_type: organization
+    to_type: company
+    subtype: org
+
+  # Cluster 4: atoms
+  - kind: retype
+    from_type: atom-extraction
+    to_type: atom
+    subtype: extraction
+  - kind: retype
+    from_type: content-atom
+    to_type: atom
+    subtype: manual
+  - kind: retype
+    from_type: lore
+    to_type: atom
+    subtype: lore
+  - kind: page_to_link
+    from_type: atom-partner-link
+    link_type: partner_of
+    source_slug_from:
+      frontmatter_field: source
+    target_slug_from:
+      frontmatter_field: target
+  - kind: page_to_link
+    from_type: partner-atom-link
+    link_type: partner_of
+    source_slug_from:
+      frontmatter_field: source
+    target_slug_from:
+      frontmatter_field: target
+
+  # Cluster 5: media/content
+  - kind: retype
+    from_type: video
+    to_type: media
+    subtype: video
+  - kind: retype
+    from_type: youtube-video
+    to_type: media
+    subtype: video
+  - kind: retype
+    from_type: essay
+    to_type: media
+    subtype: essay
+  - kind: retype
+    from_type: blog-post
+    to_type: media
+    subtype: blog
+  - kind: retype
+    from_type: book
+    to_type: media
+    subtype: book
+  - kind: retype
+    from_type: podcast
+    to_type: media
+    subtype: podcast
+  - kind: retype
+    from_type: podcast-episode
+    to_type: media
+    subtype: podcast
+
+  # Cluster 6: analysis
+  - kind: retype
+    from_type: media/analysis
+    to_type: analysis
+  - kind: retype
+    from_type: media-analysis
+    to_type: analysis
+  - kind: retype
+    from_type: media/x-account/analysis
+    to_type: analysis
+  - kind: retype
+    from_type: research
+    to_type: analysis
+  - kind: retype
+    from_type: organization-research
+    to_type: analysis
+  - kind: retype
+    from_type: competitive-intel
+    to_type: analysis
+  - kind: retype
+    from_type: yc/competitive-intel
+    to_type: analysis
+
+  # Cluster 7: concept-redirect → slug_aliases
+  - kind: page_to_alias
+    from_type: concept-redirect
+    canonical_from: body_first_link
+    alias_slug_from: slug
+    notes_from: body_excerpt
+
+  # Cluster 8: documented one-off types → note
+  - kind: retype
+    from_type: civic
+    to_type: note
+    subtype_field: legacy_type
+    subtype: civic
+  - kind: retype
+    from_type: framework
+    to_type: note
+    subtype_field: legacy_type
+    subtype: framework
+  - kind: retype
+    from_type: insight
+    to_type: note
+    subtype_field: legacy_type
+    subtype: insight
+  - kind: retype
+    from_type: anecdote
+    to_type: note
+    subtype_field: legacy_type
+    subtype: anecdote
+
+  # ── Steve's additions: collapse remaining junk types ───────────────
+  - kind: retype
+    from_type: repo-registry
+    to_type: note
+    subtype_field: legacy_type
+    subtype: repo-registry
+  - kind: retype
+    from_type: resource
+    to_type: note
+    subtype_field: legacy_type
+    subtype: resource
+  - kind: retype
+    from_type: guide
+    to_type: note
+    subtype_field: legacy_type
+    subtype: guide
+  - kind: retype
+    from_type: summary
+    to_type: note
+    subtype_field: legacy_type
+    subtype: summary
+  - kind: retype
+    from_type: strategy
+    to_type: note
+    subtype_field: legacy_type
+    subtype: strategy
+  - kind: retype
+    from_type: session
+    to_type: meeting
+    subtype_field: legacy_type
+    subtype: session
+  - kind: retype
+    from_type: agent-knowledge
+    to_type: note
+    subtype_field: legacy_type
+    subtype: agent-knowledge
+  - kind: retype
+    from_type: operations
+    to_type: note
+    subtype_field: legacy_type
+    subtype: operations
+  - kind: retype
+    from_type: feedback
+    to_type: note
+    subtype_field: legacy_type
+    subtype: feedback
+  - kind: retype
+    from_type: project
+    to_type: project
+    subtype_field: legacy_type
+    subtype: project
+  - kind: retype
+    from_type: operating-doc
+    to_type: note
+    subtype_field: legacy_type
+    subtype: operating-doc
+  - kind: retype
+    from_type: infrastructure
+    to_type: note
+    subtype_field: legacy_type
+    subtype: infrastructure
+  - kind: retype
+    from_type: lecture
+    to_type: media
+    subtype_field: legacy_type
+    subtype: lecture
+  - kind: retype
+    from_type: synthesis
+    to_type: note
+    subtype_field: legacy_type
+    subtype: synthesis
+  - kind: retype
+    from_type: wiki
+    to_type: note
+    subtype_field: legacy_type
+    subtype: wiki
+  - kind: retype
+    from_type: configuration
+    to_type: note
+    subtype_field: legacy_type
+    subtype: configuration
+  - kind: retype
+    from_type: coordination
+    to_type: note
+    subtype_field: legacy_type
+    subtype: coordination
+  - kind: retype
+    from_type: daily
+    to_type: note
+    subtype_field: legacy_type
+    subtype: daily
+  - kind: retype
+    from_type: briefing
+    to_type: note
+    subtype_field: legacy_type
+    subtype: briefing
+  - kind: retype
+    from_type: intelligence
+    to_type: note
+    subtype_field: legacy_type
+    subtype: intelligence
+  - kind: retype
+    from_type: procedure
+    to_type: note
+    subtype_field: legacy_type
+    subtype: procedure
+  - kind: retype
+    from_type: intel
+    to_type: note
+    subtype_field: legacy_type
+    subtype: intel
+  - kind: retype
+    from_type: proposal
+    to_type: note
+    subtype_field: legacy_type
+    subtype: proposal
+  - kind: retype
+    from_type: protocol
+    to_type: note
+    subtype_field: legacy_type
+    subtype: protocol
+  - kind: retype
+    from_type: board-update
+    to_type: note
+    subtype_field: legacy_type
+    subtype: board-update
+  - kind: retype
+    from_type: instruction
+    to_type: note
+    subtype_field: legacy_type
+    subtype: instruction
+  - kind: retype
+    from_type: initiative-registry
+    to_type: note
+    subtype_field: legacy_type
+    subtype: initiative-registry
+  - kind: retype
+    from_type: infrastructure-decision
+    to_type: note
+    subtype_field: legacy_type
+    subtype: infrastructure-decision
+  - kind: retype
+    from_type: infrastructure-audit
+    to_type: note
+    subtype_field: legacy_type
+    subtype: infrastructure-audit
+  - kind: retype
+    from_type: incident-report
+    to_type: note
+    subtype_field: legacy_type
+    subtype: incident-report
+  - kind: retype
+    from_type: analysis
+    to_type: analysis
+    subtype_field: legacy_type
+    subtype: analysis
+  - kind: retype
+    from_type: ideas
+    to_type: note
+    subtype_field: legacy_type
+    subtype: ideas
+  - kind: retype
+    from_type: decision
+    to_type: note
+    subtype_field: legacy_type
+    subtype: decision
+  - kind: retype
+    from_type: yc
+    to_type: note
+    subtype_field: legacy_type
+    subtype: yc
+  - kind: retype
+    from_type: take
+    to_type: note
+    subtype_field: legacy_type
+    subtype: take
+  - kind: retype
+    from_type: takes
+    to_type: note
+    subtype_field: legacy_type
+    subtype: takes
+  - kind: retype
+    from_type: task
+    to_type: note
+    subtype_field: legacy_type
+    subtype: task
+  - kind: retype
+    from_type: handoff
+    to_type: note
+    subtype_field: legacy_type
+    subtype: handoff
+  - kind: retype
+    from_type: operating-model
+    to_type: note
+    subtype_field: legacy_type
+    subtype: operating-model
+  - kind: retype
+    from_type: organization
+    to_type: company
+    subtype_field: legacy_type
+    subtype: organization
+
+  # Catch-all: any type not declared above → note with legacy_type preserved
+  - kind: retype
+    from_type: "*unknown*"
+    to_type: note
+    subtype_field: legacy_type
+    subtype: "*original_type*"
