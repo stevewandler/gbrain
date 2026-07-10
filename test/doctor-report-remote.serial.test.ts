@@ -3,7 +3,7 @@
  * powers the run_doctor MCP op.
  *
  * Strategy: build a fresh PGLite engine + initSchema, run the report, assert
- * all 5 checks present + healthy. Uses the canonical PGLite test pattern
+ * key remote-safe checks present + healthy. Uses the canonical PGLite test pattern
  * (beforeAll + afterAll, not beforeEach) per CLAUDE.md test-isolation rules.
  */
 
@@ -39,7 +39,14 @@ afterAll(async () => {
 });
 
 describe('doctorReportRemote', () => {
-  test('runs all 5 checks on a fresh PGLite brain', async () => {
+  test('self-identifies as a non-comparable remote subset', async () => {
+    const report = await doctorReportRemote(engine);
+    expect(report.schema_version).toBe(2);
+    expect(report.surface).toBe('railway_mcp_remote_subset');
+    expect(report.comparable_to_local_cli).toBe(false);
+  });
+
+  test('runs key remote-safe checks on a fresh PGLite brain', async () => {
     const report = await doctorReportRemote(engine);
     expect(report.schema_version).toBe(2);
     expect(report.checks.length).toBeGreaterThanOrEqual(5);

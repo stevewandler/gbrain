@@ -98,6 +98,18 @@ export interface Check {
  */
 export interface DoctorReport {
   schema_version: 2;
+  /**
+   * Additive metadata naming the Doctor surface that produced this report.
+   * Local CLI uses `local_cli_full` by omission/back-compat; the MCP
+   * run_doctor surface sets `railway_mcp_remote_subset` so agents do not
+   * compare its `health_score` 1:1 with the full local CLI Doctor score.
+   */
+  surface?: 'local_cli_full' | 'railway_mcp_remote_subset' | 'thin_client_remote_probe';
+  /**
+   * `false` means this report intentionally uses a different check set than
+   * local CLI Doctor. Treat as a diagnostic supplement, not a health gate.
+   */
+  comparable_to_local_cli?: boolean;
   status: 'healthy' | 'warnings' | 'unhealthy';
   /**
    * Legacy all-checks aggregate. `100 − 20×fails − 5×warns`, floor 0.
@@ -197,18 +209,20 @@ export function computeDoctorReport(checks: Check[]): DoctorReport {
 /**
  * Focused doctor for `run_doctor` MCP op + `gbrain remote doctor` CLI.
  *
- * Runs five checks scoped to "what does a remote operator need to know about
- * this brain right now?":
+ * Runs a remote-safe subset scoped to "what does a remote operator need to
+ * know about this brain right now?":
  *   - connection (engine reachable + page count)
  *   - schema_version (current vs latest)
  *   - brain_score (the 5-component health composite)
  *   - sync_failures (unacked parse failures)
  *   - queue_health (Postgres-only: stalled-forever active jobs)
+ *   - plus remote-safe ops/retrieval/readiness checks that do not require a
+ *     local checkout, skills directory, or eval fixture tree.
  *
  * Deliberately a focused subset of the local doctor surface, NOT a full
- * mirror. Generalizing to lint/integrity/orphans is filed as follow-up work
- * pending demand. Local doctor is unchanged — operators on the host machine
- * still get the full check set.
+ * mirror. Its `health_score` is not directly comparable to local CLI Doctor
+ * because the check set differs. Local doctor is unchanged — operators on the
+ * host machine still get the full check set.
  */
 /**
  * Doctor check: takes.weight grid integrity (v0.32 — EXP-2).
@@ -833,7 +847,11 @@ export async function doctorReportRemote(engine: BrainEngine): Promise<DoctorRep
   // File-plane only (no engine) — works on thin clients too.
   checks.push(checkSelfUpgradeHealth());
 
-  return computeDoctorReport(checks);
+  return {
+    ...computeDoctorReport(checks),
+    surface: 'railway_mcp_remote_subset',
+    comparable_to_local_cli: false,
+  };
 }
 
 /**

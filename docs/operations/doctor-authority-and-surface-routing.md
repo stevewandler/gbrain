@@ -16,6 +16,15 @@ For Steve's production brain, the authoritative Doctor path is:
 
 Remote MCP Doctor surfaces, including Railway-hosted MCP, are cross-checks. They are not allowed to override the local CLI unless the report proves the remote deployment is on the same code version, database, schema pack, and source set.
 
+The Railway MCP `run_doctor` surface is a remote subset report. It must be treated as:
+
+```yaml
+surface: railway_mcp_remote_subset
+comparable_to_local_cli: false
+```
+
+Its `health_score` is a diagnostic supplement, not a direct substitute for local CLI Doctor's full `health_score`.
+
 ## Required health-report fields
 
 Agents must include these fields in G-Brain Doctor summaries:
@@ -27,6 +36,7 @@ Agents must include these fields in G-Brain Doctor summaries:
 - Database/project identity at a non-secret level.
 - Doctor status, health score, brain score, warning count, and warning names.
 - Whether local CLI and remote MCP agree. If they disagree, call it surface drift.
+- Whether the report declares `comparable_to_local_cli: false`.
 
 ## Surface drift protocol
 
