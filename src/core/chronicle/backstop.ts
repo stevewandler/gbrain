@@ -30,7 +30,11 @@ export async function runChronicleBackstop(
   try {
     const { MinionQueue } = await import('../minions/queue.ts');
     const queue = new MinionQueue(ctx.engine);
-    await queue.add('chronicle_extract', { slug: page.slug, sourceId: ctx.sourceId });
+    await queue.add(
+      'chronicle_extract',
+      { slug: page.slug, sourceId: ctx.sourceId },
+      { maxWaiting: 10 },
+    );
     return { enqueued: true };
   } catch {
     return { enqueued: false, skipped: 'enqueue_error' };

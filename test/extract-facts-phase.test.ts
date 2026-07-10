@@ -42,6 +42,24 @@ async function putPage(slug: string, body: string): Promise<void> {
   });
 }
 
+async function seedOntologyFact(input: {
+  entitySlug: string;
+  dimension: string;
+  value: string;
+  source?: string;
+  sourceId?: string;
+  validFrom?: string;
+}): Promise<void> {
+  await engine.mergeOntologyFact({
+    entitySlug: input.entitySlug,
+    dimension: input.dimension,
+    value: input.value,
+    source: input.source ?? 'meetings/test',
+    sourceId: input.sourceId ?? 'default',
+    validFrom: input.validFrom ?? '2026-01-01',
+  });
+}
+
 const FACT_FENCE = (rows: string): string => `# Page
 
 Body.
@@ -210,6 +228,43 @@ describe('runExtractFacts — empty-fence guard (Codex R2-#7)', () => {
     expect(rows.rows[0].fact).toBe('legacy claim');
   });
 
+  test('a legacy backlog only gates reconciliation for its own source', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (engine as any).db.query(
+      `INSERT INTO sources (id, name, config)
+       VALUES ('personal-sensitive', 'personal-sensitive', '{}'::jsonb)
+       ON CONFLICT (id) DO NOTHING`,
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (engine as any).db.query(
+      `INSERT INTO facts (source_id, entity_slug, fact, kind, visibility, notability,
+                          valid_from, source, confidence)
+       VALUES ('personal-sensitive', 'people/alice', 'sensitive legacy claim',
+               'fact', 'private', 'medium', now(), 'mcp:extract_facts', 1.0)`,
+    );
+
+    await putPage('people/alice', FACT_FENCE(
+      `| 1 | default fact | fact | 1.0 | world | high | 2026-01-01 |  | s |  |`,
+    ));
+
+    const defaultResult = await runExtractFacts(engine, {
+      sourceId: 'default',
+      slugs: ['people/alice'],
+    });
+    expect(defaultResult.guardTriggered).toBe(false);
+    expect(defaultResult.legacyRowsPending).toBe(0);
+    expect(defaultResult.factsInserted).toBe(1);
+
+    const sensitiveResult = await runExtractFacts(engine, {
+      sourceId: 'personal-sensitive',
+      slugs: ['people/alice'],
+    });
+    expect(sensitiveResult.guardTriggered).toBe(true);
+    expect(sensitiveResult.legacyRowsPending).toBe(1);
+    expect(sensitiveResult.factsInserted).toBe(0);
+  });
+
   test('guard releases when all legacy rows have been backfilled', async () => {
     // Seed a backfilled (v51) row — row_num + source_markdown_slug set.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -246,6 +301,39 @@ describe('runExtractFacts — empty-fence guard (Codex R2-#7)', () => {
     const r = await runExtractFacts(engine, { slugs: ['people/alice'] });
     expect(r.guardTriggered).toBe(false);
     expect(r.factsInserted).toBe(1);
+  });
+
+  test('ontology rows do NOT trigger the guard and survive reconcile', async () => {
+    await seedOntologyFact({
+      entitySlug: 'people/alice',
+      dimension: 'role',
+      value: 'founder',
+      source: 'meetings/alice',
+    });
+
+    await putPage('people/alice', '# Just a page\n\nNo fence.\n');
+    const r = await runExtractFacts(engine, { slugs: ['people/alice'] });
+
+    expect(r.guardTriggered).toBe(false);
+    expect(r.legacyRowsPending).toBe(0);
+    expect(r.factsDeleted).toBe(0);
+
+    // The ontology row stays put because deleteFactsForPage skips
+    // dimension IS NOT NULL rows.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows = await (engine as any).db.query(
+      `SELECT fact, dimension, row_num, source_markdown_slug
+         FROM facts
+        WHERE entity_slug = 'people/alice'
+        ORDER BY id`,
+    );
+    expect(rows.rows).toHaveLength(1);
+    expect(rows.rows[0]).toMatchObject({
+      fact: 'role: founder',
+      dimension: 'role',
+      row_num: null,
+      source_markdown_slug: 'meetings/alice',
+    });
   });
 });
 

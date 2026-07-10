@@ -82,7 +82,10 @@ export async function runPhasePatterns(
       allowed_slug_prefixes: allowedSlugPrefixes,
     };
     const submitOpts: Partial<MinionJobInput> = {
-      max_stalled: 3,
+      // Patterns is a paid subagent phase. If it wedges, fail once and let the
+      // parent cycle/cooldown surface the problem instead of replaying it.
+      max_attempts: 1,
+      max_stalled: 1,
       timeout_ms: 30 * 60 * 1000,
     };
     const job = await queue.add('subagent', data as unknown as Record<string, unknown>, submitOpts, {

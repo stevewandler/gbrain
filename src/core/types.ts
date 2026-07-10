@@ -1405,19 +1405,17 @@ export interface BrainHealth {
   embed_coverage: number;
   stale_pages: number;
   /**
-   * Islanded pages — zero inbound AND zero outbound links. A hub page
-   * that has references out but no back-references is NOT an orphan under
-   * this definition (it's working as intended as an index). The metric
-   * aims at "pages I forgot to connect to anything", not the stricter
-   * graph-theory "no inbound" definition. Both engines share this
-   * semantics after Bug 11 doc-drift fix.
+   * Entity-scoped islanded pages — graph-required entity pages with zero
+   * inbound AND zero outbound links. Annotation/import/catch-all artifacts
+   * may be intentionally standalone, so they are handled by schema/type
+   * hygiene checks rather than this core brain-quality metric.
    */
   orphan_pages: number;
   missing_embeddings: number;
   /**
    * Composite quality score, 0-100. Weighted sum of five components: embed
-   * coverage, link density, timeline coverage, orphan avoidance, dead-link
-   * avoidance. See the per-component *_score fields below for breakdown.
+   * coverage, link density, entity timeline coverage, entity orphan avoidance,
+   * and dead-link avoidance. See the per-component *_score fields below.
    */
   brain_score: number;
   /**
@@ -1436,8 +1434,7 @@ export interface BrainHealth {
    * Per-component contribution to brain_score. Sum equals brain_score by
    * construction. Displayed by `gbrain doctor` when brain_score < 100.
    * Field names are distinct from the entity-scoped link_coverage /
-   * timeline_coverage above to avoid semantic collision (these reflect
-   * whole-brain measures used in the score formula).
+   * timeline_coverage above to avoid semantic collision.
    */
   embed_coverage_score: number;     // 0-35
   link_density_score: number;        // 0-25

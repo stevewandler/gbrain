@@ -1287,8 +1287,8 @@ describe('PGLiteEngine: getHealth graph metrics', () => {
     expect(h.most_connected[0].link_count).toBe(2);
   });
 
-  test('orphan_pages: pages with neither inbound nor outbound links', async () => {
-    // All 3 pages start with no links. Expect 3 orphans.
+  test('orphan_pages: entity pages with neither inbound nor outbound links', async () => {
+    // All 3 entity pages start with no links. Expect 3 core orphans.
     const h = await engine.getHealth();
     expect(h.orphan_pages).toBe(3);
 

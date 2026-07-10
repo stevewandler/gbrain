@@ -84,6 +84,7 @@ describe('dispatchGlobalMaintenance — single-flight gate', () => {
     expect(added[0].name).toBe('autopilot-global-maintenance');
     expect(added[0].opts.idempotency_key).toBe('autopilot-global:s1');
     expect(added[0].opts.maxWaiting).toBe(1); // structural single-flight
+    expect(added[0].opts.max_attempts).toBe(1); // no paid/global phase replay
     expect(added[0].data.phases).toEqual(GLOBAL_PHASES);
   });
 

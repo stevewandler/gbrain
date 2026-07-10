@@ -4062,19 +4062,25 @@ export class PostgresEngine implements BrainEngine {
     const prefixes = opts?.excludeSourcePrefixes;
     if (prefixes && prefixes.length > 0) {
       // #1928: keep rows whose `source` matches an excluded prefix (e.g.
-      // `cli:` conversation facts). COALESCE so NULL/empty-source fence rows
-      // stay deletable — only the explicitly-protected prefixes survive.
+      // `cli:` conversation facts). Ontology rows (dimension IS NOT NULL)
+      // are DB-owned, not fence-owned, and must also survive reconcile.
+      // COALESCE so NULL/empty-source fence rows stay deletable — only the
+      // explicitly-protected rows survive.
       const patterns = prefixes.map(p => `${p}%`);
       const result = await sql`
         DELETE FROM facts
         WHERE source_id = ${source_id}
           AND source_markdown_slug = ${slug}
+          AND dimension IS NULL
           AND NOT (COALESCE(source, '') LIKE ANY(${patterns}))
       `;
       return { deleted: result.count ?? 0 };
     }
     const result = await sql`
-      DELETE FROM facts WHERE source_id = ${source_id} AND source_markdown_slug = ${slug}
+      DELETE FROM facts
+       WHERE source_id = ${source_id}
+         AND source_markdown_slug = ${slug}
+         AND dimension IS NULL
     `;
     return { deleted: result.count ?? 0 };
   }
@@ -4969,27 +4975,29 @@ export class PostgresEngine implements BrainEngine {
 
   async getHealth(): Promise<BrainHealth> {
     const sql = this.sql;
-    // Bug 11 doc-drift fix — orphan_pages means "islanded" (no inbound AND
-    // no outbound links), aligning both engines with the user-facing
-    // definition. The type comment previously said "no inbound" but the
-    // SQL required both — docs now match code so users can trust the
-    // number. A hub page that links out to many but has no back-references
-    // is working as intended, not an orphan.
+    // `orphan_pages` is entity-scoped by design. Annotation/import/catch-all
+    // artifacts (atoms, source docs, notes, receipts, etc.) may be intentionally
+    // standalone; counting them as core brain-quality failures made healthy
+    // retrieval/indexing look broken on large brains.
     const [h] = await sql`
       WITH entity_pages AS (
-        SELECT id, slug FROM pages WHERE type IN ('person', 'company')
+        SELECT id, slug
+        FROM pages
+        WHERE type IN ('person', 'company', 'organization', 'entity')
+          AND deleted_at IS NULL
       )
       SELECT
-        (SELECT count(*) FROM pages) as page_count,
+        (SELECT count(*) FROM pages WHERE deleted_at IS NULL) as page_count,
         (SELECT count(*) FROM content_chunks WHERE embedded_at IS NOT NULL)::float /
           GREATEST((SELECT count(*) FROM content_chunks), 1)::float as embed_coverage,
         (SELECT count(*) FROM pages p
          WHERE p.updated_at < (SELECT MAX(te.created_at) FROM timeline_entries te WHERE te.page_id = p.id)
         ) as stale_pages,
-        (SELECT count(*) FROM pages p
+        (SELECT count(*) FROM entity_pages p
          WHERE NOT EXISTS (SELECT 1 FROM links l WHERE l.to_page_id = p.id)
            AND NOT EXISTS (SELECT 1 FROM links l WHERE l.from_page_id = p.id)
         ) as orphan_pages,
+        (SELECT count(*) FROM entity_pages) as graph_required_pages,
         (SELECT count(*) FROM links l
          WHERE NOT EXISTS (SELECT 1 FROM pages p WHERE p.id = l.to_page_id)
         ) as dead_links,
@@ -5014,6 +5022,7 @@ export class PostgresEngine implements BrainEngine {
     `;
 
     const pageCount = Number(h.page_count);
+    const graphRequiredPages = Number(h.graph_required_pages);
     const embedCoverage = Number(h.embed_coverage);
     const orphanPages = Number(h.orphan_pages);
     const deadLinks = Number(h.dead_links);
@@ -5022,8 +5031,8 @@ export class PostgresEngine implements BrainEngine {
 
     // brain_score: 0-100 weighted average
     const linkDensity = pageCount > 0 ? Math.min(linkCount / pageCount, 1) : 0;
-    const timelineCoverageWhole = pageCount > 0 ? Math.min(pagesWithTimeline / pageCount, 1) : 0;
-    const noOrphans = pageCount > 0 ? 1 - (orphanPages / pageCount) : 1;
+    const entityTimelineCoverage = Number(h.timeline_coverage);
+    const noOrphans = graphRequiredPages > 0 ? 1 - (orphanPages / graphRequiredPages) : 1;
     const noDeadLinks = pageCount > 0 ? 1 - Math.min(deadLinks / pageCount, 1) : 1;
     // Per-component points. Sum equals brainScore by construction.
     //
@@ -5035,8 +5044,8 @@ export class PostgresEngine implements BrainEngine {
     // who'd just successfully run init. PGLite path has the same fix.
     const embedCoverageScore = pageCount === 0 ? 35 : Math.round(embedCoverage * 35);
     const linkDensityScore = pageCount === 0 ? 25 : Math.round(linkDensity * 25);
-    const timelineCoverageScore = pageCount === 0 ? 15 : Math.round(timelineCoverageWhole * 15);
-    const noOrphansScore = pageCount === 0 ? 15 : Math.round(noOrphans * 15);
+    const timelineCoverageScore = pageCount === 0 ? 15 : Math.round(entityTimelineCoverage * 15);
+    const noOrphansScore = graphRequiredPages === 0 ? 15 : Math.round(noOrphans * 15);
     const noDeadLinksScore = pageCount === 0 ? 10 : Math.round(noDeadLinks * 10);
     const brainScore = embedCoverageScore + linkDensityScore + timelineCoverageScore + noOrphansScore + noDeadLinksScore;
 
@@ -5049,7 +5058,7 @@ export class PostgresEngine implements BrainEngine {
       brain_score: brainScore,
       dead_links: deadLinks,
       link_coverage: Number(h.link_coverage),
-      timeline_coverage: Number(h.timeline_coverage),
+      timeline_coverage: entityTimelineCoverage,
       most_connected: (connected as unknown as { slug: string; link_count: number }[]).map(c => ({
         slug: c.slug,
         link_count: Number(c.link_count),

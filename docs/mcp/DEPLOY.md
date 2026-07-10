@@ -246,6 +246,35 @@ paths outside cwd are rejected. Page slugs and filenames are allowlist-validated
 CLI callers (`gbrain file upload ...`) keep unrestricted filesystem access since
 the user owns the machine.
 
+## Doctor authority and deployment drift
+
+Remote MCP is a separate runtime surface from the local CLI. Do not assume a
+remote `run_doctor` result is equivalent to the operator's local Doctor unless
+the deployment version, database, schema pack, and source set are known to match.
+
+For Steve's production brain, the local CLI path is authoritative:
+
+```text
+/opt/homebrew/bin/gbrain
+  -> /Users/stevewandler/.hermes/scripts/gbrain_wrapper.sh
+  -> bun /Users/stevewandler/github-repos/gbrain/src/cli.ts
+```
+
+When Railway MCP Doctor disagrees with local CLI Doctor, classify it as
+surface drift first. Fix or redeploy the remote MCP surface before treating the
+remote warning as a brain-quality issue.
+
+Remote MCP health summaries should include:
+
+- MCP endpoint/deployment identity.
+- GBrain version or commit.
+- Database/project identity at a non-secret level.
+- Schema pack.
+- Source count.
+- Doctor status, health score, brain score, warning count, and warning names.
+
+See [Doctor Authority and Surface Routing](../operations/doctor-authority-and-surface-routing.md).
+
 ## Deployment Options
 
 See [ALTERNATIVES.md](ALTERNATIVES.md) for a comparison of ngrok, Tailscale

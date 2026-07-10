@@ -2027,12 +2027,26 @@ export async function runCycle(
 
         if (phases.includes('propose_takes')) {
           checkAborted(opts.signal);
-          progress.start('cycle.propose_takes');
-          const { runPhaseProposeTakes } = await import('./cycle/propose-takes.ts');
-          const { result, duration_ms } = await timePhase(() => runPhaseProposeTakes(calibrationCtx, { repoPath: brainDir ?? undefined }) as Promise<PhaseResult>);
-          result.duration_ms = duration_ms;
-          phaseResults.push(result);
-          progress.finish();
+          const enabledRaw = await engine.getConfig('cycle.propose_takes.enabled');
+          if (enabledRaw === 'false') {
+            phaseResults.push({
+              phase: 'propose_takes',
+              status: 'skipped',
+              duration_ms: 0,
+              summary: 'cycle.propose_takes.enabled=false',
+              details: {
+                reason: 'disabled',
+                enable_hint: 'gbrain config set cycle.propose_takes.enabled true',
+              },
+            });
+          } else {
+            progress.start('cycle.propose_takes');
+            const { runPhaseProposeTakes } = await import('./cycle/propose-takes.ts');
+            const { result, duration_ms } = await timePhase(() => runPhaseProposeTakes(calibrationCtx, { repoPath: brainDir ?? undefined }) as Promise<PhaseResult>);
+            result.duration_ms = duration_ms;
+            phaseResults.push(result);
+            progress.finish();
+          }
           await safeYield(opts.yieldBetweenPhases);
         }
 

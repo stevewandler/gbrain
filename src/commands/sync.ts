@@ -1001,6 +1001,17 @@ async function writeSyncAnchor(
   await engine.setConfig(`sync.${which}`, value);
 }
 
+async function stampSyncFreshness(engine: BrainEngine, sourceId: string | undefined): Promise<void> {
+  if (sourceId) {
+    await engine.executeRaw(
+      `UPDATE sources SET last_sync_at = now() WHERE id = $1`,
+      [sourceId],
+    );
+    return;
+  }
+  await engine.setConfig('sync.last_sync_at', new Date().toISOString());
+}
+
 /**
  * v0.20.0 Cathedral II Layer 12 (SP-1 fix) — read/write the chunker version
  * last used to sync a given source. When it mismatches CURRENT_CHUNKER_VERSION,
@@ -1786,6 +1797,10 @@ async function performSyncInner(engine: BrainEngine, opts: SyncOpts): Promise<Sy
       detachedWorkingTreeManifest.renamed.length > 0);
 
   if (lastCommit === headCommit && !versionMismatch && !versionNeverSet && !hasDetachedWorkingTreeChanges) {
+    // A no-op sync is still a successful freshness proof. Previously this
+    // returned before any durable stamp, so Doctor kept reporting unchanged
+    // sources as stale even after `gbrain sync --source <id>` succeeded.
+    await stampSyncFreshness(engine, opts.sourceId);
     return {
       status: 'up_to_date',
       fromCommit: lastCommit,

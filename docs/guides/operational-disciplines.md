@@ -1,7 +1,7 @@
 # Operational Disciplines
 
 ## Goal
-Five non-negotiable rules that separate a production brain from a demo -- signal detection, brain-first lookup, sync after every write, daily heartbeat, and nightly dream cycle.
+Six non-negotiable rules that separate a production brain from a demo -- signal detection, brain-first lookup, sync after every write, daily heartbeat, nightly dream cycle, and authority-surface discipline.
 
 ## What the User Gets
 Without this: the agent misses signals in conversation, wastes money on external APIs when the brain already has the answer, leaves search results stale after writes, and lets the brain rot quietly. With this: every message is scanned for entities, the brain is always consulted first, search is always current, health is monitored daily, and the brain compounds overnight.
@@ -57,6 +57,10 @@ on daily_schedule("09:00"):
     # Checks: database connectivity, embedding health, sync status,
     # page count, stale pages, broken links
     # If doctor reports issues, fix them before doing anything else.
+    # The report is invalid unless it names the surface used.
+    # For Steve's production brain, local CLI is authoritative:
+    # /opt/homebrew/bin/gbrain -> ~/.hermes/scripts/gbrain_wrapper.sh
+    # -> ~/github-repos/gbrain/src/cli.ts.
 
 # DISCIPLINE 5: Nightly Dream Cycle
 on nightly_schedule("02:00"):
@@ -98,6 +102,25 @@ on nightly_schedule("02:00"):
 #   5. Add to cron -- automate it
 # Each entity type and signal source has exactly one owner skill.
 # Two skills creating the same page = coverage violation.
+
+# DISCIPLINE 6: Authority Surface + GitHub Notes (MANDATORY)
+on any_gbrain_health_or_infra_change():
+    # Health reports must say what they actually queried.
+    # "Doctor says X" is not enough. Which Doctor?
+    report.surface = one_of("local_cli", "local_stdio_mcp", "railway_mcp", "other")
+    report.command_or_tool = exact_invocation
+    report.version_or_deploy = version_or_deploy_identity
+
+    if report.surface != "local_cli":
+        local = run("/opt/homebrew/bin/gbrain doctor --json")
+        compare(local, report)
+        if disagrees(local, report):
+            classify("surface_drift")
+            fix_or_redeploy_remote_surface_before_diagnosing_brain()
+
+    # Infrastructure changes are not complete until they leave an operator note.
+    # Wrappers, Railway MCP, LaunchAgents, cron, queue workers, embeddings,
+    # calibration, and sync changes require docs/operations or docs/incidents notes.
 ```
 
 ## Tricky Spots
@@ -107,6 +130,7 @@ on nightly_schedule("02:00"):
 3. **Signal detection must fire on EVERY message.** Not just messages that look important. The user says "I talked to Pedro yesterday about the board seat" in passing -- that's a timeline entry on Pedro's page, a potential update to his State section, and a signal about the board. If the agent doesn't catch it, the system is broken.
 4. **Brain-first saves money AND gives better answers.** The brain has context that external APIs don't: relationship history, meeting notes, the user's own assessment. An API lookup for "Pedro Franceschi" returns a LinkedIn profile. The brain returns the full picture including private context.
 5. **`gbrain doctor` catches silent failures.** Embedding pipelines can stall, sync can fail silently, database connections can drop. The daily heartbeat catches these before they compound into data loss.
+6. **A Doctor report without a surface is not a Doctor report.** Local CLI, local MCP, and Railway MCP can be different code paths. If agents do not name the surface and version, they can mistake deployment drift for brain drift.
 
 ## How to Verify
 
@@ -115,6 +139,7 @@ on nightly_schedule("02:00"):
 3. Write a new page with `gbrain put`, then immediately run `gbrain search` for it. Confirm it appears in results (verifies sync ran).
 4. Run `gbrain doctor`. Confirm it returns a health report with database status, page count, and any flagged issues.
 5. After a dream cycle runs, check a page that had unlinked entity mentions. Confirm new links were added (`gbrain get_links <slug>`).
+6. For any MCP Doctor report, run `/opt/homebrew/bin/gbrain doctor --json` locally and confirm the two surfaces agree, or open a surface-drift incident.
 
 ---
 *Part of the [GBrain Skillpack](../GBRAIN_SKILLPACK.md).*

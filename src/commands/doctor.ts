@@ -3230,6 +3230,10 @@ export async function computeExtractAtomsBacklogCheck(
  *
  * Reads the extract_rollup_7d table (migration v106) for the last 7 days
  * and reports per-kind aggregates. Stable JSON envelope schema_version:1.
+ * Warn/fail posture is based on recent rows (last 24h), while the 7-day
+ * aggregate remains in details for incident forensics. This keeps fixed
+ * extractor incidents from poisoning Doctor for a full week after the current
+ * extractor has gone healthy again.
  *
  * 3-state status:
  *   - OK when rollup is empty (no extractions yet) OR every per-kind
@@ -3263,6 +3267,8 @@ export async function computeExtractHealthCheck(
       eval_fail_count: number;
       halt_count: number;
       round_completed_count: number;
+      recent_halt_count: number;
+      recent_round_completed_count: number;
       rollup_write_failures: number;
       last_updated_at: Date | string | null;
     };
@@ -3275,6 +3281,8 @@ export async function computeExtractHealthCheck(
          SUM(eval_fail_count) AS eval_fail_count,
          SUM(halt_count) AS halt_count,
          SUM(round_completed_count) AS round_completed_count,
+         SUM(CASE WHEN updated_at >= NOW() - INTERVAL '24 hours' THEN halt_count ELSE 0 END) AS recent_halt_count,
+         SUM(CASE WHEN updated_at >= NOW() - INTERVAL '24 hours' THEN round_completed_count ELSE 0 END) AS recent_round_completed_count,
          SUM(rollup_write_failures) AS rollup_write_failures,
          MAX(updated_at) AS last_updated_at
        FROM extract_rollup_7d
@@ -3304,6 +3312,9 @@ export async function computeExtractHealthCheck(
       halt_count: number;
       round_completed_count: number;
       halt_rate: number;
+      recent_halt_count: number;
+      recent_round_completed_count: number;
+      recent_halt_rate: number;
       last_updated_at: string | null;
     };
 
@@ -3311,6 +3322,9 @@ export async function computeExtractHealthCheck(
       const halts = Number(r.halt_count) || 0;
       const completed = Number(r.round_completed_count) || 0;
       const total = halts + completed;
+      const recentHalts = Number(r.recent_halt_count) || 0;
+      const recentCompleted = Number(r.recent_round_completed_count) || 0;
+      const recentTotal = recentHalts + recentCompleted;
       return {
         kind: r.kind,
         cost_7d_usd: Number(r.cost_7d_usd) || 0,
@@ -3319,6 +3333,9 @@ export async function computeExtractHealthCheck(
         halt_count: halts,
         round_completed_count: completed,
         halt_rate: total > 0 ? halts / total : 0,
+        recent_halt_count: recentHalts,
+        recent_round_completed_count: recentCompleted,
+        recent_halt_rate: recentTotal > 0 ? recentHalts / recentTotal : 0,
         last_updated_at: r.last_updated_at
           ? new Date(r.last_updated_at).toISOString()
           : null,
@@ -3332,18 +3349,18 @@ export async function computeExtractHealthCheck(
 
     // High halt rates: per F-OUT-19 doctor surfaces extractor health
     // distinctly from rollup write health.
-    const highHaltKinds = kinds.filter(k => k.halt_rate > 0.10);
+    const highHaltKinds = kinds.filter(k => k.recent_halt_rate > 0.10);
 
     if (highHaltKinds.length > 0) {
       const top3 = [...highHaltKinds]
-        .sort((a, b) => b.halt_rate - a.halt_rate)
+        .sort((a, b) => b.recent_halt_rate - a.recent_halt_rate)
         .slice(0, 3)
-        .map(k => `${k.kind}=${(k.halt_rate * 100).toFixed(1)}%`)
+        .map(k => `${k.kind}=${(k.recent_halt_rate * 100).toFixed(1)}%`)
         .join(', ');
       return {
         name,
         status: 'warn',
-        message: `${highHaltKinds.length} kind(s) with halt rate > 10% (top: ${top3})`,
+        message: `${highHaltKinds.length} kind(s) with current halt rate > 10% (last 24h; top: ${top3})`,
         details: {
           schema_version: 1,
           kinds,
@@ -4856,9 +4873,9 @@ export async function buildChecks(
   // 3d.3 v0.41.13.0 — conversation_format_coverage. Scans up to 200
   // most-recent conversation-type pages, runs parseConversation in
   // dry mode, reports per-pattern hit counts + unmatched count. Warn
-  // at >10% unmatched with paste-ready hint pointing at
-  // `gbrain conversation-parser scan <slug>` so the operator can
-  // triage the misses interactively.
+  // at >10% unmatched only when LLM fallback is disabled; if fallback is
+  // enabled, poor built-in regex coverage is an OK-but-visible capability
+  // note rather than an unresolved health warning.
   if (engine) {
     try {
       const { parseConversation } = await import('../core/conversation-parser/parse.ts');
@@ -4892,15 +4909,28 @@ export async function buildChecks(
           .map(([k, v]) => `${k}=${v}`)
           .join(', ');
         if (unmatchedPct > 10) {
-          checks.push({
-            name: 'conversation_format_coverage',
-            status: 'warn',
-            message:
-              `${unmatched}/${sample.length} conversation pages (${unmatchedPct.toFixed(1)}%) match NO built-in pattern. ` +
-              `Breakdown: ${breakdown}. ` +
-              `Investigate: gbrain conversation-parser scan <slug> | ` +
-              `Enable LLM fallback (opt-in): gbrain config set conversation_parser.llm_fallback_enabled true`,
-          });
+          const fallbackRaw = await engine.getConfig('conversation_parser.llm_fallback_enabled');
+          const fallbackEnabled = fallbackRaw != null &&
+            !['false', '0', 'no', 'off', ''].includes(fallbackRaw.trim().toLowerCase());
+          if (fallbackEnabled) {
+            checks.push({
+              name: 'conversation_format_coverage',
+              status: 'ok',
+              message:
+                `${unmatched}/${sample.length} conversation pages (${unmatchedPct.toFixed(1)}%) match NO built-in pattern, ` +
+                `but LLM fallback is enabled. Breakdown: ${breakdown}`,
+            });
+          } else {
+            checks.push({
+              name: 'conversation_format_coverage',
+              status: 'warn',
+              message:
+                `${unmatched}/${sample.length} conversation pages (${unmatchedPct.toFixed(1)}%) match NO built-in pattern. ` +
+                `Breakdown: ${breakdown}. ` +
+                `Investigate: gbrain conversation-parser scan <slug> | ` +
+                `Enable LLM fallback (opt-in): gbrain config set conversation_parser.llm_fallback_enabled true`,
+            });
+          }
         } else {
           checks.push({
             name: 'conversation_format_coverage',
@@ -5854,9 +5884,12 @@ export async function buildChecks(
 
   // 9b. v0.41.18.0 — orphan_ratio check (migration #1 of #1409).
   //
-  // Surfaces the fraction of linkable pages with no inbound links.
-  // Consumes the same canonical getOrphansData() pure fn as
-  // `gbrain orphans --count` (D1), so the two surfaces cannot disagree.
+  // Surfaces the fraction of entity pages with no inbound links.
+  // This is intentionally narrower than `gbrain orphans --count`, which is a
+  // broad curation backlog and includes notes, artifacts, atoms/annotations,
+  // receipts, source documents, and other non-core graph material. Doctor is a
+  // brain-quality gate, so its orphan signal must match getHealth(): people,
+  // companies, organizations, and explicit entity pages.
   //
   // Skip when entity count < 100 (vacuous — small brains naturally
   // show high orphan ratio; not actionable signal).
@@ -5864,16 +5897,18 @@ export async function buildChecks(
   // `gbrain extract links --by-mention` as the fix.
   // v0.41.29.0: explicit `--source <id>` scopes this check to one source
   // (orphanRatioSourceId, parsed at the top of buildChecks). The entity-count
-  // gate + getOrphansData both scope to it; messages name the source. Bare
+  // gate + orphan count both scope to it; messages name the source. Bare
   // doctor (no --source) stays brain-wide.
   progress.heartbeat('orphan_ratio');
   try {
-    const { getOrphansData } = await import('./orphans.ts');
     const srcId = orphanRatioSourceId;
     const inSource = srcId ? ` in source '${srcId}'` : '';
+    const entityTypeFilter = `p.type IN ('entity', 'person', 'company', 'organization')`;
+    const sourceFilter = srcId ? ' AND p.source_id = $1' : '';
+    const params = srcId ? [srcId] : [];
     const entityCount = (await engine.executeRaw<{ count: number }>(
-      `SELECT COUNT(*)::int AS count FROM pages WHERE type IN ('entity', 'person', 'company', 'organization') AND deleted_at IS NULL${srcId ? ' AND source_id = $1' : ''}`,
-      srcId ? [srcId] : [],
+      `SELECT COUNT(*)::int AS count FROM pages p WHERE ${entityTypeFilter} AND p.deleted_at IS NULL${sourceFilter}`,
+      params,
     ))[0]?.count ?? 0;
     // Brain-wide (no --source): <100 entities is vacuous — small brains
     // naturally show a high orphan ratio; not actionable signal. Skip.
@@ -5888,8 +5923,18 @@ export async function buildChecks(
       // about one source — answer it even below 100 entities, with a
       // low-scale caveat, instead of swallowing a real per-source failure
       // (e.g. 80 fully-orphaned entity pages) behind a vacuous "ok".
-      const data = await getOrphansData(engine, { includePseudo: false, sourceId: srcId });
-      const ratio = data.total_linkable > 0 ? data.total_orphans / data.total_linkable : 0;
+      const orphanCount = (await engine.executeRaw<{ count: number }>(
+        `SELECT COUNT(*)::int AS count
+           FROM pages p
+          WHERE ${entityTypeFilter}
+            AND p.deleted_at IS NULL${sourceFilter}
+            AND NOT EXISTS (
+              SELECT 1 FROM links l
+               WHERE l.to_page_id = p.id
+            )`,
+        params,
+      ))[0]?.count ?? 0;
+      const ratio = entityCount > 0 ? orphanCount / entityCount : 0;
       const pct = (ratio * 100).toFixed(0);
       const caveat =
         entityCount < 100
@@ -5902,19 +5947,19 @@ export async function buildChecks(
         checks.push({
           name: 'orphan_ratio',
           status: 'fail',
-          message: `Orphan ratio ${pct}%${inSource} (${data.total_orphans}/${data.total_linkable} linkable pages have no inbound links)${caveat}. ${hint}`,
+          message: `Orphan ratio ${pct}%${inSource} (${orphanCount}/${entityCount} entity pages have no inbound links)${caveat}. ${hint}`,
         });
       } else if (ratio > 0.5) {
         checks.push({
           name: 'orphan_ratio',
           status: 'warn',
-          message: `Orphan ratio ${pct}%${inSource} (${data.total_orphans}/${data.total_linkable} linkable pages have no inbound links)${caveat}. ${hint}`,
+          message: `Orphan ratio ${pct}%${inSource} (${orphanCount}/${entityCount} entity pages have no inbound links)${caveat}. ${hint}`,
         });
       } else {
         checks.push({
           name: 'orphan_ratio',
           status: 'ok',
-          message: `Orphan ratio ${pct}%${inSource} (${data.total_orphans}/${data.total_linkable} linkable pages)${caveat}`,
+          message: `Orphan ratio ${pct}%${inSource} (${orphanCount}/${entityCount} entity pages)${caveat}`,
         });
       }
     }
@@ -6215,8 +6260,9 @@ export async function buildChecks(
   //
   // - oversized_pages: indexed-free table scan (~100ms on 100K-page brains)
   //   counting pages whose body (compiled_truth + timeline, UTF-8 bytes
-  //   via octet_length per Codex r2 #13) exceeds the block threshold.
-  //   Status warn when 1+ rows; never fail (oversize is now a soft state).
+  //   via octet_length per Codex r2 #13) exceeds the block threshold AND has
+  //   not been accepted as non-embeddable via frontmatter.embed_skip.
+  //   Status warn when 1+ unaccepted rows; never fail (oversize is now a soft state).
   // - scraper_junk_pages: capped 1000-most-recent default + --content-audit
   //   opt-in for full scan (D10 mirrors --index-audit precedent). Applies
   //   the assessor per-page on title + 2KB head-slice + frontmatter.
@@ -6242,6 +6288,7 @@ export async function buildChecks(
              octet_length(p.compiled_truth) + octet_length(COALESCE(p.timeline, '')) AS bytes
       FROM pages p
       WHERE p.deleted_at IS NULL
+        AND NOT (COALESCE(p.frontmatter, '{}'::jsonb) ? 'embed_skip')
         AND (octet_length(p.compiled_truth) + octet_length(COALESCE(p.timeline, ''))) > ${bytesBlock}
       ORDER BY bytes DESC
       LIMIT 100
@@ -6250,7 +6297,7 @@ export async function buildChecks(
       checks.push({
         name: 'oversized_pages',
         status: 'ok',
-        message: `No pages exceed ${bytesBlock} bytes`,
+        message: `No unaccepted pages exceed ${bytesBlock} bytes`,
       });
     } else {
       const oversizeRows = rows as unknown as Array<{ slug: string; source_id: string; bytes: number }>;
@@ -6362,10 +6409,11 @@ export async function buildChecks(
         .join(', ');
       // Audit events are evidence, not automatically breakage. A large code
       // source can legitimately emit many WARN events (oversize/markup-heavy)
-      // while remaining searchable and intentionally flagged. Fail on hard
-      // dispositions (content actually blocked or hidden); warn on soft
-      // dispositions or volume. This keeps doctor from treating expected
-      // code-corpus telemetry as an unhealthy brain.
+      // while remaining searchable and intentionally flagged. Current markers
+      // are surfaced by the sibling `quarantined_pages`, `flagged_pages`, and
+      // `oversized_pages` checks below. This audit-history check should only
+      // degrade health for hard dispositions (content actually blocked,
+      // rejected, or hidden), otherwise it remains an OK forensic summary.
       //
       // v0.42 renamed the hard path: a rejected page emits `reject` and a
       // quarantined (hidden) junk page emits `quarantine`; `hard_block` is now
@@ -6376,9 +6424,7 @@ export async function buildChecks(
       const hardBlocked =
         summary.by_type.hard_block + summary.by_type.reject + summary.by_type.quarantine;
       const softBlocked = summary.by_type.soft_block + summary.by_type.flag;
-      const status: 'ok' | 'warn' | 'fail' =
-        hardBlocked > 0 ? 'fail' :
-          (softBlocked > 0 || events.length >= 10) ? 'warn' : 'ok';
+      const status: 'ok' | 'fail' = hardBlocked > 0 ? 'fail' : 'ok';
       checks.push({
         name: 'content_sanity_audit_recent',
         status,
@@ -6424,11 +6470,14 @@ export async function buildChecks(
       `SELECT COUNT(*)::int AS n FROM pages p WHERE p.deleted_at IS NULL AND p.frontmatter ? 'content_flag'`,
     );
     const n = Number(rows[0]?.n ?? 0);
-    // Flagged pages are "examine me", not "broken" — warn so they're visible
-    // but the message is non-alarming.
+    // Flagged pages are "examine me", not "broken". They stay searchable by
+    // design and the warning rides with retrieval/get_page output. Doctor
+    // should expose the count without degrading health; hard/hidden content is
+    // covered by `quarantined_pages`, and unaccepted oversized content by
+    // `oversized_pages`.
     checks.push({
       name: 'flagged_pages',
-      status: n > 0 ? 'warn' : 'ok',
+      status: 'ok',
       message: n > 0
         ? `${n} page(s) flagged (markup-heavy or oversize) — still searchable, agent warned on retrieval. Review with 'gbrain quarantine list --include-flagged'.`
         : 'No flagged pages',

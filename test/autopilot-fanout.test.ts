@@ -196,6 +196,7 @@ describe('dispatchPerSource — integration with stubbed engine + queue', () => 
     expect(added[0].name).toBe('autopilot-cycle');
     expect((added[0].data as Record<string, unknown>).source_id).toBeUndefined();
     expect(added[0].opts.idempotency_key).toBe('autopilot-cycle:2026-05-22T12:00:00.000Z');
+    expect(added[0].opts.max_attempts).toBe(1);
   });
 
   test('listAllSources throwing also falls back to legacy', async () => {
@@ -220,6 +221,9 @@ describe('dispatchPerSource — integration with stubbed engine + queue', () => 
     // source_id threaded through job data
     const sourceIds = added.map(j => (j.data as Record<string, unknown>).source_id).sort();
     expect(sourceIds).toEqual(['alpha', 'beta']);
+    for (const job of added) {
+      expect(job.opts.max_attempts).toBe(1);
+    }
   });
 
   test('pull: true only when source.config.remote_url is set', async () => {

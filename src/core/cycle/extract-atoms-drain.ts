@@ -132,6 +132,12 @@ export interface DrainForSourceOpts {
   brainDir?: string;
   /** Hard batch cap (belt-and-suspenders). */
   maxBatches?: number;
+  /**
+   * Max DB pages per extract_atoms phase invocation. The normal phase can
+   * discover up to 50 pages; drain mode must use smaller batches so the
+   * wallclock window is meaningful between LLM calls.
+   */
+  pageLimitPerBatch?: number;
   /** Optional per-batch progress sink (stderr line in dream; job progress in the handler). */
   onBatch?: ExtractAtomsDrainDeps['onBatch'];
 }
@@ -154,7 +160,12 @@ export async function runExtractAtomsDrainForSource(
         const r = await runPhaseExtractAtoms(engine, {
           sourceId: extractionSourceId,
           dryRun: false,
-          brainDir: opts.brainDir,
+          // Drain mode is the remediation for Doctor's DB-page backlog check.
+          // Do not discover transcript files here: one transcript LLM call can
+          // overrun the drain window, and transcripts are not counted by
+          // extract_atoms_backlog.
+          _transcripts: [],
+          pageLimit: opts.pageLimitPerBatch ?? 1,
         });
         const d = (r.details ?? {}) as Record<string, unknown>;
         return {

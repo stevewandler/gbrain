@@ -486,8 +486,8 @@ export async function checkTypeProliferation(
         status: 'fail',
         message:
           `${n} distinct page types (pack declares ${declared}). ` +
-          `Run \`gbrain onboard --check --explain\` to preview a pack upgrade ` +
-          `or define a custom pack with mapping_rules.`,
+          `Preview with \`gbrain jobs submit unify-types --allow-protected --follow --params '{"target_pack":"<pack>","apply":false}'\`, ` +
+          `then apply with apply=true, or define a custom pack with mapping_rules.`,
       },
       remediations: [],  // pack_upgrade_available check emits the actionable step
     };

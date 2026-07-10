@@ -23,8 +23,8 @@
  *
  * Empty-fence guard (Codex R2-#7): the phase refuses to do its
  * destructive reconciliation pass when legacy rows (row_num IS NULL,
- * entity_slug IS NOT NULL) still exist in the brain — they're the
- * v0.31 hot-memory facts pending the v0_32_2 backfill. Status returns
+ * entity_slug IS NOT NULL) still exist for the active source — they're
+ * the v0.31 hot-memory facts pending the v0_32_2 backfill. Status returns
  * `warn` with a hint to run `gbrain apply-migrations --yes`. Without
  * the guard, an interrupted upgrade where v0_32_2 hasn't run could
  * leave the cycle silently misreporting "0 facts on people/alice"
@@ -113,12 +113,17 @@ export async function runExtractFacts(
   };
 
   // ── Empty-fence guard (Codex R2-#7) ────────────────────────────
-  // Pre-check: if any legacy fact rows exist (row_num NULL but
-  // entity_slug NOT NULL), refuse to run the destructive
-  // reconciliation pass. The v0_32_2 orchestrator must complete
-  // first.
+  // Pre-check: if legacy prose fact rows exist for this source (row_num
+  // NULL, entity_slug NOT NULL, and no ontology dimension), refuse to run
+  // its destructive reconciliation pass. Another source's backlog cannot
+  // make this source unsafe; ontology rows are DB-owned and need no backfill.
   const legacy = await engine.executeRaw<{ n: string }>(
-    `SELECT COUNT(*) AS n FROM facts WHERE row_num IS NULL AND entity_slug IS NOT NULL`,
+    `SELECT COUNT(*) AS n FROM facts
+      WHERE row_num IS NULL
+        AND entity_slug IS NOT NULL
+        AND dimension IS NULL
+        AND source_id = $1`,
+    [sourceId],
   );
   const legacyCount = parseInt(legacy[0]?.n ?? '0', 10);
   result.legacyRowsPending = legacyCount;

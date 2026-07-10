@@ -76,6 +76,8 @@ export interface ExtractAtomsOpts {
   sourceId?: string;
   dryRun?: boolean;
   affectedSlugs?: string[];
+  /** Optional page discovery cap. Drain mode uses this to make batches truly bounded. */
+  pageLimit?: number;
   /** Test seam: alternative chat function (bypasses real LLM calls). */
   _chat?: typeof gatewayChat;
   /**
@@ -167,6 +169,7 @@ export async function discoverExtractablePages(
   engine: BrainEngine,
   sourceId: string,
   affectedSlugs?: string[],
+  limit: number = PAGE_DISCOVERY_BUDGET,
 ): Promise<DiscoveredPage[]> {
   const hasFilter = Array.isArray(affectedSlugs) && affectedSlugs.length > 0;
   const sql = `
@@ -197,7 +200,7 @@ export async function discoverExtractablePages(
     sourceId,
     EXTRACTABLE_PAGE_TYPES as unknown as string[],
     MIN_PAGE_CHARS_FOR_EXTRACTION,
-    PAGE_DISCOVERY_BUDGET,
+    Math.max(0, Math.min(limit, PAGE_DISCOVERY_BUDGET)),
   ];
   if (hasFilter) params.push(affectedSlugs);
 
@@ -379,7 +382,7 @@ export async function runPhaseExtractAtoms(
   if (opts._pages !== undefined) {
     pages = opts._pages;
   } else {
-    pages = await discoverExtractablePages(engine, sourceId, opts.affectedSlugs);
+    pages = await discoverExtractablePages(engine, sourceId, opts.affectedSlugs, opts.pageLimit);
   }
 
   // 2. Apply transcript-side source-hash idempotency in ONE batch query

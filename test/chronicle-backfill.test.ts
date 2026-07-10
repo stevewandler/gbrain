@@ -43,4 +43,17 @@ describe('chronicle_backfill op', () => {
     const jobs = await engine.executeRaw<{ n: number }>(`SELECT count(*)::int AS n FROM minion_jobs WHERE name='chronicle_extract'`);
     expect(Number(jobs[0].n)).toBe(2);
   });
+
+  test('caps waiting chronicle_extract backlog at Doctor threshold', async () => {
+    for (let i = 0; i < 12; i++) {
+      await engine.putPage(`meetings/m${i}`, { type: 'meeting', title: `m${i}`, compiled_truth: LONG });
+    }
+    const r = await operationsByName.chronicle_backfill.handler(mkCtx(), {}) as { eligible: number; errors: unknown[] };
+    expect(r.eligible).toBe(12);
+    expect(r.errors).toHaveLength(0);
+    const jobs = await engine.executeRaw<{ n: number }>(
+      `SELECT count(*)::int AS n FROM minion_jobs WHERE name='chronicle_extract' AND status='waiting'`,
+    );
+    expect(Number(jobs[0].n)).toBe(10);
+  });
 });

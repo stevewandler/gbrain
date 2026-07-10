@@ -80,4 +80,9 @@ describe('patterns scope filter', () => {
   test('caps gather to 100 reflections (cost control)', () => {
     expect(patternsSrc).toContain('LIMIT 100');
   });
+
+  test('subagent submit is one-shot to prevent paid retry loops', () => {
+    expect(patternsSrc).toContain('max_attempts: 1');
+    expect(patternsSrc).toContain('max_stalled: 1');
+  });
 });

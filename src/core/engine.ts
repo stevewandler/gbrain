@@ -1736,11 +1736,13 @@ export interface BrainEngine {
    * the re-insert puts them back with `valid_until = today` per the
    * `extract-from-fence` derivation contract.
    *
-   * Pre-v51 rows (NULL `source_markdown_slug`) are NEVER deleted by this
-   * call — the partial UNIQUE index on `row_num IS NOT NULL` is the
-   * structural guarantee that legacy rows live in a different keyspace
-   * until the v0_32_2 migration backfills them. Cycle-phase callers in
-   * commit 7 add the empty-fence-guard as a belt-and-suspenders check.
+   * Pre-v51 prose rows (NULL `source_markdown_slug`) are NEVER deleted by
+   * this call, and ontology rows (`dimension IS NOT NULL`) are also
+   * preserved. The partial UNIQUE index on `row_num IS NOT NULL` is the
+   * structural guarantee that legacy prose rows live in a different
+   * keyspace until the v0_32_2 migration backfills them. Cycle-phase
+   * callers in commit 7 add the empty-fence-guard as a
+   * belt-and-suspenders check.
    */
   /**
    * #1928: `excludeSourcePrefixes` protects facts whose `source` matches any

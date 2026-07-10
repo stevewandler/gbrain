@@ -72,6 +72,31 @@ async function seedLegacyFact(input: {
   return r.rows[0].id;
 }
 
+async function seedOntologyFact(input: {
+  entity_slug: string;
+  fact: string;
+  source_id?: string;
+  source_markdown_slug?: string;
+}): Promise<number> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const r = await (engine as any).db.query(
+    `INSERT INTO facts (
+       source_id, entity_slug, fact, kind, visibility, notability,
+       valid_from, source, confidence, dimension, value, source_markdown_slug
+     )
+     VALUES ($1, $2, $3, 'fact', 'private', 'medium', now(), 'mcp:put_page', 1.0,
+             'role', 'founder', $4)
+     RETURNING id`,
+    [
+      input.source_id ?? 'default',
+      input.entity_slug,
+      input.fact,
+      input.source_markdown_slug ?? input.entity_slug,
+    ],
+  );
+  return r.rows[0].id;
+}
+
 describe('phaseASchema', () => {
   test('passes when schema is at v51', async () => {
     // initSchema ran v51, so the version config + columns are set.
@@ -95,13 +120,13 @@ describe('phaseASchema', () => {
 describe('phaseBFenceFacts — dry-run reporting', () => {
   test('reports counts without writing FS or updating DB', async () => {
     await seedLegacyFact({ entity_slug: 'people/alice', fact: 'Founded Acme' });
-    await seedLegacyFact({ entity_slug: 'people/bob', fact: 'Met at YC W22' });
     await seedLegacyFact({ entity_slug: null, fact: 'Unparented claim' });
+    await seedOntologyFact({ entity_slug: 'people/bob', fact: 'Ontology founder' });
 
     const r = await __testing.phaseBFenceFacts(engine, DRY_OPTS);
     expect(r.status).toBe('skipped');
     expect(r.detail).toContain('dry-run');
-    expect(r.detail).toContain('would fence 2 rows');  // 3 total - 1 unparented
+    expect(r.detail).toContain('would fence 1 rows');
     expect(r.detail).toContain('1 unfenceable');
 
     // No files created.
@@ -140,6 +165,44 @@ describe('phaseBFenceFacts — happy path backfill', () => {
     );
     expect(rows.rows[0]).toMatchObject({ id: id1, row_num: 1, source_markdown_slug: 'people/alice' });
     expect(rows.rows[1]).toMatchObject({ id: id2, row_num: 2, source_markdown_slug: 'people/alice' });
+  });
+
+  test('skips ontology rows during the sweep and leaves them unfenced', async () => {
+    await seedLegacyFact({ entity_slug: 'people/alice', fact: 'Founded Acme' });
+    await seedOntologyFact({
+      entity_slug: 'people/alice',
+      fact: 'role: founder',
+      source_markdown_slug: 'people/alice',
+    });
+
+    const r = await __testing.phaseBFenceFacts(engine, OPTS);
+    expect(r.status).toBe('complete');
+    expect(r.detail).toContain('fenced=1');
+    expect(r.detail).toContain('pages=1');
+
+    const body = readFileSync(join(brainDir, 'people/alice.md'), 'utf-8');
+    expect(body).toContain('Founded Acme');
+    expect(body).not.toContain('role: founder');
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows = await (engine as any).db.query(
+      `SELECT fact, dimension, row_num, source_markdown_slug
+         FROM facts
+        ORDER BY id`,
+    );
+    expect(rows.rows).toHaveLength(2);
+    expect(rows.rows[0]).toMatchObject({
+      fact: 'Founded Acme',
+      dimension: null,
+      row_num: 1,
+      source_markdown_slug: 'people/alice',
+    });
+    expect(rows.rows[1]).toMatchObject({
+      fact: 'role: founder',
+      dimension: 'role',
+      row_num: null,
+      source_markdown_slug: 'people/alice',
+    });
   });
 
   test('groups by entity page — multi-entity batch touches multiple files', async () => {

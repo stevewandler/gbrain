@@ -3985,19 +3985,24 @@ export class PGLiteEngine implements BrainEngine {
     const prefixes = opts?.excludeSourcePrefixes;
     if (prefixes && prefixes.length > 0) {
       // #1928: keep rows whose `source` matches an excluded prefix (e.g.
-      // `cli:` conversation facts). COALESCE so NULL/empty-source fence rows
-      // stay deletable — only the explicitly-protected prefixes survive.
+      // `cli:` conversation facts). Ontology rows (dimension IS NOT NULL)
+      // are DB-owned, not fence-owned, and must also survive reconcile.
+      // COALESCE so NULL/empty-source fence rows stay deletable — only the
+      // explicitly-protected rows survive.
       const patterns = prefixes.map(p => `${p}%`);
       const result = await this.db.query(
         `DELETE FROM facts
            WHERE source_id = $1 AND source_markdown_slug = $2
+             AND dimension IS NULL
              AND NOT (COALESCE(source, '') LIKE ANY($3::text[]))`,
         [source_id, slug, patterns],
       );
       return { deleted: result.affectedRows ?? 0 };
     }
     const result = await this.db.query(
-      `DELETE FROM facts WHERE source_id = $1 AND source_markdown_slug = $2`,
+      `DELETE FROM facts
+        WHERE source_id = $1 AND source_markdown_slug = $2
+          AND dimension IS NULL`,
       [source_id, slug],
     );
     return { deleted: result.affectedRows ?? 0 };
@@ -4970,21 +4975,25 @@ export class PGLiteEngine implements BrainEngine {
     // dashboard, v0.10.3 metrics give entity-page-level granularity.
     const { rows: [h] } = await this.db.query(`
       WITH entity_pages AS (
-        SELECT id, slug FROM pages WHERE type IN ('person', 'company')
+        SELECT id, slug
+        FROM pages
+        WHERE type IN ('person', 'company', 'organization', 'entity')
+          AND deleted_at IS NULL
       )
       SELECT
-        (SELECT count(*) FROM pages) as page_count,
+        (SELECT count(*) FROM pages WHERE deleted_at IS NULL) as page_count,
         (SELECT count(*) FROM content_chunks WHERE embedded_at IS NOT NULL)::float /
           GREATEST((SELECT count(*) FROM content_chunks), 1)::float as embed_coverage,
         (SELECT count(*) FROM pages p
          WHERE p.updated_at < (SELECT MAX(te.created_at) FROM timeline_entries te WHERE te.page_id = p.id)
         ) as stale_pages,
-        -- Bug 11 — orphan = islanded (no inbound AND no outbound).
-        -- See BrainHealth.orphan_pages docstring; docs updated to match this.
-        (SELECT count(*) FROM pages p
+        -- Entity-scoped islanded count. Annotation/import/catch-all artifacts
+        -- can be intentionally standalone and should not tank core brain score.
+        (SELECT count(*) FROM entity_pages p
          WHERE NOT EXISTS (SELECT 1 FROM links l WHERE l.to_page_id = p.id)
            AND NOT EXISTS (SELECT 1 FROM links l WHERE l.from_page_id = p.id)
         ) as orphan_pages,
+        (SELECT count(*) FROM entity_pages) as graph_required_pages,
         (SELECT count(*) FROM links l
          WHERE NOT EXISTS (SELECT 1 FROM pages p WHERE p.id = l.to_page_id)
         ) as dead_links,
@@ -5011,6 +5020,7 @@ export class PGLiteEngine implements BrainEngine {
 
     const r = h as Record<string, unknown>;
     const pageCount = Number(r.page_count);
+    const graphRequiredPages = Number(r.graph_required_pages);
     const embedCoverage = Number(r.embed_coverage);
     const orphanPages = Number(r.orphan_pages);
     const deadLinks = Number(r.dead_links);
@@ -5018,8 +5028,8 @@ export class PGLiteEngine implements BrainEngine {
     const pagesWithTimeline = Number(r.pages_with_timeline);
 
     const linkDensity = pageCount > 0 ? Math.min(linkCount / pageCount, 1) : 0;
-    const timelineCoverageDensity = pageCount > 0 ? Math.min(pagesWithTimeline / pageCount, 1) : 0;
-    const noOrphans = pageCount > 0 ? 1 - (orphanPages / pageCount) : 1;
+    const entityTimelineCoverage = Number(r.timeline_coverage);
+    const noOrphans = graphRequiredPages > 0 ? 1 - (orphanPages / graphRequiredPages) : 1;
     const noDeadLinks = pageCount > 0 ? 1 - Math.min(deadLinks / pageCount, 1) : 1;
     // Bug 11 — per-component points. Sum equals brainScore by construction
     // so `doctor` can render a breakdown that adds up to the total.
@@ -5032,8 +5042,8 @@ export class PGLiteEngine implements BrainEngine {
     // who'd just successfully run init.
     const embedCoverageScore = pageCount === 0 ? 35 : Math.round(embedCoverage * 35);
     const linkDensityScore = pageCount === 0 ? 25 : Math.round(linkDensity * 25);
-    const timelineCoverageScore = pageCount === 0 ? 15 : Math.round(timelineCoverageDensity * 15);
-    const noOrphansScore = pageCount === 0 ? 15 : Math.round(noOrphans * 15);
+    const timelineCoverageScore = pageCount === 0 ? 15 : Math.round(entityTimelineCoverage * 15);
+    const noOrphansScore = graphRequiredPages === 0 ? 15 : Math.round(noOrphans * 15);
     const noDeadLinksScore = pageCount === 0 ? 10 : Math.round(noDeadLinks * 10);
     const brainScore = embedCoverageScore + linkDensityScore + timelineCoverageScore + noOrphansScore + noDeadLinksScore;
 
@@ -5046,7 +5056,7 @@ export class PGLiteEngine implements BrainEngine {
       brain_score: brainScore,
       dead_links: deadLinks,
       link_coverage: Number(r.link_coverage),
-      timeline_coverage: Number(r.timeline_coverage),
+      timeline_coverage: entityTimelineCoverage,
       most_connected: (connected as { slug: string; link_count: number }[]).map(c => ({
         slug: c.slug,
         link_count: Number(c.link_count),

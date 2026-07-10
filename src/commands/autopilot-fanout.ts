@@ -292,7 +292,7 @@ export async function readRecentSourceFailures(
 
 /**
  * Claim-time cooldown guard (codex #5 / D4): a job already queued or retrying
- * (max_attempts:2) can reach the worker after the dispatch gate decided. The
+ * (max_attempts:1) can reach the worker after the dispatch gate decided. The
  * handler calls this immediately before runCycle; an in-cooldown claim becomes
  * a no-op skip (NOT a failure — it must not re-arm the cooldown). Shares the
  * exact cooldown math with the dispatch gate (DRY).
@@ -395,7 +395,9 @@ export async function dispatchPerSource(
       {
         queue: 'default',
         idempotency_key: `autopilot-cycle:${opts.slot}`,
-        max_attempts: 2,
+        // Autopilot cycles can contain paid LLM phases. A failure should surface
+        // and enter cooldown, not automatically replay the whole cycle.
+        max_attempts: 1,
         timeout_ms: opts.timeoutMs,
         maxWaiting: 1,
       },
@@ -448,7 +450,9 @@ export async function dispatchPerSource(
           // Per-source idempotency key — two ticks for the same source
           // within the same slot coalesce; different sources never collide.
           idempotency_key: `autopilot-cycle:${src.id}:${opts.slot}`,
-          max_attempts: 2,
+          // One-shot by design: repeated cycle failures are handled by the
+          // per-source failure cooldown instead of automatic paid retries.
+          max_attempts: 1,
           timeout_ms: opts.timeoutMs,
           // DELIBERATELY no maxWaiting: 1 here. maxWaiting is per
           // (name, queue), so it would coalesce all N per-source jobs
@@ -557,7 +561,10 @@ export async function dispatchGlobalMaintenance(
       // Structural single-flight: one global job per slot; maxWaiting:1 coalesces
       // any surplus so a slow brain-wide pass never stacks duplicates.
       idempotency_key: `autopilot-global:${opts.slot}`,
-      max_attempts: 2,
+      // Global maintenance includes potentially paid/global phases (embed,
+      // skillopt, purge). Keep it one-shot so a transient failure does not
+      // replay the whole maintenance pass.
+      max_attempts: 1,
       timeout_ms: opts.timeoutMs,
       maxWaiting: 1,
     },

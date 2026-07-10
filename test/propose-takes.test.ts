@@ -14,6 +14,7 @@
  *  - parseExtractorOutput unit tests for the raw JSON parser
  */
 
+import { readFileSync } from 'fs';
 import { describe, test, expect } from 'bun:test';
 import {
   runPhaseProposeTakes,
@@ -28,6 +29,8 @@ import {
 import type { OperationContext } from '../src/core/operations.ts';
 import type { BrainEngine } from '../src/core/engine.ts';
 import type { Page } from '../src/core/types.ts';
+
+const cycleSrc = readFileSync(new URL('../src/core/cycle.ts', import.meta.url), 'utf-8');
 
 // ─── Mock engine ────────────────────────────────────────────────────
 
@@ -92,6 +95,14 @@ function buildCtx(engine: BrainEngine): OperationContext {
 }
 
 // ─── parseExtractorOutput ───────────────────────────────────────────
+
+describe('cycle propose_takes gate', () => {
+  test('cycle.propose_takes.enabled=false skips the phase before runner import', () => {
+    expect(cycleSrc).toContain("engine.getConfig('cycle.propose_takes.enabled')");
+    expect(cycleSrc).toContain("summary: 'cycle.propose_takes.enabled=false'");
+    expect(cycleSrc).toContain("reason: 'disabled'");
+  });
+});
 
 describe('parseExtractorOutput', () => {
   test('parses a clean JSON array', () => {

@@ -23,9 +23,10 @@
  * the user can review the diff before committing.
  *
  * Facts with NULL entity_slug are structurally unfenceable (no page to
- * fence onto). They're skipped with a warning; the operator decides
- * whether to hand-curate or delete them. Their row_num stays NULL
- * forever; they live in the legacy keyspace permanently.
+ * fence onto). Ontology rows (dimension IS NOT NULL) are also skipped:
+ * they are DB-owned, not fence-owned, and must survive the reconcile /
+ * backfill passes intact. The operator only needs to reason about the
+ * legacy prose rows in the row_num NULL + dimension NULL keyspace.
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync } from 'node:fs';
@@ -157,11 +158,16 @@ async function phaseBFenceFacts(
     if (!engine) return { name: 'fence_facts', status: 'skipped', detail: 'no_brain_configured' };
     try {
       const counts = await engine.executeRaw<{ n: string }>(
-        `SELECT COUNT(*) AS n FROM facts WHERE row_num IS NULL`,
+        `SELECT COUNT(*) AS n FROM facts
+          WHERE row_num IS NULL
+            AND dimension IS NULL`,
       );
       const total = parseInt(counts[0]?.n ?? '0', 10);
       const noEntity = await engine.executeRaw<{ n: string }>(
-        `SELECT COUNT(*) AS n FROM facts WHERE row_num IS NULL AND entity_slug IS NULL`,
+        `SELECT COUNT(*) AS n FROM facts
+          WHERE row_num IS NULL
+            AND dimension IS NULL
+            AND entity_slug IS NULL`,
       );
       const noEntityCount = parseInt(noEntity[0]?.n ?? '0', 10);
       return {
@@ -204,8 +210,9 @@ async function phaseBFenceFacts(
               context, valid_from, valid_until, source, confidence
          FROM facts
         WHERE row_num IS NULL
+          AND dimension IS NULL
         ORDER BY source_id, entity_slug, id`,
-    );
+      );
 
     const outcome: PhaseBOutcome = {
       scanned: legacy.length,
@@ -217,7 +224,8 @@ async function phaseBFenceFacts(
     };
 
     // Group by (source_id, entity_slug) so each page's fence is updated
-    // atomically with all its legacy rows.
+    // atomically with all its legacy prose rows. Ontology rows are
+    // DB-owned and intentionally excluded from this backfill.
     const groups = new Map<string, LegacyFactRow[]>();
     for (const row of legacy) {
       if (row.entity_slug === null) {

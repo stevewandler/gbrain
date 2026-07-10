@@ -116,6 +116,7 @@ describe('runChronicleExtract', () => {
 describe('runChronicleBackstop gating', () => {
   beforeEach(async () => {
     await engine.unsetConfig('auto_chronicle');
+    await engine.executeRaw(`DELETE FROM minion_jobs WHERE name = 'chronicle_extract'`);
     await engine.putPage('meetings/bs', { type: 'meeting', title: 'bs', compiled_truth: LONG_BODY });
   });
 
@@ -135,5 +136,20 @@ describe('runChronicleBackstop gating', () => {
     expect(r.enqueued).toBe(true);
     const jobs = await engine.executeRaw<{ n: number }>(`SELECT count(*)::int AS n FROM minion_jobs WHERE name = 'chronicle_extract'`);
     expect(Number(jobs[0].n)).toBeGreaterThanOrEqual(1);
+  });
+
+  test('caps waiting chronicle_extract backlog at Doctor threshold', async () => {
+    await engine.setConfig('auto_chronicle', 'true');
+    for (let i = 0; i < 12; i++) {
+      const r = await runChronicleBackstop(
+        { slug: `meetings/bs-${i}`, type: 'meeting', compiled_truth: LONG_BODY },
+        { engine, sourceId: 'default' },
+      );
+      expect(r.enqueued).toBe(true);
+    }
+    const jobs = await engine.executeRaw<{ n: number }>(
+      `SELECT count(*)::int AS n FROM minion_jobs WHERE name = 'chronicle_extract' AND status = 'waiting'`,
+    );
+    expect(Number(jobs[0].n)).toBe(10);
   });
 });
