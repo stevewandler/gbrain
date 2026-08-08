@@ -278,7 +278,23 @@ and reapply them forever.
   recovery window; a spot-check before then is the last cheap chance to catch
   a bad merge.
 
-## Anti-patterns
+## Output Format
+
+Report the sweep, then the repairs, then the deadline.
+
+```
+Detected: {N} candidate pairs ({N} case A, {N} case B, {N} case C, {N} fabricated)
+Repaired: {N} moved, {N} retired, {N} merged, {N} aliased
+Titles fixed: {N}
+Upstream: {N} vocabulary terms refreshed, {N} speaker entries corrected
+Recoverable until: {timestamp} — spot-check merged pages before then
+```
+
+Always name the merged pages explicitly and list any content dropped from a
+retired stub — never let a discard be silent. If a fabricated entity was
+dissolved, say which page absorbed its real content.
+
+## Anti-Patterns
 
 | Don't | Why |
 |---|---|
