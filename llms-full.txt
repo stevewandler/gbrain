@@ -1387,6 +1387,7 @@ This is the dispatcher. Skills are the implementation. **Read the skill file bef
 | "watch this video", "process this YouTube link", "ingest this PDF", "save this podcast", "process this book", "summarize this book", "PDF book", "ingest it into my brain", "what's in this screenshot", "check out this repo" | `skills/media-ingest/SKILL.md` |
 | Meeting transcript received | `skills/meeting-ingestion/SKILL.md` |
 | "duplicate person pages", "merge duplicate pages", "this person doesn't exist", "why are there two pages for", "clean up transcript names", "speaker names are wrong", "entity cleanup", "the name is misspelled in my brain" | `skills/transcript-identity-hygiene/SKILL.md` |
+| "is my sync actually working", "audit the ingestion pipeline", "the cron says ok but nothing is showing up", "transcripts aren't reaching my brain", "why did the same meeting get ingested twice", "pipeline health check" | `skills/ingestion-pipeline-audit/SKILL.md` (run BEFORE transcript-identity-hygiene — don't clean while the pipeline still mints duplicates) |
 | Generic "ingest this" (auto-routes to above) | `skills/ingest/SKILL.md` |
 
 ## Thinking skills (from GStack)

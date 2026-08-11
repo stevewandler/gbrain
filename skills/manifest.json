@@ -85,6 +85,11 @@
       "description": "Prevent and repair entity corruption from mis-transcribed names: detect duplicate/fabricated people, classify move/retire/merge, close the tap upstream"
     },
     {
+      "name": "ingestion-pipeline-audit",
+      "path": "ingestion-pipeline-audit/SKILL.md",
+      "description": "Audit an automated ingestion pipeline end to end: hop-by-hop verification by destination state, idempotency keying, multi-writer identity collision, payload integrity, runbook drift"
+    },
+    {
       "name": "citation-fixer",
       "path": "citation-fixer/SKILL.md",
       "description": "Audit and fix citation formatting across brain pages."
