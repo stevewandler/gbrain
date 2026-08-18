@@ -1,6 +1,8 @@
 FROM oven/bun:1.3.14-alpine
 WORKDIR /app
 COPY package.json bun.lock ./
+# v0.46: postinstall hook runs `bun run scripts/postinstall.ts` — scripts/ must exist before install (build failure 2026-08-18)
+COPY scripts/ scripts/
 RUN bun install --frozen-lockfile
 COPY . .
 # Explicitly copy schema packs and place them in gbrain's lookup path
