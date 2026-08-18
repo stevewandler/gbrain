@@ -54,8 +54,9 @@ export interface FactsBackstopCtx {
    *   - 'mcp:extract_facts'  — explicit MCP op (inline mode)
    *   - 'file_upload'        — file_upload import path
    *   - 'code_import'        — code import path
+   *   - 'hook:compact'       — compaction-boundary checkpoint harvest (cathedral 5)
    */
-  source: 'sync:import' | 'mcp:put_page' | 'mcp:extract_facts' | 'file_upload' | 'code_import';
+  source: 'sync:import' | 'mcp:put_page' | 'mcp:extract_facts' | 'file_upload' | 'code_import' | 'hook:compact';
   /** Execution mode — D8. Default 'queue' (fire-and-forget). */
   mode?: 'queue' | 'inline';
   /** Notability filter — D4. Default 'all'; sync uses 'high-only'. */
@@ -157,6 +158,56 @@ export async function runFactsBackstop(
 
   // --- Mode dispatch ---
   if (mode === 'queue') {
+    // Local patch 2026-06-11: in a one-shot CLI process the in-process queue
+    // is doomed — cli.ts's exit drain aborts the in-flight chat after ~1-2s,
+    // so every CLI capture logged `pipeline_error: [chat(...)] The operation
+    // was aborted.` and extracted nothing. Submit a durable facts-absorb
+    // minion job for the long-lived jobs worker instead. Falls through to
+    // the in-process queue if durable submission fails (old schema, no
+    // minions infra), preserving prior behavior + absorb-log visibility.
+    const { isShortLivedCliProcess } = await import('./cli-process-mode.ts');
+    if (isShortLivedCliProcess()) {
+      try {
+        const { MinionQueue } = await import('../minions/queue.ts');
+        const { createHash } = await import('node:crypto');
+        const contentHash = createHash('sha256')
+          .update(parsedPage.compiled_truth)
+          .digest('hex')
+          .slice(0, 16);
+        const minions = new MinionQueue(ctx.engine);
+        // [ENG-8] Caller-unset visibility resolves the brain default HERE
+        // (not in the long-lived worker) so the durable payload carries the
+        // visibility that was in force at write time.
+        const { resolveDefaultVisibility } = await import('./visibility.ts');
+        await minions.add(
+          'facts-absorb',
+          {
+            slug: parsedPage.slug,
+            sourceId: ctx.sourceId,
+            source: ctx.source,
+            sessionId: ctx.sessionId,
+            notabilityFilter: ctx.notabilityFilter ?? 'all',
+            visibility: ctx.visibility ?? (await resolveDefaultVisibility(ctx.engine)),
+            ...(ctx.model ? { model: ctx.model } : {}),
+          },
+          {
+            queue: 'default',
+            // Content-hash key: re-submits after edits, dedups rapid
+            // identical writes (idempotent ON CONFLICT returns existing row).
+            idempotency_key: `facts-absorb:${ctx.sourceId}:${parsedPage.slug}:${contentHash}`,
+            max_attempts: 3,
+            timeout_ms: 180_000,
+          },
+        );
+        return { mode: 'queue', enqueued: true, queueDepth: 0 };
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        warnOnce(
+          'facts-absorb-job-submit',
+          `[facts] durable facts-absorb submit failed (${msg}); falling back to in-process queue`,
+        );
+      }
+    }
     const { getFactsQueue } = await import('./queue.ts');
     const queue = getFactsQueue();
     const enqueued = queue.enqueue(async (signal) => {
@@ -220,7 +271,22 @@ export async function runFactsBackstop(
 export async function runFactsPipeline(
   turnText: string,
   ctx: FactsBackstopCtx,
-): Promise<{ inserted: number; duplicate: number; superseded: number; fact_ids: number[] }> {
+): Promise<{
+  inserted: number;
+  duplicate: number;
+  superseded: number;
+  fact_ids: number[];
+  /**
+   * Cathedral 5 (additive): DISTINCT resolved entity slugs of facts that were
+   * INSERTED via the fence-write path this run — i.e. slugs whose entity page
+   * is known to exist with the new fact fenced onto it. Duplicates (old
+   * provenance), legacy DB-only inserts (no fenceable page), and
+   * stub-guard-blocked facts are EXCLUDED — a checkpoint manifest link built
+   * from this list is truthful by construction (link candidates only; the
+   * harvest re-verifies each via source-scoped getPage before banking).
+   */
+  entity_slugs: string[];
+}> {
   return runPipelineWithBody({
     turnText,
     isDreamGenerated: false,
@@ -240,7 +306,7 @@ async function runPipeline(
   parsedPage: ParsedPageInput,
   ctx: FactsBackstopCtx,
   abortSignal?: AbortSignal,
-): Promise<{ inserted: number; duplicate: number; superseded: number; fact_ids: number[] }> {
+): Promise<{ inserted: number; duplicate: number; superseded: number; fact_ids: number[]; entity_slugs: string[] }> {
   return runPipelineWithBody(
     {
       turnText: parsedPage.compiled_truth,
@@ -281,14 +347,14 @@ async function runPipelineWithBody(
   input: { turnText: string; isDreamGenerated: boolean },
   ctx: FactsBackstopCtx,
   abortSignal?: AbortSignal,
-): Promise<{ inserted: number; duplicate: number; superseded: number; fact_ids: number[] }> {
+): Promise<{ inserted: number; duplicate: number; superseded: number; fact_ids: number[]; entity_slugs: string[] }> {
   const { extractFactsFromTurn } = await import('./extract.ts');
   const { resolveEntitySlug } = await import('../entities/resolve.ts');
   const { cosineSimilarity } = await import('./classify.ts');
   const { writeFactsToFence, lookupSourceLocalPath } = await import('./fence-write.ts');
 
   if (abortSignal?.aborted) {
-    return { inserted: 0, duplicate: 0, superseded: 0, fact_ids: [] };
+    return { inserted: 0, duplicate: 0, superseded: 0, fact_ids: [], entity_slugs: [] };
   }
 
   const facts = await extractFactsFromTurn({
@@ -303,12 +369,17 @@ async function runPipelineWithBody(
   });
 
   const filter = ctx.notabilityFilter ?? 'all';
-  const visibility = ctx.visibility ?? 'private';
+  // [ENG-8] Explicit ctx.visibility wins; unset resolves the operator-set
+  // facts.default_visibility (fail-closed to 'private').
+  const { resolveDefaultVisibility } = await import('./visibility.ts');
+  const visibility = ctx.visibility ?? (await resolveDefaultVisibility(ctx.engine));
 
   let inserted = 0;
   let duplicate = 0;
   let superseded = 0;
   const fact_ids: number[] = [];
+  // Cathedral 5: slugs whose fence-write actually inserted a fact this run.
+  const fencedSlugs = new Set<string>();
 
   // Phase 1: per-fact filter + dedup. Surviving facts (no dedup hit)
   // get grouped by entity_slug for the fence-write phase below.
@@ -361,7 +432,7 @@ async function runPipelineWithBody(
   }
 
   if (survived.length === 0) {
-    return { inserted, duplicate, superseded, fact_ids };
+    return { inserted, duplicate, superseded, fact_ids, entity_slugs: [] };
   }
 
   // Phase 2: group survived facts by resolved entity_slug. Facts with
@@ -418,8 +489,9 @@ async function runPipelineWithBody(
   }
 
   if (localPath === null) {
-    // All went through legacy bucket; nothing left to fence.
-    return { inserted, duplicate, superseded, fact_ids };
+    // All went through legacy bucket; nothing left to fence — DB-only
+    // inserts have no fence-written page, so entity_slugs stays empty.
+    return { inserted, duplicate, superseded, fact_ids, entity_slugs: [] };
   }
 
   // Phase 5: fence-write per entity. writeFactsToFence handles the
@@ -493,7 +565,8 @@ async function runPipelineWithBody(
 
     inserted += result.inserted;
     fact_ids.push(...result.ids);
+    if (result.inserted > 0) fencedSlugs.add(slug);
   }
 
-  return { inserted, duplicate, superseded, fact_ids };
+  return { inserted, duplicate, superseded, fact_ids, entity_slugs: [...fencedSlugs] };
 }

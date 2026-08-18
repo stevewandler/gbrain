@@ -11,6 +11,9 @@
  */
 
 import { describe, test, expect, beforeAll, afterAll, beforeEach } from 'bun:test';
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { PGLiteEngine } from '../src/core/pglite-engine.ts';
 import { resetPgliteState } from './helpers/reset-pglite.ts';
 import { registerBuiltinHandlers } from '../src/commands/jobs.ts';
@@ -83,8 +86,11 @@ describe('dispatchGlobalMaintenance — single-flight gate', () => {
     expect(added.length).toBe(1);
     expect(added[0].name).toBe('autopilot-global-maintenance');
     expect(added[0].opts.idempotency_key).toBe('autopilot-global:s1');
-    expect(added[0].opts.maxWaiting).toBe(1); // structural single-flight
-    expect(added[0].opts.max_attempts).toBe(1); // no paid/global phase replay
+    // Structural single-flight: maxPending (waiting + live-lock active),
+    // NOT maxWaiting — an in-flight active run must suppress re-dispatch
+    // across slot rotation (upstream issue #2).
+    expect(added[0].opts.maxPending).toBe(1);
+    expect(added[0].opts.maxWaiting).toBeUndefined();
     expect(added[0].data.phases).toEqual(GLOBAL_PHASES);
   });
 
@@ -93,6 +99,27 @@ describe('dispatchGlobalMaintenance — single-flight gate', () => {
     const r = await dispatchGlobalMaintenance(engine, queue, { repoPath: '/tmp', slot: 's1', timeoutMs: 1, jsonMode: true, emit: () => {} });
     expect(r.dispatched).toBe(false);
     expect(added.length).toBe(0);
+  });
+
+  test('coalesced submission → coalesced-aware return + dispatch_coalesced event (never claims a dispatch that did not insert)', async () => {
+    const events: string[] = [];
+    const engine = {
+      kind: 'postgres' as const,
+      getConfig: async (k: string) => (k === LAST_GLOBAL_AT_KEY ? null : null),
+    } as unknown as BrainEngine;
+    const queue = {
+      add: async () => ({ id: 7, coalesced: true }),
+    } as any;
+    const r = await dispatchGlobalMaintenance(engine, queue, {
+      repoPath: '/tmp', slot: 's1', timeoutMs: 1, jsonMode: true, emit: (l: string) => events.push(l),
+    });
+    // Honest-dispatch contract: nothing was inserted, so dispatched is false;
+    // coalesced says the work is already in flight.
+    expect(r.dispatched).toBe(false);
+    expect(r.coalesced).toBe(true);
+    const kinds = events.map(e => JSON.parse(e).event);
+    expect(kinds).toContain('dispatch_coalesced');
+    expect(kinds).not.toContain('dispatched');
   });
 });
 
@@ -131,13 +158,23 @@ describe('autopilot-global-maintenance handler stamps last_global_at (PGLite)', 
 
   test('runs global phases (no source_id) and stamps autopilot.last_global_at on success', async () => {
     expect(await engine.getConfig(LAST_GLOBAL_AT_KEY)).toBeNull();
+    const repoPath = mkdtempSync(join(tmpdir(), 'gbrain-global-maintenance-'));
+    await engine.executeRaw(
+      `INSERT INTO sources (id, name, local_path) VALUES ($1, $2, $3)`,
+      ['repo-a', 'repo-a', repoPath],
+    );
     const handlers = await captureHandlers();
     const handler = handlers.get('autopilot-global-maintenance');
     expect(handler).toBeTruthy();
 
-    const result = await handler!({ data: { phases: ['orphans', 'embed'] }, signal: undefined });
+    const result = await handler!({
+      data: { phases: ['orphans', 'embed'], repoPath },
+      signal: undefined,
+    });
     // The cycle ran the requested global phases (DB-only on an empty brain).
-    expect(result.report.phases.some((p: any) => p.phase === 'orphans')).toBe(true);
+    const orphans = result.report.phases.find((p: any) => p.phase === 'orphans');
+    expect(orphans).toBeTruthy();
+    expect(orphans.details.source_id).toBeUndefined();
     expect(['ok', 'clean', 'partial']).toContain(result.report.status);
     // Freshness stamped so the dispatch gate backs off.
     const stamped = await engine.getConfig(LAST_GLOBAL_AT_KEY);

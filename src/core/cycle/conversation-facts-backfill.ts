@@ -36,7 +36,7 @@
  *   cycle.conversation_facts_backfill.max_total_cost_usd   (5.00)
  *   cycle.conversation_facts_backfill.max_walltime_min     (20)
  *   cycle.conversation_facts_backfill.max_total_walltime_min (30)
- *   cycle.conversation_facts_backfill.types                (["conversation","meeting","slack","email"])
+ *   cycle.conversation_facts_backfill.types                (all of ALLOWED_TYPES — src/core/facts/conversation-types.ts)
  *
  * `.types` is the single source of truth for "enabled types" — the CLI
  * default reads from the same key (Eng-v2 A2).
@@ -48,15 +48,25 @@ import { withBudgetTracker } from '../ai/gateway.ts';
 import { listSources } from '../sources-ops.ts';
 import {
   runExtractConversationFactsCore,
-  ALLOWED_TYPES,
-  type AllowedType,
   type ExtractConversationFactsResult,
 } from '../../commands/extract-conversation-facts.ts';
+// The type allowlist comes straight from the canonical leaf module (same
+// binding extract-conversation-facts.ts re-exports) so this phase is part of
+// the drift-guarded set in test/conversation-facts-type-allowlist-drift.test.ts.
+import { ALLOWED_TYPES, type AllowedType } from '../facts/conversation-types.ts';
 
 /** Per-phase wrapper opts. */
 export interface ConversationFactsBackfillPhaseOpts {
   dryRun?: boolean;
   signal?: AbortSignal;
+  /**
+   * issue #2860 — `gbrain dream --phase conversation_facts_backfill --once`.
+   * Bypasses the `cycle.conversation_facts_backfill.enabled` gate for THIS
+   * call only; never reads or writes config. Per-source + brain-wide cost/
+   * walltime caps still apply — the override lifts the on/off switch, not
+   * the spend guards.
+   */
+  once?: boolean;
 }
 
 /** Phase return shape (matches PhaseResult contract from cycle.ts). */
@@ -155,17 +165,23 @@ export async function runPhaseConversationFactsBackfill(
   const cfg = await loadCfg(engine);
 
   if (!cfg.enabled) {
-    return {
-      phase: 'conversation_facts_backfill',
-      status: 'skipped',
-      duration_ms: 0,
-      summary: 'cycle.conversation_facts_backfill.enabled=false (default OFF)',
-      details: {
-        reason: 'disabled',
-        enable_hint:
-          'gbrain config set cycle.conversation_facts_backfill.enabled true',
-      },
-    };
+    if (!opts.once) {
+      return {
+        phase: 'conversation_facts_backfill',
+        status: 'skipped',
+        duration_ms: 0,
+        summary: 'cycle.conversation_facts_backfill.enabled=false (default OFF)',
+        details: {
+          reason: 'disabled',
+          enable_hint:
+            'gbrain config set cycle.conversation_facts_backfill.enabled true',
+        },
+      };
+    }
+    process.stderr.write(
+      '[dream] --once: cycle.conversation_facts_backfill.enabled is false but ' +
+      '--phase conversation_facts_backfill --once forces this run (config untouched)\n',
+    );
   }
 
   const startedAt = Date.now();
@@ -246,6 +262,12 @@ export async function runPhaseConversationFactsBackfill(
             pages_skipped: 0,
             pages_skipped_too_large: 0,
             pages_skipped_disappeared: 0,
+            pages_skipped_completed: 0,
+            pages_skipped_non_extractable: 0,
+            pages_marked_non_extractable: 0,
+            pages_skipped_unrecognized_speaker: 0,
+            pages_failed: 1,
+            pages_llm_fallback: 0,
             // v0.41.15.0 (D6 + D11): new counters from the per-page lock
             // + delete-orphans-first replay safety.
             pages_lock_skipped: 0,
@@ -282,6 +304,11 @@ export async function runPhaseConversationFactsBackfill(
   const totals = {
     pages_processed: 0,
     pages_skipped: 0,
+    pages_skipped_completed: 0,
+    pages_skipped_non_extractable: 0,
+    pages_marked_non_extractable: 0,
+    pages_skipped_unrecognized_speaker: 0,
+    pages_failed: 0,
     facts_inserted: 0,
     sources_processed: 0,
   };
@@ -289,10 +316,17 @@ export async function runPhaseConversationFactsBackfill(
     if (!r.error) totals.sources_processed++;
     totals.pages_processed += r.pages_processed;
     totals.pages_skipped += r.pages_skipped;
+    totals.pages_skipped_completed += r.pages_skipped_completed;
+    totals.pages_skipped_non_extractable += r.pages_skipped_non_extractable;
+    totals.pages_marked_non_extractable += r.pages_marked_non_extractable;
+    totals.pages_skipped_unrecognized_speaker += r.pages_skipped_unrecognized_speaker;
+    totals.pages_failed += r.pages_failed;
     totals.facts_inserted += r.facts_inserted;
   }
 
-  const anyError = Object.values(perSourceResults).some((r) => r.error);
+  const anyError = Object.values(perSourceResults).some(
+    (r) => r.error || r.pages_failed > 0,
+  );
   const status = anyError ? 'warn' : 'ok';
   const summary = `${totals.facts_inserted} facts inserted across ${totals.sources_processed}/${sources.length} sources, ~$${totalSpent.toFixed(4)} spent`;
 
@@ -306,6 +340,11 @@ export async function runPhaseConversationFactsBackfill(
       sources_processed: totals.sources_processed,
       pages_processed: totals.pages_processed,
       pages_skipped: totals.pages_skipped,
+      pages_skipped_completed: totals.pages_skipped_completed,
+      pages_skipped_non_extractable: totals.pages_skipped_non_extractable,
+      pages_marked_non_extractable: totals.pages_marked_non_extractable,
+      pages_skipped_unrecognized_speaker: totals.pages_skipped_unrecognized_speaker,
+      pages_failed: totals.pages_failed,
       facts_inserted: totals.facts_inserted,
       spent_usd: totalSpent,
       skipped_by_brain_wide_cap: skippedByBrainWideCap,

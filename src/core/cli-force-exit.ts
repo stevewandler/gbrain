@@ -115,6 +115,26 @@ function resolveFlushGraceMs(): number {
 const DEFAULT_DRAIN_TIMEOUT_MS = 2_000;
 
 /**
+ * Resolve the per-sink drain budget: `GBRAIN_DRAIN_TIMEOUT_MS` env override
+ * (slow-provider escape hatch, same env-only pattern as
+ * GBRAIN_TEARDOWN_DEADLINE_MS) over the 2000ms default. An explicit
+ * `drainTimeoutMs` from a call site still wins — the env replaces only the
+ * DEFAULT. The 2s default assumes a sub-second cloud chat provider; a
+ * self-hosted model (e.g. ollama at 10-20s per completion) can never finish a
+ * fire-and-forget facts:absorb extraction inside it, so every one-shot CLI
+ * exit — sync timers especially — aborts the in-flight chat and the
+ * extraction never lands, retrying (and re-aborting) on each subsequent sync
+ * of the same page. Raising the budget via env lets those installs drain
+ * instead of abort; computeTeardownDeadlineMs already scales the backstop
+ * from the resolved value, so the deadline widens with it.
+ */
+export function resolveDrainTimeoutMs(): number {
+  const env = Number(process.env.GBRAIN_DRAIN_TIMEOUT_MS);
+  if (Number.isFinite(env) && env > 0) return env;
+  return DEFAULT_DRAIN_TIMEOUT_MS;
+}
+
+/**
  * Backstop deadline for drain + disconnect COMBINED, computed from the bounds
  * it guards so it fires only when a component violated its own bound (#2084
  * eng-review D9 — a static 10s fired on healthy-but-slow bounded teardown:
@@ -131,8 +151,18 @@ export function computeTeardownDeadlineMs(opts: {
   // +500 mirrors endPoolBounded's slack over the postgres.js hint (db.ts);
   // ×2 budgets the worst case of two sequential pool ends (direct + read).
   const poolEndBoundMs = POOL_END_TIMEOUT_SECONDS * 1000 + 500;
+  // #4143: engine.disconnect() now runs its OWN drain pass (the
+  // in-flight-settle drain, fixed at 2000ms/sink — see
+  // drainBackgroundWorkBeforeDisconnect) AFTER the exit-mode drain above it
+  // in finishCliTeardown, plus PGLite's 5s bounded close. Budget both, or
+  // the backstop fires while every component honored its own bound (the D9
+  // false-backstop class this formula exists to kill).
+  const disconnectDrainBoundMs = opts.sinkCount * 2000;
+  const pgliteCloseBoundMs = 5000;
   const computed =
     opts.sinkCount * opts.drainTimeoutMs +
+    disconnectDrainBoundMs +
+    pgliteCloseBoundMs +
     FACTS_ABORT_GRACE_MS +
     2 * poolEndBoundMs +
     TEARDOWN_SLACK_MS;
@@ -262,7 +292,10 @@ export function flushThenExit(code: number, opts: FlushThenExitOpts = {}): void 
 export interface FinishCliTeardownOpts {
   /** Engine to disconnect. A disconnect throw is warned + swallowed (D3). */
   engine: { disconnect(): Promise<void> };
-  /** Per-sink drain budget. Default 2000 (the registry default). */
+  /**
+   * Per-sink drain budget. Default: `GBRAIN_DRAIN_TIMEOUT_MS` env override,
+   * else 2000 (the registry default).
+   */
   drainTimeoutMs?: number;
   /** Test seam — wins over the env override and the computed formula. */
   deadlineMs?: number;
@@ -284,7 +317,7 @@ export interface FinishCliTeardownOpts {
  * exit in here, and it means a component violated its own bound.
  */
 export async function finishCliTeardown(opts: FinishCliTeardownOpts): Promise<void> {
-  const drainTimeoutMs = opts.drainTimeoutMs ?? DEFAULT_DRAIN_TIMEOUT_MS;
+  const drainTimeoutMs = opts.drainTimeoutMs ?? resolveDrainTimeoutMs();
   const warn = opts.warn ?? ((m: string) => console.warn(m));
   const drain = opts.drain ?? drainAllBackgroundWorkForCliExit;
   const deadlineMs =
