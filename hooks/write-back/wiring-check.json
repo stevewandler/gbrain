@@ -1,0 +1,32 @@
+{
+  "_comment": [
+    "A ready-made entry for a check-wiring style nightly verifier. It proves the",
+    "claim 'session write-back reaches the brain' rather than trusting it: the",
+    "hook's own status command exits non-zero when records are parked or the CLI",
+    "cannot be found.",
+    "",
+    "Install this deliberately. If the verifier gates other decisions, adding a",
+    "check changes what that gate means — which is a change of intent, not a",
+    "repair, and belongs to whoever owns the gate."
+  ],
+  "checks": [
+    {
+      "id": "write_back_reaching_brain",
+      "claim": "Claude Code session write-back is reaching the brain",
+      "cmd": "python3 $HOME/.claude/write-back/write_back_hook.py status >/dev/null 2>&1 || python3 <PATH_TO_REPO>/hooks/write-back/write_back_hook.py status >/dev/null 2>&1",
+      "on_fail": "Records are parked or the gbrain CLI is unreachable. Run `write_back_hook.py status` for the failure rows, fix the cause, then `write_back_hook.py flush`. Session history is incomplete until this passes."
+    },
+    {
+      "id": "write_back_hook_registered",
+      "claim": "The write-back hook is registered in Claude Code settings",
+      "cmd": "grep -q write_back_hook.py $HOME/.claude/settings.json",
+      "on_fail": "The hook is not registered, so sessions are ending without a record. Re-run `python3 hooks/write-back/install.py`."
+    },
+    {
+      "id": "write_back_record_shape",
+      "claim": "The write-back record shape still holds",
+      "cmd": "python3 <PATH_TO_REPO>/hooks/write-back/write_back_hook.py selftest >/dev/null 2>&1",
+      "on_fail": "The hook's selftest is failing: the transcript format or the record shape has drifted. Run it directly for the failing checks."
+    }
+  ]
+}
