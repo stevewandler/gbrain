@@ -2,6 +2,22 @@
 
 All notable changes to GBrain will be documented in this file.
 
+## [0.42.55.0] - 2026-08-19
+
+**Sessions now write their own record. A new Claude Code hook captures what was asked, what was done, what is still open and which check closes each claim — into your brain, through `gbrain capture`, with no habit to remember.** An agent session produces an artifact and loses the record; whoever reads it next reconstructs the intent from the output, and reconstruction is where they get it wrong. A manual write-back habit only closes that gap on the days someone remembers.
+
+### Added
+- **Automatic session write-back (`hooks/write-back/`).** A dependency-free hook that builds a five-section record — Asked (verbatim prompts), Did (tool-call ledger), Rejected, Open, Evidence (verifying commands with the outcome the transcript recorded) — and captures it to `ops/sessions/<date>-<session>`. Registers on `SessionEnd`, with a `PreCompact` checkpoint onto the same slug so a session that dies after compaction still leaves a record, and a `SessionStart` pass that drains the retry spool.
+- **Every record states its own confidence, per section.** Asked/Did/Evidence are machine-derived and labelled as such. Rejected and Open are agent-recorded only: when nothing was recorded, the record says `Not recorded` instead of inferring a dropped path from the output. A record that cannot state its own gaps gets trusted where it should not be.
+- **Durability by construction.** The record is written to disk before it is offered to the brain, and only ever reaches the brain through `gbrain capture` (database + disk mirror + git) — never through an MCP page write, which lands in one place and leaves nothing to recover from. A test asserts the hook cannot reach for one.
+- **Failures stay loud.** A failed capture keeps the record spooled and logs the failure to an append-only ledger with the CLI's own receipts; the next session start retries it and reports the backlog into the session. Past the retry cap the record is parked, never deleted, and `status` exits non-zero so a scheduled wiring check can use the exit code. Auto-capture that fails quietly is worse than none, because it is trusted.
+- **Commitment candidates get flagged.** A deliberately narrow scan of the human'"'"'s own words — first-person promise, named counterparty, time reference, all in one sentence — surfaces promises made inside a session, tagged `commitment-flag` and labelled unverified. Precision over recall: it misses rather than over-reports, and model prose is excluded entirely.
+- **An idempotent, reversible installer.** `install.py` backs up the settings file, writes atomically, adds exactly three event entries and touches nothing else. Running it twice changes nothing; `--uninstall` restores the file exactly and never deletes spooled or archived records.
+- Secrets are scrubbed on the way in (API keys, bearer tokens, connection strings, `*_TOKEN=` assignments), heredoc bodies are cut from recorded commands, and trivial sessions write nothing at all.
+
+### To take advantage of v0.42.55.0
+`python3 hooks/write-back/install.py`, then prove it before trusting it: `python3 hooks/write-back/write_back_hook.py selftest` (26 checks, brain untouched) and `... status`. The hook takes effect in the next session, not the one that installed it. Requires Python 3.9+ (standard library only) and the `gbrain` CLI on `PATH`. Turn it off entirely with `GBRAIN_WRITEBACK_DISABLED=1`, or remove it with `install.py --uninstall`.
+
 ## [0.42.54.0] - 2026-06-24
 
 **Four "silent failure" bugs fixed: a command that reported success while saving nothing, a PGLite setup dead-end, dishonest health scores, and a config write that could throw on already-corrupted data. Each one returned a green result while doing the wrong thing.**
