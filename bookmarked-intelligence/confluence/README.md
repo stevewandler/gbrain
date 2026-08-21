@@ -12,7 +12,9 @@ statutory-reference page.
 | Evidence Severity and the "Not a Rating System" Boundary | `205520897` | PROD → 1 · Doctrine | DRAFT — awaiting CEO approval |
 | Book Intelligence — Statutory Evidence Model | `205553665` | PROD → 1 · Doctrine | DRAFT — awaiting CEO approval |
 | Book Intelligence — Documentation Cleanup Register | `205357059` | PROD → under BI Canonical Source of Truth | OPEN REGISTER |
-| Accuracy Gate — Statutory Evidence Model, First Result | `205750273` | PROD → 4 · Evidence Quality and Measurement | DRAFT — awaiting CEO approval |
+| Accuracy Gate — Statutory Evidence Model, First Result | `205750273` | PROD → 4 · Evidence Quality and Measurement | DRAFT — claim-scope decision recorded 2026-08-21 |
+| Content-Evidence Benchmark — Design (Channel 2) | `205488140` | PROD → 4 · Evidence Quality and Measurement | DRAFT — awaiting CEO approval; owner unassigned |
+| Citation-Stability Rule — for the ingestion pipeline | `205160462` | PROD → 4 · Evidence Quality and Measurement | READY TO IMPLEMENT |
 
 ## What changed and why
 
@@ -48,3 +50,16 @@ the per-statutory-question content evidence — the half that makes a claim abou
 inside a book, and the half that most needs gating. Full result, including the one real
 defect it did surface and what building the missing ground truth requires:
 `../accuracy-gate-2026-08-21.md` and page `205750273`.
+
+**Decision, 2026-08-21:** claim scope is the measured flag layer. No
+content-evidence accuracy claim reaches a customer until the benchmark exists,
+and the benchmark is scheduled rather than deferred — design at `205488140`.
+
+The benchmark design's own finding is that the work splits in two. **Faithfulness**
+(does the claim follow from its cited source) needs no book text, is achievable
+now, and is exactly the claim the product makes. **Correctness** (is the claim
+true of the book) needs text access, which is a business dependency rather than a
+labour cost. And for the passage-level questions — indecent content, profane
+content, website referral — recall is not definable from outside the text at all,
+because absence of evidence and absence in the book are indistinguishable. Those
+carry precision only; a recall figure there would be an invented denominator.
