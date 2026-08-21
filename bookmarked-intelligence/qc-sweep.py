@@ -8,6 +8,14 @@ Checks every JSON in sample-results/:
   4. Provenance block present with exact disclaimer.
   5. Advisory: rating-language words (safe/clean/low risk) in findings/synopsis.
   6. Advisory: RED verdicts on sexually_explicit with <2 admissible sources.
+  7. Citation stability: a flag asserting a dated appearance may not cite a
+     live rotating index. Admissibility asks whether a source is a credible
+     kind of source; stability asks whether the cited page will still contain
+     the claim tomorrow. A rotating "current top ten" index passes the first
+     and fails the second — the claim stays true while the citation goes false,
+     which is the worst failure mode for a citation read aloud at a board
+     meeting. Added 2026-08-21 after the accuracy gate found three such flags
+     in the sample set; see accuracy-gate-2026-08-21.md.
 """
 import json, re, sys
 from pathlib import Path
@@ -23,6 +31,13 @@ DISCLAIMER = "This summary is AI generated and unverified. Confirm findings agai
 VERDICTS = {"RED", "YELLOW", "NO_EVIDENCE_FOUND"}
 PRIORITIES = {"LOOK_CLOSER", "NO_ACTION_INDICATED"}
 RATING_WORDS = re.compile(r"\b(safe|clean|low[- ]risk)\b", re.I)
+# Rotating indexes: pages whose contents are replaced each cycle.
+ROTATING_INDEX = re.compile(
+    r"/(top10|topten|top-10|frequentlychallengedbooks/?$|banned-?books-?week/?$)", re.I)
+# Anchors that pin a page to a fixed edition: an explicit year, a decade
+# retrospective, or an archive snapshot.
+STABLE_ANCHOR = re.compile(r"(19|20)\d\d|decade|web\.archive\.org", re.I)
+DATED_CLAIM = re.compile(r"\b(19|20)\d\d\b")
 
 fails, advisories = [], []
 results_dir = Path(__file__).parent / "sample-results"
@@ -46,6 +61,13 @@ for f in files:
                 fails.append(f"{name}: {cat} NO_EVIDENCE_FOUND but has sources")
         if c["verdict"] in ("RED", "YELLOW") and not c.get("sources"):
             fails.append(f"{name}: {cat} {c['verdict']} with zero sources")
+    for k in d.get("known_list_flags", []):
+        u = k.get("url", "")
+        path = u.split("://", 1)[-1].split("/", 1)[-1] if "://" in u else u
+        if (ROTATING_INDEX.search(u) and not STABLE_ANCHOR.search(path)
+                and DATED_CLAIM.search(k.get("claim", ""))):
+            fails.append(
+                f"{name}: UNSTABLE CITATION — dated claim cites a rotating index: {u}")
     if d.get("review_priority") not in PRIORITIES:
         fails.append(f"{name}: invalid review_priority {d.get('review_priority')}")
     if d.get("provenance", {}).get("disclaimer") != DISCLAIMER:
