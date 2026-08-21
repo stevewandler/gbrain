@@ -84,9 +84,23 @@ DELIBERATELY NOT SAID (standing cautions, CH/203096065):
     stops there.
 
 STILL CUT from v1 (restorable on request): Patrick's 80% claim; his "Today, you know"
-quote; Robinson's parents-final-voice sentence; the Lubbock ISD example (figures need
-re-verification — the one-pager said 130+/10, internal watch list CH/203096065 §8 said
-150-on-agenda).
+quote; Robinson's parents-final-voice sentence.
+
+LUBBOCK EXAMPLE — RESOLVED, CUT PERMANENTLY (2026-08-21). The two figures were never in
+conflict. The one-pager's "130+ challenges and 10 removed" is framed as the meeting's
+outcome; CH/203096065 §8's "150 challenged titles on the agenda, 10 removed at the time of
+the press conference" is an agenda count — and it sits in that page's OPEN items watch list,
+so the outcome was never confirmed in the durable record. The "10 removed" agrees in both.
+The deciding factor is not the arithmetic: §6 of the same page states that district-specific
+counts "are private and belong to that district, not to marketing." Lubbock ISD is a real
+district and a prospective customer, so the example stays out regardless of which figure
+reconciles. Do not reopen without an authoritative company source overriding that rule.
+
+AVAILABLE, VERIFIED, NOT USED (one-line add if wanted): CH/203096065 §6 confirms that
+Pulitzer-winning fiction appears on the third-party Texas lists — one title was found on two
+separate district lists. The generic form ("a prize-winning novel sits in the same column as
+everything else") is safe to state and sharpens the no-reason-attached argument; the specific
+titles must NOT be reproduced, per §4's Chron caution. Held out of v4 for word budget only.
 
 HELD IN RESERVE: Draft C ("The most useful hour your library team will spend this fall") is
 the same argument with no news peg — a candidate second post that ages into an evergreen
