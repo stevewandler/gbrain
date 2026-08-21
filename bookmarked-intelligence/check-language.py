@@ -10,6 +10,13 @@ absence of evidence as safe/clean/clear/low-risk.
 Assertive patterns only. A disclaimer that DENIES making a determination
 ("does not determine whether a book complies with...") is correct usage and
 must not trip the check — the earlier naive grep flagged exactly that.
+
+Scope limit, stated so nobody mistakes this for a proof: it is a drift guard,
+not a verifier. It catches the phrasings we know go wrong. A determined writer
+can still smuggle a conclusion past it, and a contrived negation ("we can't
+stress enough that the book violates...") reads as a disclaimer to it. Human
+review of customer-facing copy is still the control; this is the backstop that
+keeps the common failures from surviving to a report.
 """
 import re
 import sys
@@ -29,8 +36,16 @@ ASSERTIVE = [
     (r"\brisk (?:score|rating|level)\b", "uses rating language for evidence"),
 ]
 # Contexts where the words legitimately appear because they are being disclaimed.
+# Contractions are included deliberately: a disclaimer written naturally ("we
+# can't tell you a book violates the law") is still a disclaimer, and excluding
+# them made the guard fire on correct copy. [’'] covers both apostrophe forms —
+# markdown authored in an editor gets the typographic one.
 NEGATING = re.compile(
-    r"(does not|do not|never|not a|cannot|must not|does no|is not)\b[^.]{0,120}$",
+    r"("
+    r"does not|do not|never|not a|cannot|must not|does no|is not|"
+    r"can[’']t|won[’']t|don[’']t|doesn[’']t|isn[’']t|aren[’']t|"
+    r"couldn[’']t|wouldn[’']t|shouldn[’']t|nobody|no one"
+    r")\b[^.]{0,120}$",
     re.I,
 )
 
