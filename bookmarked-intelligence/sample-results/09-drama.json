@@ -1,0 +1,141 @@
+{
+  "book": {
+    "title": "Drama",
+    "author": "Raina Telgemeier",
+    "isbn": "",
+    "publication_year": 2012,
+    "audience_reported": "middle grade (publisher-listed ages 10-14, grades 5-9); input audience_shelf: middle"
+  },
+  "known_list_flags": [
+    {
+      "list": "ALA Office for Intellectual Freedom - Top Ten Most Challenged Books",
+      "scope": "2016 (#2 on the list; cited reasons per ALA: LGBT content, sexually explicit, offensive political viewpoint)",
+      "claim": "appeared on ALA OIF's Top Ten Most Challenged Books list as of 2016",
+      "url": "https://www.ala.org/sites/default/files/advocacy/content/Top%20Ten%20for%202016.pdf",
+      "independence_group": "ALA_OIF"
+    },
+    {
+      "list": "ALA Office for Intellectual Freedom - Top Ten Most Challenged Books",
+      "scope": "2017 and 2019 list appearances; reported as its 5th year on an ALA most-challenged/banned list as of April 2020",
+      "claim": "appeared on ALA OIF's Top Ten Most Challenged Books list as of 2017 and 2019, noted as a 5th-year appearance as of 2020",
+      "url": "https://cbldf.org/2020/04/dramas-5th-year-on-alas-most-banned-challenged-list/",
+      "independence_group": "ALA_OIF"
+    },
+    {
+      "list": "PEN America Index of School Book Bans",
+      "scope": "2024-2025 index; specific instance in Katy Independent School District, TX, August 2024",
+      "claim": "appeared on PEN America's Index of School Book Bans as of the 2024-2025 index, with an instance recorded in Katy ISD (TX) as of August 2024",
+      "url": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2024-2025/",
+      "independence_group": "PEN_America"
+    },
+    {
+      "list": "PEN America cumulative book-ban index",
+      "scope": "most recent PEN America reporting: 11 bans across 11 districts for this title",
+      "claim": "appeared in PEN America's cumulative book-ban index as of its most recent reporting, with 11 bans recorded across 11 districts",
+      "url": "https://pen.org/book-bans/pen-america-book-ban-index-data/",
+      "independence_group": "PEN_America"
+    },
+    {
+      "list": "Florida Department of Education - school district removal reporting",
+      "scope": "2023-2024 school year; Gilchrist County Schools, Grade 5, listed as removed/discontinued",
+      "claim": "appeared on Florida Department of Education school-district removal reporting as of the 2023-2024 school year (Gilchrist County Schools, Grade 5)",
+      "url": "https://www.fldoe.org/file/5574/2324-SDRPS-100628-2.pdf",
+      "independence_group": "FL_FLDOE"
+    },
+    {
+      "list": "Florida district-level removal action (press-reported)",
+      "scope": "Polk County Public Schools, January 2022, pulled for administrative review after an advocacy-group complaint",
+      "claim": "appeared among titles pulled for administrative review by Polk County Public Schools (FL) as of January 2022, per press reporting",
+      "url": "https://smashpages.net/2022/01/31/florida-school-district-removes-telgemeiers-drama-15-other-books-from-shelves/",
+      "independence_group": "press_FL_Polk"
+    },
+    {
+      "list": "South Carolina Regulation 43-170 statutory instructional-materials review",
+      "scope": "2024-2025 review cycle; final State Board disposition for this specific title not located in sources reviewed",
+      "claim": "appeared among titles referred to South Carolina's Regulation 43-170 statewide review process as of the 2024-2025 review cycle",
+      "url": "https://libguides.columbiasc.edu/Weboflies/SCreg",
+      "independence_group": "SC_reg43-170"
+    },
+    {
+      "list": "Moms for Liberty chapter list / BookLooks-lineage rating site (Rated Books)",
+      "scope": "chapter-level list plus a BookLooks-lineage rating-site page; specific date not stated in sources reviewed",
+      "claim": "appeared on a Moms for Liberty chapter book list and on a BookLooks-lineage rating site page, date not stated in sources reviewed",
+      "url": "https://www.ratedbooks.org/product-page/53-drama-by-raina-telgemeier",
+      "independence_group": "MFL_BookLooks_lineage"
+    },
+    {
+      "list": "ACLU of Texas - Banned Books Report on Texas Schools",
+      "scope": "2016-2017 school year (removed, Franklin ISD); earlier removals reported at Kirbyville Middle School (2015-2016) and Chapel Hill Elementary, Mount Pleasant (2014-2015)",
+      "claim": "appeared on ACLU of Texas's annual banned-books report as of the 2016-2017 school year (Franklin Independent School District), with earlier district removals reported as of 2015-2016 and 2014-2015",
+      "url": "https://www.aclutx.org/app/uploads/drupal/sites/default/files/banned_books_report.pdf",
+      "independence_group": "ACLU_TX"
+    }
+  ],
+  "categories": {
+    "sexually_explicit": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "sustained_nudity": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "extreme_violence": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "profane_content": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "indecent_content": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "patently_vulgar": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "prohibited_website_referral": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    }
+  },
+  "legal_lenses": {
+    "prurient_theme": {
+      "evidence_found": false,
+      "basis": "Starred professional reviews (Kirkus, School Library Journal) and ALA's own Spotlight on Censorship coverage describe the book's theme as a middle-school theater production and friendship/crush story; none characterize the work as a whole as appealing to prurient interest. The sexually-explicit reason code ALA OIF applied in its challenge tracking (2014, 2016) reflects how challengers categorized a same-sex kiss, not a content description meeting this test."
+    },
+    "onpage_explicit_scenes": {
+      "evidence_found": false,
+      "basis": "The only on-page scene tied to the challenges across independent sources (Comic Book Legal Defense Fund's case study, Banned Books Week's spotlight, and commentary on South Carolina's Regulation 43-170 review) is a single onstage kiss between two male characters, consistently described as chaste; one account of the South Carolina review states the book was found to contain no sexual content even under a very broad regulatory definition. No source describes a detailed, on-the-page explicit scene."
+    }
+  },
+  "synopsis": "Drama carries an extensive, well-corroborated known-list record spanning more than a decade: ALA OIF's Top Ten Most Challenged Books list (2016, 2017, 2019, and noted as a 5th-year appearance in 2020), PEN America's book-ban index (11 bans across 11 districts, including Katy ISD, TX in August 2024), Florida Department of Education district reporting (Gilchrist County, 2023-24) plus a separate Polk County review action (2022), South Carolina's Regulation 43-170 review list (2024-25 cycle, final disposition not located), a Moms for Liberty chapter list and a BookLooks-lineage rating-site page, and multiple ACLU of Texas-documented district removals (2014-2017). None of this establishes content in this book meeting any of the seven categories this report tracks. Starred professional reviews (Kirkus, School Library Journal) describe the book positively with no content cautions, and every independent source that describes the underlying triggering content identifies it as a single onstage kiss between two male characters, repeatedly characterized as chaste. ALA's sexually-explicit challenge-reason code (2014, 2016) reflects how challengers framed that kiss, not a content description meeting this system's definition of sexual conduct. Utah's statewide sensitive-materials list and the Take Back the Classroom site were checked; no match for this title was found in sources reviewed. This is a case where the challenge record is real and heavy, but the content evidence is not.",
+  "review_priority": "NO_ACTION_INDICATED",
+  "provenance": {
+    "model": "Claude research agent (stop-gap run)",
+    "prompt_version": "1.0",
+    "run_date": "2026-08-20",
+    "sources_reviewed_count": 16,
+    "disclaimer": "This summary is AI generated and unverified. Confirm findings against the cited sources before acting."
+  },
+  "feedback": {
+    "thumbs": null,
+    "note": null
+  }
+}

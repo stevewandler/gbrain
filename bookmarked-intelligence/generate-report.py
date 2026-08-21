@@ -33,7 +33,7 @@ def chart(books):
         cells = [f"**{b['book']['title']}**"]
         for key, _ in CATS:
             cells.append(GLYPH[b["categories"][key]["verdict"]])
-        klf = "<br>".join(f"{k['list'].split('—')[0].split('(')[0].strip()} ({k['scope'][:40]})" for k in b["known_list_flags"]) or "none found"
+        klf = "<br>".join(f"{k['list'].split('—')[0].split('(')[0].strip()} ({(k['scope'][:38] + '…') if len(k['scope']) > 38 else k['scope']})" for k in b["known_list_flags"]) or "none found"
         cells.append(klf)
         cells.append("🔎 LOOK CLOSER" if b["review_priority"] == "LOOK_CLOSER" else "No action indicated")
         lines.append("| " + " | ".join(cells) + " |")
