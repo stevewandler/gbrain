@@ -107,6 +107,10 @@ def main():
         "appears in Texas statute, the Education Code, or 13 TAC §4.2, so they are "
         "reported as this district's own criteria rather than as state requirements.",
         "",
+        "| " + " | ".join(hdr) + " |",
+        "|" + "---|" * len(hdr),
+        *rows,
+        "",
         "## What this chart is measured to support",
         "",
         "Calibrated to the accuracy gate run on 2026-08-21 "
@@ -132,9 +136,6 @@ def main():
         "elsewhere; the citations need repointing to dated or archived pages "
         "before this chart goes to a board.",
         "",
-        "| " + " | ".join(hdr) + " |",
-        "|" + "---|" * len(hdr),
-        *rows,
         "",
         "## What the evidence says",
         "",

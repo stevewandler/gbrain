@@ -8,16 +8,6 @@ Legend: ● evidence found · ◐ partial or implied · — no content evidence 
 
 **Sexually explicit** and **Obscenity** are Texas statutory gates. **Nudity** and **Extreme violence** are district criteria — neither term appears in Texas statute, the Education Code, or 13 TAC §4.2, so they are reported as this district's own criteria rather than as state requirements.
 
-## What this chart is measured to support
-
-Calibrated to the accuracy gate run on 2026-08-21 (`accuracy-gate-2026-08-21.md`), so the chart carries only claims that have a measurement behind them.
-
-**Measured.** The known-list layer — whether a flag's citation holds up. On the sample set, scored against an independent citation-credibility rubric: zero award or booklist pages cited as ban evidence, zero junk-tier or retail sources, a date on 91% of flags and a jurisdiction on 51%. Ten titles and 35 flags, so those are proportions of a small sample, not rates.
-
-**Not measured.** The accuracy of the content evidence itself, per statutory question. No adjudicated ground truth for that exists yet, so no accuracy claim is made about the ● ◐ — marks in the four columns above. Read them as what the cited sources say, and check the sources.
-
-**Known defect, marked inline.** Some citations point at a rotating index whose contents are replaced each cycle, so a claim about a specific past year may land on a page that no longer shows it. Those carry a repointing note beside the link. The claims are documented elsewhere; the citations need repointing to dated or archived pages before this chart goes to a board.
-
 | Title | Author | Sexually explicit | Obscenity | Nudity | Extreme violence | Known lists | Priority |
 |---|---|---|---|---|---|---|---|
 | **Because of Winn-Dixie** | Kate DiCamillo | — | — | — | — | 1 | No evidence found |
@@ -30,6 +20,17 @@ Calibrated to the accuracy gate run on 2026-08-21 (`accuracy-gate-2026-08-21.md`
 | **Looking for Alaska** | John Green | ● | ◐ | — | — | 5 | Look closer |
 | **Drama** | Raina Telgemeier | — | — | — | — | 9 | No evidence found |
 | **The Absolutely True Diary of a Part-Time Indian** | Sherman Alexie | ◐ | ◐ | — | ◐ | 2 | Look closer |
+
+## What this chart is measured to support
+
+Calibrated to the accuracy gate run on 2026-08-21 (`accuracy-gate-2026-08-21.md`), so the chart carries only claims that have a measurement behind them.
+
+**Measured.** The known-list layer — whether a flag's citation holds up. On the sample set, scored against an independent citation-credibility rubric: zero award or booklist pages cited as ban evidence, zero junk-tier or retail sources, a date on 91% of flags and a jurisdiction on 51%. Ten titles and 35 flags, so those are proportions of a small sample, not rates.
+
+**Not measured.** The accuracy of the content evidence itself, per statutory question. No adjudicated ground truth for that exists yet, so no accuracy claim is made about the ● ◐ — marks in the four columns above. Read them as what the cited sources say, and check the sources.
+
+**Known defect, marked inline.** Some citations point at a rotating index whose contents are replaced each cycle, so a claim about a specific past year may land on a page that no longer shows it. Those carry a repointing note beside the link. The claims are documented elsewhere; the citations need repointing to dated or archived pages before this chart goes to a board.
+
 
 ## What the evidence says
 
