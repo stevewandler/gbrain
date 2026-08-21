@@ -12,6 +12,7 @@ statutory-reference page.
 | Evidence Severity and the "Not a Rating System" Boundary | `205520897` | PROD → 1 · Doctrine | DRAFT — awaiting CEO approval |
 | Book Intelligence — Statutory Evidence Model | `205553665` | PROD → 1 · Doctrine | DRAFT — awaiting CEO approval |
 | Book Intelligence — Documentation Cleanup Register | `205357059` | PROD → under BI Canonical Source of Truth | OPEN REGISTER |
+| Accuracy Gate — Statutory Evidence Model, First Result | `205750273` | PROD → 4 · Evidence Quality and Measurement | DRAFT — awaiting CEO approval |
 
 ## What changed and why
 
@@ -37,5 +38,13 @@ Three findings drove the restructure:
 ## Gate before any customer-facing compliance claim
 
 CEO decision, 2026-08-21: no compliance-grade claim reaches a customer before a measured
-precision figure exists, produced against the La Grange gold-standard set and published
-**per question** (a blended number would hide the prevalence asymmetry that matters most).
+precision figure exists, published **per question** (a blended number would hide the
+prevalence asymmetry that matters most).
+
+**Result: the gate cannot be satisfied as specified.** The reference gold-standard harness
+grades whether a citation substantiates a ban or challenge *event*. It has no content-type
+axis and no passage-level citations, so it scores the known-list flag layer but cannot score
+the per-statutory-question content evidence — the half that makes a claim about what is
+inside a book, and the half that most needs gating. Full result, including the one real
+defect it did surface and what building the missing ground truth requires:
+`../accuracy-gate-2026-08-21.md` and page `205750273`.
