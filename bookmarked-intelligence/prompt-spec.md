@@ -1,4 +1,38 @@
-# Book Intelligence — Content Evidence Prompt (v1.0 DRAFT)
+# Book Intelligence — Content Evidence Prompt (v1.0) — **SUPERSEDED**
+
+> **STATUS: SUPERSEDED 2026-08-21** by the Confluence spec
+> **Book Intelligence — Statutory Evidence Model** (page `205553665`, PROD → 1 · Doctrine),
+> which is the source of record. This file is retained for the corrections history and because
+> the 10-title sample run it produced is still valid evidence.
+>
+> **What v1.0 got wrong:**
+> 1. It presented seven content categories as "SB 13 vocabulary." Two of them — **"sustained
+>    nudity"** and **"extreme violence"** — are not Texas statutory categories at all. Neither
+>    term appears in Texas statute, the Education Code, or 13 TAC §4.2; violence has no
+>    statutory hook in Texas school-library law. Both are legitimate *district-rubric*
+>    dimensions, not state gates.
+> 2. It applied one uniform prevalence threshold across all categories. Prevalence is
+>    **per-question**: "as a whole" is in the statute for harmful material and obscenity,
+>    arrives via *Parent v. Lovejoy* for pervasively vulgar / educationally unsuitable, and is
+>    **absent** for indecent and profane content — where a single passage suffices.
+> 3. It organized output around content categories rather than around **the statutory questions
+>    a district must answer**. Categories are inputs; the questions are the output.
+> 4. Its `NO_EVIDENCE_FOUND` state conflated "we reviewed credible sources and found nothing"
+>    with "too few sources exist to review." The successor spec adds `INSUFFICIENT_DATA` —
+>    the distinction matters most on new and pre-publication titles, which is exactly where
+>    districts order.
+> 5. It carried no explicit prohibition on identity-based flagging. Education Code
+>    §33.021(d)(2)(G) and 13 TAC §4.2(c)(7)(g) forbid determinations resting solely on the
+>    ideas in a work or the personal background of author or characters.
+>
+> **What stands:** the source-admissibility rules, the content-description vs challenge-record
+> discipline, the one-witness independence rule, the no-evidence language discipline, and the
+> AI-provenance requirement all carried forward into the successor spec unchanged. The 10-title
+> sample evidence in `sample-results/` remains valid — only its category framing changed, so no
+> re-run was required.
+
+---
+
 
 Spec version: 1.0-draft · Author: Steve Wandler (CEO) w/ Claude session, 2026-08-20 · Status: DRAFT — staging validation, not production
 Companion: `sample-report-2026-08-20.md` (the prompt actually run on 10 test books)
