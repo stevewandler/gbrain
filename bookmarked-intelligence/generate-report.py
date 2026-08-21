@@ -7,6 +7,8 @@ known-list flags, review priority. Then per-book cards. Markdown out.
 import json
 from pathlib import Path
 
+from citation_stability import annotate
+
 CATS = [
     ("sexually_explicit", "Sexually explicit"),
     ("sustained_nudity", "Sustained nudity"),
@@ -43,7 +45,8 @@ def card(b):
     out = [f"### {b['book']['title']} — {b['book']['author']} ({b['book'].get('publication_year', '')})", ""]
     if b["known_list_flags"]:
         out.append("**Known-list flags:** " + " · ".join(
-            f"[{k['list'].split('—')[0].split('(')[0].strip()}]({k['url']}) — {k['claim']}" for k in b["known_list_flags"]))
+            f"[{k['list'].split('—')[0].split('(')[0].strip()}]({k['url']}) — {k['claim']}"
+            f"{annotate(k['url'], k['claim'])}" for k in b["known_list_flags"]))
     else:
         out.append("**Known-list flags:** none found in this run.")
     out.append("")
@@ -56,7 +59,8 @@ def card(b):
         for s in c["sources"]:
             year = f", {s['date_or_year']}" if s.get("date_or_year") else ""
             q = f' — "{s["quote"]}"' if s.get("quote") else ""
-            out.append(f"  - [{s['name']}]({s['url']}) ({s['type']}{year}){q}")
+            mark = annotate(s["url"], s.get("date_or_year", ""))
+            out.append(f"  - [{s['name']}]({s['url']}) ({s['type']}{year}){q}{mark}")
         out.append("")
     if none_:
         out.append(f"*No content evidence found in sources reviewed as of {RUN_DATE}: {', '.join(none_)}.*")

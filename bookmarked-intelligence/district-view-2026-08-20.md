@@ -8,6 +8,16 @@ Legend: ● evidence found · ◐ partial or implied · — no content evidence 
 
 **Sexually explicit** and **Obscenity** are Texas statutory gates. **Nudity** and **Extreme violence** are district criteria — neither term appears in Texas statute, the Education Code, or 13 TAC §4.2, so they are reported as this district's own criteria rather than as state requirements.
 
+## What this chart is measured to support
+
+Calibrated to the accuracy gate run on 2026-08-21 (`accuracy-gate-2026-08-21.md`), so the chart carries only claims that have a measurement behind them.
+
+**Measured.** The known-list layer — whether a flag's citation holds up. On the sample set, scored against an independent citation-credibility rubric: zero award or booklist pages cited as ban evidence, zero junk-tier or retail sources, a date on 91% of flags and a jurisdiction on 51%. Ten titles and 35 flags, so those are proportions of a small sample, not rates.
+
+**Not measured.** The accuracy of the content evidence itself, per statutory question. No adjudicated ground truth for that exists yet, so no accuracy claim is made about the ● ◐ — marks in the four columns above. Read them as what the cited sources say, and check the sources.
+
+**Known defect, marked inline.** Some citations point at a rotating index whose contents are replaced each cycle, so a claim about a specific past year may land on a page that no longer shows it. Those carry a repointing note beside the link. The claims are documented elsewhere; the citations need repointing to dated or archived pages before this chart goes to a board.
+
 | Title | Author | Sexually explicit | Obscenity | Nudity | Extreme violence | Known lists | Priority |
 |---|---|---|---|---|---|---|---|
 | **Because of Winn-Dixie** | Kate DiCamillo | — | — | — | — | 1 | No evidence found |
@@ -61,13 +71,13 @@ Legend: ● evidence found · ◐ partial or implied · — no content evidence 
   Sources: [ALA Office for Intellectual Freedom — Intellectual Freedom Blog, 'Spotlight on Censorship: Looking for Alaska'](https://www.oif.ala.org/spotlight-censorship-looking-alaska/); [PEN America — 'John Green, Author of Most Banned Book, Says It's No Badge of Honor'](https://pen.org/john-green-interview/); [Moms for Liberty — Williamson County chapter book page](https://momsforlibertywc.org/books/looking-for-alaska/)
 - **Looking for Alaska** · Obscenity (statutory gate) — ◐ YELLOW
   Multiple independent sources note strong/offensive language as part of the book's content profile, but admissible sources describe this only in general terms — no specific quoted passage, word, or frequency count was found. ALA's challenge documentation lists 'offensive language' among recorded reasons the book was challenged (2012, 2013, 2015 top-ten listings); Moms for Liberty's chapter rating p
-  Sources: [ALA Office for Intellectual Freedom — Top 10 Most Frequently Challenged Books](https://www.ala.org/bbooks/frequentlychallengedbooks/top10); [Moms for Liberty — Williamson County chapter book page](https://momsforlibertywc.org/books/looking-for-alaska/)
+  Sources: [ALA Office for Intellectual Freedom — Top 10 Most Frequently Challenged Books](https://www.ala.org/bbooks/frequentlychallengedbooks/top10) _(⚠ citation needs repointing to a dated or archived page)_; [Moms for Liberty — Williamson County chapter book page](https://momsforlibertywc.org/books/looking-for-alaska/)
 - **The Absolutely True Diary of a Part-Time Indian** · Sexually explicit (statutory gate) — ◐ YELLOW
   ALA OIF's own reason-tags for this book's repeated Top Ten Most Challenged Books appearances (2010-2020, 2022) include 'sexually explicit' and 'sex education' among cited grounds, and ALA OIF's write-up of the 2017 #2 ranking attributes the challenge to profanity plus situations 'deemed sexually explicit.' These are categorical reasons attributed to challengers, not a specific quoted scene, passag
-  Sources: [ALA Office for Intellectual Freedom — Most Challenged Books list](https://www.ala.org/bbooks/frequentlychallengedbooks/top10); [ALA OIF — "Top Ten Banned Book: Absolutely True Diary of a Part Time Indian"](https://www.oif.ala.org/top-ten-banned-book-absolutely-true-diary-of-a-part-time-indian/)
+  Sources: [ALA Office for Intellectual Freedom — Most Challenged Books list](https://www.ala.org/bbooks/frequentlychallengedbooks/top10) _(⚠ citation needs repointing to a dated or archived page)_; [ALA OIF — "Top Ten Banned Book: Absolutely True Diary of a Part Time Indian"](https://www.oif.ala.org/top-ten-banned-book-absolutely-true-diary-of-a-part-time-indian/)
 - **The Absolutely True Diary of a Part-Time Indian** · Obscenity (statutory gate) — ◐ YELLOW
   'Offensive language' / profanity recurs as a cited reason across ALA OIF's tracking of this book's many challenges (2010-2020, 2022), and ALA OIF attributes the book's 2017 #2 most-challenged ranking specifically to profanity. Sources reviewed characterize this only in general terms (frequency/severity not specified) — no source quotes a specific word, passage, or count.
-  Sources: [ALA Office for Intellectual Freedom — Most Challenged Books list](https://www.ala.org/bbooks/frequentlychallengedbooks/top10); [ALA OIF — "Top Ten Banned Book: Absolutely True Diary of a Part Time Indian"](https://www.oif.ala.org/top-ten-banned-book-absolutely-true-diary-of-a-part-time-indian/)
+  Sources: [ALA Office for Intellectual Freedom — Most Challenged Books list](https://www.ala.org/bbooks/frequentlychallengedbooks/top10) _(⚠ citation needs repointing to a dated or archived page)_; [ALA OIF — "Top Ten Banned Book: Absolutely True Diary of a Part Time Indian"](https://www.oif.ala.org/top-ten-banned-book-absolutely-true-diary-of-a-part-time-indian/)
 - **The Absolutely True Diary of a Part-Time Indian** · Extreme violence (district criterion) — ◐ YELLOW
   ALA OIF's reason-tags for this book's multiple Top Ten Most Challenged Books appearances include 'violence' alongside offensive language and sexual content. Sources reviewed give this as a categorical challenge reason, not a description of a specific violent scene, who it happens to, or how it is rendered on the page.
-  Sources: [ALA Office for Intellectual Freedom — Most Challenged Books list](https://www.ala.org/bbooks/frequentlychallengedbooks/top10)
+  Sources: [ALA Office for Intellectual Freedom — Most Challenged Books list](https://www.ala.org/bbooks/frequentlychallengedbooks/top10) _(⚠ citation needs repointing to a dated or archived page)_

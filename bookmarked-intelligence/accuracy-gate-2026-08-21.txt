@@ -31,6 +31,20 @@ FLAGS FAILING A MECHANICAL CHECK: 4
     claim: appeared on ALA's Top Ten Most Challenged Books list as of multiple years including 2010-2014, 2017, 2018, 2020, and 202
 
 --------------------------------------------------------------------------
+SAME DEFECT IN THE CONTENT-EVIDENCE LAYER: 5 sources
+--------------------------------------------------------------------------
+  To Kill a Mockingbird / profane_content
+    https://www.ala.org/bbooks/frequentlychallengedbooks/top10
+  Looking for Alaska / profane_content
+    https://www.ala.org/bbooks/frequentlychallengedbooks/top10
+  The Absolutely True Diary of a Part-Time Indian / sexually_explicit
+    https://www.ala.org/bbooks/frequentlychallengedbooks/top10
+  The Absolutely True Diary of a Part-Time Indian / extreme_violence
+    https://www.ala.org/bbooks/frequentlychallengedbooks/top10
+  The Absolutely True Diary of a Part-Time Indian / profane_content
+    https://www.ala.org/bbooks/frequentlychallengedbooks/top10
+
+--------------------------------------------------------------------------
 OVERLAP WITH THE REFERENCE AUDIT
 --------------------------------------------------------------------------
   5 of 9 sampled titles appear in the audited set

@@ -19,6 +19,8 @@ import re
 from pathlib import Path
 from urllib.parse import urlparse
 
+from citation_stability import is_unstable
+
 HERE = Path(__file__).parent
 
 # --- reference-audit baseline (Confluence 181403776, 109 flags on 126 titles) ---
@@ -77,7 +79,7 @@ def load_flags():
                 "scope": k["scope"],
                 "claim": k["claim"],
                 "known_a": bool(AWARD.search(path)),
-                "known_b": bool(ROTATING.search(k["url"])) and not YEAR_ANCHOR.search(path),
+                "known_b": is_unstable(k["url"], k["claim"]),
                 "junk_tier": bool(JUNK.search(k["url"])),
                 "new_3": bool(NEW_3.search(k["url"])),
                 "advocacy": bool(ADVOCACY.search(k["url"])),
@@ -126,6 +128,16 @@ def main():
     print(f"{'Advocacy rating site (labelled, not a fail)':<52}"
           f"{rate(hits['advocacy'], n):>14}{'tier-capped':>16}")
 
+    # The same defect in the content-evidence layer. Not part of the Channel 1
+    # rate above (different denominator) but part of the honest total.
+    cat_unstable = []
+    for path in sorted((HERE / "sample-results").glob("*.json")):
+        d = json.loads(path.read_text())
+        for cat, c in d["categories"].items():
+            for src in c.get("sources", []):
+                if is_unstable(src.get("url", ""), src.get("date_or_year", "")):
+                    cat_unstable.append((d["book"]["title"], cat, src["url"]))
+
     fails = [f for f in flags
              if f["known_b"] or f["known_a"] or f["junk_tier"] or f["new_3"]]
     print()
@@ -137,6 +149,14 @@ def main():
         print(f"  [{which}] {f['title']}")
         print(f"    {f['url']}")
         print(f"    claim: {f['claim'][:120]}")
+
+    print()
+    print("-" * 74)
+    print(f"SAME DEFECT IN THE CONTENT-EVIDENCE LAYER: {len(cat_unstable)} sources")
+    print("-" * 74)
+    for title, cat, url in cat_unstable:
+        print(f"  {title} / {cat}")
+        print(f"    {url}")
 
     print()
     print("-" * 74)

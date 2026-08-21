@@ -6,8 +6,9 @@ measure produced one real, actionable defect in the sample run.
 
 Run artifacts: `accuracy-gate.py` (the checks), `accuracy-gate-2026-08-21.txt`
 (raw output), `sample-results/*.json` (the run under test). The fix for the one
-defect found is landed in `qc-sweep.py` as check 7, which now hard-fails the
-three affected flags.
+defect found is landed in `citation_stability.py`, enforced by `qc-sweep.py`
+check 7 (8 hard fails on the committed sample) and surfaced inline by both
+report renderers.
 
 ---
 
@@ -71,6 +72,19 @@ front of a board finds a page that does not mention the book.
 This run therefore **reproduced the Known-B defect at a slightly higher rate
 than production** (8.6% vs 6.4%), on a curated sample where it should have done
 better.
+
+**And the same defect sits in the content-evidence layer.** Extending the check
+past the flag layer found **five more instances**: the same rotating index cited
+as a source under `profane_content`, `sexually_explicit`, and `extreme_violence`
+on three titles. Eight defective citations in total across the sample, and the
+five in the content layer are the ones a district actually clicks — they render
+in the "what the evidence says" section of the report, not in a flag count.
+
+One thing that did hold there: all five are typed `advocacy_rationale`, not
+`professional_review`, and each findings text says in so many words that these
+are categorical reasons attributed to challengers rather than a described scene.
+The content-description-versus-challenge-record discipline worked. The citation
+under it did not.
 
 **Root cause — a real spec gap.** Both v1.0 and the statutory evidence model
 rule on *source admissibility* (which domains and genres are allowed). Neither
@@ -173,8 +187,8 @@ manuscript is not.
 stability gap before anything ships.** Concretely:
 
 - **Landed.** `qc-sweep.py` check 7 now hard-fails a dated claim that cites a
-  rotating index. The sweep consequently reports **3 hard fails on the committed
-  sample set** — that is the gate working, not a regression. Repointing those
+  rotating index in either layer. The sweep consequently reports **8 hard fails
+  on the committed sample set** — that is the gate working, not a regression. Repointing those
   three citations to year-anchored or archived pages needs a machine that can
   open the replacement page to confirm it carries the claim; egress is blocked
   here, so the repoint is a named open item rather than a guess.

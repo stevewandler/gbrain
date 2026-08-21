@@ -18,6 +18,8 @@ neither term appears in Texas statute, the Education Code, or 13 TAC 4.2.
 import json
 from pathlib import Path
 
+from citation_stability import annotate
+
 SRC = Path(__file__).parent / "sample-results"
 RUN_DATE = "2026-08-20"
 
@@ -59,7 +61,9 @@ def main():
                 any_evidence = True
                 for fname, c in contributors:
                     srcs = "; ".join(
-                        f"[{s['name']}]({s['url']})" for s in c.get("sources", [])[:3]
+                        f"[{s['name']}]({s['url']})"
+                        f"{annotate(s['url'], s.get('date_or_year', ''))}"
+                        for s in c.get("sources", [])[:3]
                     )
                     detail.append(
                         f"- **{b['book']['title']}** · {label} "
@@ -102,6 +106,31 @@ def main():
         "**Nudity** and **Extreme violence** are district criteria — neither term "
         "appears in Texas statute, the Education Code, or 13 TAC §4.2, so they are "
         "reported as this district's own criteria rather than as state requirements.",
+        "",
+        "## What this chart is measured to support",
+        "",
+        "Calibrated to the accuracy gate run on 2026-08-21 "
+        "(`accuracy-gate-2026-08-21.md`), so the chart carries only claims that "
+        "have a measurement behind them.",
+        "",
+        "**Measured.** The known-list layer — whether a flag's citation holds up. "
+        "On the sample set, scored against an independent citation-credibility "
+        "rubric: zero award or booklist pages cited as ban evidence, zero "
+        "junk-tier or retail sources, a date on 91% of flags and a jurisdiction "
+        "on 51%. Ten titles and 35 flags, so those are proportions of a small "
+        "sample, not rates.",
+        "",
+        "**Not measured.** The accuracy of the content evidence itself, per "
+        "statutory question. No adjudicated ground truth for that exists yet, so "
+        "no accuracy claim is made about the ● ◐ — marks in the four columns "
+        "above. Read them as what the cited sources say, and check the sources.",
+        "",
+        "**Known defect, marked inline.** Some citations point at a rotating "
+        f"index whose contents are replaced each cycle, so a claim about a "
+        "specific past year may land on a page that no longer shows it. Those "
+        "carry a repointing note beside the link. The claims are documented "
+        "elsewhere; the citations need repointing to dated or archived pages "
+        "before this chart goes to a board.",
         "",
         "| " + " | ".join(hdr) + " |",
         "|" + "---|" * len(hdr),
