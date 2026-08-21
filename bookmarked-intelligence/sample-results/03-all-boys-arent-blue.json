@@ -1,0 +1,168 @@
+{
+  "book": {
+    "title": "All Boys Aren't Blue",
+    "author": "George M. Johnson",
+    "isbn": "unknown",
+    "publication_year": 2020,
+    "audience_reported": "Young adult (YA) memoir-manifesto; School Library Journal recommends it for YA nonfiction collections. District shelving/placement has varied in practice — one early challenge (Olathe, KS, 2021) arose from placement in a 7th-grade classroom library."
+  },
+  "known_list_flags": [
+    {
+      "list": "PEN America Banned in the USA Index",
+      "scope": "National index of U.S. public-school book bans, 2021-22 school year",
+      "claim": "Appeared on PEN America's book-ban index as the 2nd-most-banned title tracked nationally, as of the 2021-22 school year.",
+      "url": "https://pen.org/george-m-johnson-all-boys-arent-blue/",
+      "independence_group": "pen_america"
+    },
+    {
+      "list": "ALA Office for Intellectual Freedom — Top 10 Most Challenged Books",
+      "scope": "National, U.S. libraries and schools, 2024 reporting year",
+      "claim": "Appeared on ALA OIF's Top 10 Most Challenged Books list as the #1 (most challenged) title, as of the 2024 list (reported April 2025) — its fourth consecutive year on the list.",
+      "url": "https://www.ala.org/news/2025/11/all-boys-arent-blue-tops-alas-list-most-challenged-books",
+      "independence_group": "ala_oif"
+    },
+    {
+      "list": "South Carolina State Board of Education statewide removal order",
+      "scope": "All South Carolina public K-12 schools",
+      "claim": "Appeared on South Carolina's statewide instructional-materials removal orders as of a Feb. 4, 2025 vote (State Board of Education Order 2025-0004), removing the title from every SC public school.",
+      "url": "https://ed.sc.gov/state-board/state-board-of-education/uniform-procedure-for-selection-or-reconsideration-of-instructional-materials/books-reviewed/final-orders/sbe-order-2025-0004-all-boys-arent-blue/",
+      "independence_group": "state_record_sc"
+    },
+    {
+      "list": "Utah statewide 'objective sensitive material' tracking / Alpine School District ban list",
+      "scope": "Alpine School District, UT (district-level; feeds Utah's statewide tracking system)",
+      "claim": "Appeared on Alpine School District's banned-title list and was reported at two strikes under Utah's statewide sensitive-material tracking system, as of a Dec. 6, 2024 report.",
+      "url": "https://www.kuer.org/education/2024-12-06/with-utahs-statewide-book-bans-2-school-districts-have-steered-the-conversation",
+      "independence_group": "state_record_ut"
+    },
+    {
+      "list": "Florida school library removals (state-collected district reporting)",
+      "scope": "Florida public school districts",
+      "claim": "Named among titles pulled from Florida school libraries per Florida education officials' own reporting, as of 2025 national news coverage.",
+      "url": "https://www.nbcnews.com/nbc-out/out-news/florida-education-officials-report-hundreds-books-pulled-school-librar-rcna179958",
+      "independence_group": "news_fl"
+    }
+  ],
+  "categories": {
+    "sexually_explicit": {
+      "verdict": "RED",
+      "findings": "A starred Kirkus Reviews notice for this memoir identifies childhood sexual abuse and, separately, a consensual sexual encounter as content the book depicts. South Carolina's State Board of Education cited sexual content as grounds for its Feb. 2025 statewide removal order — regional press reported the board's action as following 'sex complaints.' Multiple district-level reconsideration proceedings centered on this same content with different outcomes: Ankeny, Iowa's full-committee review recommended retention (finding the flagged material under 5% of the total text and directing reviewers to judge the work as a whole rather than isolated passages), while in Flagler County, FL, the superintendent ordered removal from media centers even after a district committee had unanimously found the book 'appropriate for use.' This pass could not retrieve a verbatim quoted excerpt of the scene itself (WebFetch was blocked on the relevant domains) — the RED verdict rests on the professional review's explicit content description plus corroborated state/district records, not a fetched primary-text quote.",
+      "claim_types": [
+        "content_description",
+        "challenge_record"
+      ],
+      "sources": [
+        {
+          "name": "Kirkus Reviews",
+          "url": "https://www.kirkusreviews.com/book-reviews/george-m-johnson/all-boys-arent-blue/",
+          "type": "professional_review",
+          "date_or_year": "2020",
+          "quote": "",
+          "independence_group": "kirkus"
+        },
+        {
+          "name": "South Carolina State Board of Education, Order 2025-0004",
+          "url": "https://ed.sc.gov/state-board/state-board-of-education/uniform-procedure-for-selection-or-reconsideration-of-instructional-materials/books-reviewed/final-orders/sbe-order-2025-0004-all-boys-arent-blue/",
+          "type": "state_record",
+          "date_or_year": "2025",
+          "quote": "",
+          "independence_group": "state_record_sc"
+        },
+        {
+          "name": "The Post and Courier",
+          "url": "https://www.postandcourier.com/education-lab/sc-book-bans-state-board-perks-wallflower/article_c46c30c6-e33a-11ef-be16-cfbe54870a54.html",
+          "type": "news",
+          "date_or_year": "2025",
+          "quote": "State education board bans more books from SC public schools following sex complaints",
+          "independence_group": "regional_news_sc"
+        },
+        {
+          "name": "Ankeny Community School District — Group Reconsideration Recommendation",
+          "url": "https://www.ankenyschools.org/app/uploads/2021/11/Group-Reconsideration-Recommendation_-All-Boys-Arent-Blue.pdf",
+          "type": "state_record",
+          "date_or_year": "2021",
+          "quote": "",
+          "independence_group": "district_record_ia"
+        },
+        {
+          "name": "FlaglerLive",
+          "url": "https://flaglerlive.com/books-returned-withheld/",
+          "type": "news",
+          "date_or_year": "unknown",
+          "quote": "",
+          "independence_group": "regional_news_fl"
+        }
+      ]
+    },
+    "sustained_nudity": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "extreme_violence": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "profane_content": {
+      "verdict": "YELLOW",
+      "findings": "NPR's 2022 reporting on this book's bans states it was 'banned and challenged for LGBTQIA+ content, profanity, and because it was considered sexually explicit' — profanity named as one of the challengers' stated reasons, in general terms, without specific instances, frequency, or severity documented by an admissible source in this pass. This is a challenge-record-level finding, not a content description of specific language.",
+      "claim_types": [
+        "challenge_record"
+      ],
+      "sources": [
+        {
+          "name": "NPR",
+          "url": "https://www.npr.org/2022/10/25/1130433140/banned-books-all-boys-arent-blue-george-johnson-lgbtq-ya",
+          "type": "news",
+          "date_or_year": "2022",
+          "quote": "",
+          "independence_group": "national_news"
+        }
+      ]
+    },
+    "indecent_content": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "patently_vulgar": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "prohibited_website_referral": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    }
+  },
+  "legal_lenses": {
+    "prurient_theme": {
+      "evidence_found": false,
+      "basis": "Professional reviews (Kirkus; School Library Journal) and district reconsideration materials frame the work as a whole as a memoir-manifesto about Black queer identity, white supremacy, toxic masculinity, and homophobia — none characterize its overall theme as appealing to prurient interest. The sexual content found is a portion of a larger work, not its organizing theme; isolated passages do not by themselves establish whole-work prurient appeal."
+    },
+    "onpage_explicit_scenes": {
+      "evidence_found": true,
+      "basis": "Kirkus's professional review names sexual abuse and a separate consensual sexual encounter as depicted content, and the pattern of state/district actions specifically triggered by this content (South Carolina's 2025 statewide order following what regional press called 'sex complaints'; a Flagler County, FL superintendent-level removal overriding a committee that had cleared the book) indicates sources report specific explicit content beyond a passing reference. This pass did not surface an admissible source's verbatim excerpt of the scene text itself."
+    }
+  },
+  "synopsis": "This title carries the heaviest known-list footprint of any book in this run: it is the current #1 title on the ALA's national most-challenged list (2024, its fourth consecutive year listed), was PEN America's #2 most-banned title of the 2021-22 school year, was removed from every South Carolina public school by state board order in February 2025, and appears on Utah's Alpine School District ban list under the state's sensitive-material tracking, with additional reported removals in Florida. On content, a starred Kirkus review and South Carolina's own removal action — reported by regional press as following 'sex complaints' — both point to specific sexual content: a non-consensual sexual encounter with an older family member and a separately depicted consensual encounter, corroborated by multiple district-level reconsideration proceedings (Iowa, Florida) that centered on the same material, though this pass could not retrieve a verbatim quoted passage. Reviewers frame the book's overall theme as Black queer identity and anti-racism/anti-homophobia, not as thematically prurient, so the prurient-theme lens found no evidence; the on-page-explicit-scenes lens did find evidence. No admissible source in this pass supported extreme violence, sustained nudity, indecent content beyond the sexual-content finding above, patently vulgar content, or prohibited website referrals; a general 'profanity' justification appears in press coverage of the challenges but without documented specific instances. Net: a heavy known-list presence paired with genuine, multiply corroborated content evidence — exactly the case where a bare list link would tell a librarian nothing useful.",
+  "review_priority": "LOOK_CLOSER",
+  "provenance": {
+    "model": "Claude research agent (stop-gap run)",
+    "prompt_version": "1.0",
+    "run_date": "2026-08-20",
+    "sources_reviewed_count": 12,
+    "disclaimer": "This summary is AI generated and unverified. Confirm findings against the cited sources before acting."
+  },
+  "feedback": {
+    "thumbs": null,
+    "note": null
+  }
+}
