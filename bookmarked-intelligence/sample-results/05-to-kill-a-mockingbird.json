@@ -1,0 +1,139 @@
+{
+  "book": {
+    "title": "To Kill a Mockingbird",
+    "author": "Harper Lee",
+    "isbn": "",
+    "publication_year": 1960,
+    "audience_reported": "Middle grade/high school (commonly taught grades 8-10); audience_shelf provided as high"
+  },
+  "known_list_flags": [
+    {
+      "list": "ALA Office for Intellectual Freedom - Frequently/Most Challenged Books",
+      "scope": "National (U.S. school and library challenges)",
+      "claim": "appeared on ALA's Frequently Challenged Books lists as of 2011, 2017 (Top Ten), and the 2010-2019 decade Top 100 list",
+      "url": "https://www.ala.org/bbooks/frequentlychallengedbooks/top10",
+      "independence_group": "ala.org"
+    },
+    {
+      "list": "PEN America - school book ban tracking (\"The Bills Igniting Book Bans\")",
+      "scope": "Leander Independent School District, Texas",
+      "claim": "appeared on PEN America's reporting of Texas school book removals as of September-October 2025, after Leander ISD paused it in classroom use under Texas SB 12 following an AI-assisted content review; district and local news sources report it was reinstated after curriculum-materials revision",
+      "url": "https://pen.org/report/the-bills-igniting-book-bans/",
+      "independence_group": "pen.org"
+    }
+  ],
+  "categories": {
+    "sexually_explicit": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "sustained_nudity": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "extreme_violence": {
+      "verdict": "YELLOW",
+      "findings": "Kirkus Reviews' capsule review describes the novel's climax: Boo Radley kills Bob Ewell as Ewell attempts to attack Scout and Jem. This is the single specific violent scene named by an admissible source in sources reviewed; the review frames it as the plot's resolving action (defense of the children), not as gratuitous or extended violence, and no source reviewed adds further graphic detail, a count, or additional scenes.",
+      "claim_types": [
+        "content_description"
+      ],
+      "sources": [
+        {
+          "name": "Kirkus Reviews",
+          "url": "https://www.kirkusreviews.com/book-reviews/harper-lee/to-kill-a-mockingbird/",
+          "type": "professional_review",
+          "date_or_year": "",
+          "quote": "",
+          "independence_group": "kirkusreviews.com"
+        }
+      ]
+    },
+    "profane_content": {
+      "verdict": "YELLOW",
+      "findings": "Multiple national news organizations report that Biloxi, Mississippi's school district removed the novel from 8th-grade classroom curriculum in October 2017 over discomfort with its language, specifically repeated use of a racial slur, after a parent complaint (the book remained available in the school library). Coverage quotes a school board official describing the concern only in general terms (\"language in the book that makes people uncomfortable\") rather than citing a specific passage or count, which keeps this at YELLOW rather than RED. Separately, ALA's Office for Intellectual Freedom lists racial-slur/offensive-language concerns among the recurring reasons the novel has been formally challenged nationwide across multiple decades.",
+      "claim_types": [
+        "content_description",
+        "challenge_record"
+      ],
+      "sources": [
+        {
+          "name": "The Washington Post",
+          "url": "https://www.washingtonpost.com/news/retropolis/wp/2017/10/15/the-ironic-enduring-legacy-of-banning-to-kill-a-mockingbird-for-racist-language/",
+          "type": "news",
+          "date_or_year": "2017",
+          "quote": "",
+          "independence_group": "washingtonpost.com"
+        },
+        {
+          "name": "U.S. News & World Report",
+          "url": "https://www.usnews.com/news/education-news/articles/2017-10-16/biloxi-school-district-pulls-to-kill-a-mockingbird-from-8th-grade-classes",
+          "type": "news",
+          "date_or_year": "2017",
+          "quote": "There is some language in the book that makes people uncomfortable, and we can teach the same lesson with other books",
+          "independence_group": "usnews.com"
+        },
+        {
+          "name": "Time",
+          "url": "https://time.com/5138752/mockingbird-huckleberry-finn-racial-slurs-racism/",
+          "type": "news",
+          "date_or_year": "2017",
+          "quote": "",
+          "independence_group": "time.com"
+        },
+        {
+          "name": "ALA Office for Intellectual Freedom - Most Challenged Books",
+          "url": "https://www.ala.org/bbooks/frequentlychallengedbooks/top10",
+          "type": "advocacy_rationale",
+          "date_or_year": "2011-2017",
+          "quote": "",
+          "independence_group": "ala.org"
+        }
+      ]
+    },
+    "indecent_content": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "patently_vulgar": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "prohibited_website_referral": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    }
+  },
+  "legal_lenses": {
+    "prurient_theme": {
+      "evidence_found": false,
+      "basis": "Professional-review and challenge-history sources reviewed describe the novel's central theme as racial injustice and a child's moral coming-of-age via Atticus Finch's defense of a Black man falsely accused of rape. No source reviewed characterizes the work as a whole as appealing to prurient interest or as a work whose theme solicits sexual interest."
+    },
+    "onpage_explicit_scenes": {
+      "evidence_found": false,
+      "basis": "Sources reviewed (Kirkus Reviews; challenge-history coverage) describe a rape accusation and courtroom trial as a plot element that is discussed and litigated in the text, not a depicted scene. No source reviewed reports a detailed, on-the-page sexual scene."
+    }
+  },
+  "synopsis": "This title's real, well-documented content-evidence profile centers on profanity/racial-slur language and one plot-necessary violent scene, not sexual content. Multiple national news outlets confirm Biloxi, MS removed it from 8th-grade curriculum in October 2017 specifically over racial-slur language (it remained in the school library), and it has appeared on ALA's Frequently Challenged Books lists in 2011, 2017 (Top Ten), and the 2010-2019 decade Top 100, with slurs, a 'white savior' framing, and language cited as recurring reasons. Most recently, per PEN America, Leander ISD (TX) paused it in classroom use in Sept-Oct 2025 during an AI-assisted Texas SB 12 'DEI content' review; local news reports it was reinstated after the district revised curriculum materials. Despite the plot's rape-trial subject matter, no admissible source reviewed describes an on-page explicit sexual scene or sustained nudity, so sexually_explicit and both legal lenses are unsupported here. No match was found, in sources reviewed, on Moms for Liberty/BookLooks, Take Back the Classroom, or Utah/Florida state removal lists; South Carolina's State Board Instructional Materials Review Committee formally reviewed the title in 2024 under Regulation 43-170 and recommended it be RETAINED, not removed. Net: the documented risk surface here is language/racial-slur and general violence-in-plot history, corroborated by a state-level review that found no statutory violation -- not a sexual-content case.",
+  "review_priority": "NO_ACTION_INDICATED",
+  "provenance": {
+    "model": "Claude research agent (stop-gap run)",
+    "prompt_version": "1.0",
+    "run_date": "2026-08-20",
+    "sources_reviewed_count": 12,
+    "disclaimer": "This summary is AI generated and unverified. Confirm findings against the cited sources before acting."
+  },
+  "feedback": {
+    "thumbs": null,
+    "note": null
+  }
+}

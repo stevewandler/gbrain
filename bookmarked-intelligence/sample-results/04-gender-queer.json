@@ -1,0 +1,173 @@
+{
+  "book": {
+    "title": "Gender Queer: A Memoir",
+    "author": "Maia Kobabe",
+    "isbn": "unknown",
+    "publication_year": 2019,
+    "audience_reported": "School Library Journal recommends grades 9+ (Dec. 2019 review); author states e wrote it for eir parents and for older teens already questioning their identity; some retailers list 15+ or 18+."
+  },
+  "known_list_flags": [
+    {
+      "list": "ALA Office for Intellectual Freedom — Top 10 Most Challenged Books",
+      "scope": "#1 most challenged title on the annual lists covering 2021, 2022, and 2023 (2023 list released April 2024)",
+      "claim": "appeared on ALA OIF's Top 10 Most Challenged Books list as the #1 most challenged title as of the 2021, 2022, and 2023 annual reports",
+      "url": "https://www.publishersweekly.com/pw/by-topic/industry-news/libraries/article/94768-ala-releases-top-10-most-challenged-books-of-2023.html",
+      "independence_group": "ala_oif"
+    },
+    {
+      "list": "PEN America — Banned in the USA index / Banned in the USA Spotlight series",
+      "scope": "reported as the most-banned book of the 2021–22 school year; profiled individually in PEN America's ongoing Spotlight coverage",
+      "claim": "appeared on PEN America's Banned in the USA index as of the 2021–22 school-year tracking and in its Spotlight series naming this title specifically",
+      "url": "https://pen.org/maia-kobabe-gender-queer-interview/",
+      "independence_group": "pen_america"
+    },
+    {
+      "list": "BookLooks.org (Moms for Liberty–linked rating site)",
+      "scope": "book-specific report card/rating; analyzed by an ALA journal article and referenced in regional news coverage of a Moms for Liberty–linked library challenge",
+      "claim": "appeared on BookLooks.org as of a book-specific report card, as documented by academic and news sources that reviewed that report card",
+      "url": "https://journals.ala.org/index.php/jifp/article/view/8142",
+      "independence_group": "moms_for_liberty_booklooks"
+    }
+  ],
+  "categories": {
+    "sexually_explicit": {
+      "verdict": "RED",
+      "findings": "Multiple independent sources describe specific on-the-page sexual content in this book. School Library Journal's professional review (Dec. 2019) says the memoir 'examines everything from pap smears gone wrong to experiments with sex toys.' Staff-reported news (WAFB, a Louisiana CBS affiliate) documents a September 2023 U.S. Senate Judiciary hearing at which Sen. John Kennedy read aloud on camera a passage referencing a sex-toy/strap-on scene. A Virginia Circuit Court obscenity petition against this book (per the ACLU's press release on the ruling) was dismissed on jurisdictional/due-process grounds; reporting on Kobabe's brief in that case states the contested sexual content spans roughly seven pages of the full memoir. Separately, BookLooks' report card on this title, as analyzed in an ALA journal article (Journal of Intellectual Freedom & Privacy), catalogs specific sexual-content panels.",
+      "claim_types": [
+        "content_description",
+        "challenge_record"
+      ],
+      "sources": [
+        {
+          "name": "School Library Journal, book review",
+          "url": "https://www.slj.com/review/gender-queer-a-memoir",
+          "type": "professional_review",
+          "date_or_year": "2019-12",
+          "quote": "experiments with sex toys",
+          "independence_group": "professional_review_slj"
+        },
+        {
+          "name": "WAFB (CBS affiliate), Senate hearing coverage",
+          "url": "https://www.wafb.com/2023/09/15/sen-kennedy-reads-graphic-excerpts-novels-during-discussion-book-bans-senate-committee/",
+          "type": "news",
+          "date_or_year": "2023-09-15",
+          "quote": "",
+          "independence_group": "news_wafb"
+        },
+        {
+          "name": "ACLU, press release on Virginia obscenity ruling",
+          "url": "https://www.aclu.org/press-releases/virginia-judge-rejects-obscenity-proceedings-against-gender-queer-and-court-mist-and",
+          "type": "state_record",
+          "date_or_year": "2023",
+          "quote": "",
+          "independence_group": "court_record_va"
+        },
+        {
+          "name": "Journal of Intellectual Freedom & Privacy (ALA), analysis of BookLooks report card",
+          "url": "https://journals.ala.org/index.php/jifp/article/view/8142",
+          "type": "advocacy_rationale",
+          "date_or_year": "unknown",
+          "quote": "",
+          "independence_group": "moms_for_liberty_booklooks"
+        }
+      ]
+    },
+    "sustained_nudity": {
+      "verdict": "RED",
+      "findings": "As an illustrated, full-color graphic memoir, sources describe nudity as drawn on the page, not merely narrated. Fox News coverage of the controversy characterizes the contested illustrations as 'extremely graphic images' of sex acts. BookLooks' report card on this title, as analyzed by an ALA journal article, lists sexual nudity among its cataloged concerns and cites specific panels. School Library Journal's review corroborates that the memoir depicts intimate bodily/sexual content (sex-toy experimentation, gynecological exams) directly in its illustrated panels rather than through implication.",
+      "claim_types": [
+        "content_description"
+      ],
+      "sources": [
+        {
+          "name": "Fox News, coverage of author's response to controversy",
+          "url": "https://noticias.foxnews.com/media/gender-queer-author-defends-extremely-graphic-images-sex-acts-memoir-could-have-been-worse",
+          "type": "news",
+          "date_or_year": "unknown",
+          "quote": "extremely graphic images",
+          "independence_group": "news_fox"
+        },
+        {
+          "name": "Journal of Intellectual Freedom & Privacy (ALA), analysis of BookLooks report card",
+          "url": "https://journals.ala.org/index.php/jifp/article/view/8142",
+          "type": "advocacy_rationale",
+          "date_or_year": "unknown",
+          "quote": "",
+          "independence_group": "moms_for_liberty_booklooks"
+        },
+        {
+          "name": "School Library Journal, book review",
+          "url": "https://www.slj.com/review/gender-queer-a-memoir",
+          "type": "professional_review",
+          "date_or_year": "2019-12",
+          "quote": "experiments with sex toys",
+          "independence_group": "professional_review_slj"
+        }
+      ]
+    },
+    "extreme_violence": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "profane_content": {
+      "verdict": "YELLOW",
+      "findings": "Evidence is secondhand and general. An ALA journal analysis of BookLooks' report card on this title notes the report includes a 'profanity counter' among its cataloged concerns, but no admissible, book-specific verbatim examples or counts were found in the professional-review, state-record, or staff-reported-news sources reviewed for this run.",
+      "claim_types": [
+        "content_description"
+      ],
+      "sources": [
+        {
+          "name": "Journal of Intellectual Freedom & Privacy (ALA), analysis of BookLooks report card",
+          "url": "https://journals.ala.org/index.php/jifp/article/view/8142",
+          "type": "advocacy_rationale",
+          "date_or_year": "unknown",
+          "quote": "",
+          "independence_group": "moms_for_liberty_booklooks"
+        }
+      ]
+    },
+    "indecent_content": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "patently_vulgar": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "prohibited_website_referral": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    }
+  },
+  "legal_lenses": {
+    "prurient_theme": {
+      "evidence_found": false,
+      "basis": "No admissible source reviewed asserts the memoir AS A WHOLE appeals to prurient interest. Reporting on Kobabe's Virginia court brief (ACLU press release on the ruling) frames the contested sexual content as roughly seven pages within a memoir centrally about gender identity, and the Virginia obscenity petitions against the book were dismissed. PEN America's coverage notes multiple districts' reconsideration committees retained the book after reading it in full. Under this test, isolated explicit passages do not by themselves establish whole-work prurient appeal, and no source found argues otherwise for this title."
+    },
+    "onpage_explicit_scenes": {
+      "evidence_found": true,
+      "basis": "Sources name specific on-the-page scenes: a sex-toy/strap-on scene read aloud at a September 2023 U.S. Senate Judiciary hearing (per WAFB news coverage), sex-toy experimentation and gynecological/pap-smear exam content (School Library Journal review), and sexual-nudity panels cataloged in BookLooks' report card on this title (per the ALA journal analysis)."
+    }
+  },
+  "synopsis": "This illustrated memoir has topped ALA OIF's most-challenged-books list for three consecutive annual reports (2021-2023) and is separately tracked in PEN America's Banned in the USA index and in a Moms for Liberty-linked BookLooks report card; no source found in this run explicitly names this book on Take Back the Classroom's list or on the specific state-agency removal lists requested (Utah USBE, South Carolina SCDE, Florida FLDOE), so no known-list flag is reported for those four beyond the general reporting that districts in Utah, South Carolina, and Florida have challenged or removed the title locally. On content, admissible sources converge on specific, named on-the-page scenes -- a sex-toy/strap-on scene read aloud at a 2023 Senate hearing, a sex-toy-experimentation and gynecological-exam sequence per School Library Journal, and sexual-nudity panels per a BookLooks report card -- supporting RED verdicts for sexually_explicit and sustained_nudity, both specific to this illustrated title. Profanity evidence is present but generic and single-sourced (YELLOW); no admissible source reviewed supports extreme_violence, additional indecent_content beyond the sexual-content findings above, patently_vulgar, or prohibited_website_referral for this title. On the two legal lenses, sources support specific named on-page explicit scenes, but do not support that the work AS A WHOLE is designed to appeal to prurient interest -- Kobabe's own court filing frames the explicit content as roughly seven pages of a broader coming-of-age narrative, and multiple reconsideration committees that read the full book chose to retain it. Districts should weigh the specific named scenes above directly rather than relying on aggregate challenge counts.",
+  "review_priority": "LOOK_CLOSER",
+  "provenance": {
+    "model": "Claude research agent (stop-gap run)",
+    "prompt_version": "1.0",
+    "run_date": "2026-08-20",
+    "sources_reviewed_count": 17,
+    "disclaimer": "This summary is AI generated and unverified. Confirm findings against the cited sources before acting."
+  },
+  "feedback": {
+    "thumbs": null,
+    "note": null
+  }
+}

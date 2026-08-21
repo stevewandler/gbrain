@@ -1,0 +1,74 @@
+{
+  "book": {
+    "title": "Diary of a Wimpy Kid: Old School",
+    "author": "Jeff Kinney",
+    "isbn": "unknown",
+    "publication_year": 2015,
+    "audience_reported": "middle"
+  },
+  "known_list_flags": [],
+  "categories": {
+    "sexually_explicit": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "sustained_nudity": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "extreme_violence": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "profane_content": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "indecent_content": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "patently_vulgar": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "prohibited_website_referral": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    }
+  },
+  "legal_lenses": {
+    "prurient_theme": {
+      "evidence_found": false,
+      "basis": "No credible source indicates the work as a whole appeals to prurient interest or that its theme solicits an interest in sex; the one admissible, book-specific review located (Kirkus) characterizes the title as family-oriented comedy consistent with the series' established tone."
+    },
+    "onpage_explicit_scenes": {
+      "evidence_found": false,
+      "basis": "No credible source reports any detailed, on-the-page explicit scene in this title."
+    }
+  },
+  "synopsis": "No credible, book-specific evidence was found for any of the seven content categories in this title. The only admissible source located that names this exact book — a Kirkus Reviews notice for 'Old School' specifically — describes standard series-style family comedy and raises no caution-relevant content. No admissible source among PEN America's index, ALA OIF's frequently-challenged lists, the Utah/South Carolina/Florida state removal lists, Moms for Liberty/BookLooks-lineage material, or Take Back the Classroom was found naming this specific title; search results surfacing 'Diary of a Wimpy Kid' challenges refer to the original 2007 book or the series generically, which does not satisfy the book-naming requirement for this installment. A previously circulated claim of an 'Oklahoma City ban' could not be traced to any admissible source in this research pass — the only lead identified for that claim traces to a resale-marketplace listing, which is inadmissible — so it is not carried forward as a flag. Current evidence supports no action.",
+  "review_priority": "NO_ACTION_INDICATED",
+  "provenance": {
+    "model": "Claude research agent (stop-gap run)",
+    "prompt_version": "1.0",
+    "run_date": "2026-08-20",
+    "sources_reviewed_count": 1,
+    "disclaimer": "This summary is AI generated and unverified. Confirm findings against the cited sources before acting."
+  },
+  "feedback": { "thumbs": null, "note": null }
+}

@@ -1,0 +1,141 @@
+{
+  "book": {
+    "title": "The Absolutely True Diary of a Part-Time Indian",
+    "author": "Sherman Alexie",
+    "isbn": "unknown",
+    "publication_year": 2007,
+    "audience_reported": "young adult; publisher-marketed to grades 9-12 and commonly taught in middle and high school classrooms"
+  },
+  "known_list_flags": [
+    {
+      "list": "PEN America Index of School Book Bans",
+      "scope": "K-12 public school bans, 2021-22 school year reporting period",
+      "claim": "appeared on PEN America's Index of School Book Bans as of the 2021-22 school year, per School Library Journal's reporting on PEN America's list of most-banned titles since 2021",
+      "url": "https://www.schoollibraryjournal.com/story/PEN-America-Releases-list-52-most-Books-Banned-Schools-Since-2021",
+      "independence_group": "PEN America"
+    },
+    {
+      "list": "ALA Office for Intellectual Freedom — Top Ten Most Challenged Books",
+      "scope": "multiple years: 2010-2014, 2017, 2018, 2020, and 2022",
+      "claim": "appeared on ALA's Top Ten Most Challenged Books list as of multiple years including 2010-2014, 2017, 2018, 2020, and 2022",
+      "url": "https://www.ala.org/bbooks/frequentlychallengedbooks/top10",
+      "independence_group": "ALA OIF"
+    }
+  ],
+  "categories": {
+    "sexually_explicit": {
+      "verdict": "YELLOW",
+      "findings": "ALA OIF's own reason-tags for this book's repeated Top Ten Most Challenged Books appearances (2010-2020, 2022) include 'sexually explicit' and 'sex education' among cited grounds, and ALA OIF's write-up of the 2017 #2 ranking attributes the challenge to profanity plus situations 'deemed sexually explicit.' These are categorical reasons attributed to challengers, not a specific quoted scene, passage, or page reference. No admissible source reviewed today names or quotes a particular sexual passage in this book.",
+      "claim_types": [
+        "challenge_record"
+      ],
+      "sources": [
+        {
+          "name": "ALA Office for Intellectual Freedom — Most Challenged Books list",
+          "url": "https://www.ala.org/bbooks/frequentlychallengedbooks/top10",
+          "type": "advocacy_rationale",
+          "date_or_year": "2010-2022 (aggregated multi-year list)",
+          "quote": "Offensive language, racism, sex education, sexually explicit, unsuited to age group, and violence.",
+          "independence_group": "ALA OIF"
+        },
+        {
+          "name": "ALA OIF — \"Top Ten Banned Book: Absolutely True Diary of a Part Time Indian\"",
+          "url": "https://www.oif.ala.org/top-ten-banned-book-absolutely-true-diary-of-a-part-time-indian/",
+          "type": "advocacy_rationale",
+          "date_or_year": "2017",
+          "quote": "",
+          "independence_group": "ALA OIF"
+        }
+      ]
+    },
+    "sustained_nudity": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "extreme_violence": {
+      "verdict": "YELLOW",
+      "findings": "ALA OIF's reason-tags for this book's multiple Top Ten Most Challenged Books appearances include 'violence' alongside offensive language and sexual content. Sources reviewed give this as a categorical challenge reason, not a description of a specific violent scene, who it happens to, or how it is rendered on the page.",
+      "claim_types": [
+        "challenge_record"
+      ],
+      "sources": [
+        {
+          "name": "ALA Office for Intellectual Freedom — Most Challenged Books list",
+          "url": "https://www.ala.org/bbooks/frequentlychallengedbooks/top10",
+          "type": "advocacy_rationale",
+          "date_or_year": "2010-2022 (aggregated multi-year list)",
+          "quote": "Anti-family, cultural insensitivity, drugs/alcohol/smoking, gambling, offensive language, sex education, sexually explicit, unsuited for age group, violence.",
+          "independence_group": "ALA OIF"
+        }
+      ]
+    },
+    "profane_content": {
+      "verdict": "YELLOW",
+      "findings": "'Offensive language' / profanity recurs as a cited reason across ALA OIF's tracking of this book's many challenges (2010-2020, 2022), and ALA OIF attributes the book's 2017 #2 most-challenged ranking specifically to profanity. Sources reviewed characterize this only in general terms (frequency/severity not specified) — no source quotes a specific word, passage, or count.",
+      "claim_types": [
+        "challenge_record"
+      ],
+      "sources": [
+        {
+          "name": "ALA Office for Intellectual Freedom — Most Challenged Books list",
+          "url": "https://www.ala.org/bbooks/frequentlychallengedbooks/top10",
+          "type": "advocacy_rationale",
+          "date_or_year": "2010-2022 (aggregated multi-year list)",
+          "quote": "Offensive language, racism, sex education, sexually explicit, unsuited to age group, and violence.",
+          "independence_group": "ALA OIF"
+        },
+        {
+          "name": "ALA OIF — \"Top Ten Banned Book: Absolutely True Diary of a Part Time Indian\"",
+          "url": "https://www.oif.ala.org/top-ten-banned-book-absolutely-true-diary-of-a-part-time-indian/",
+          "type": "advocacy_rationale",
+          "date_or_year": "2017",
+          "quote": "",
+          "independence_group": "ALA OIF"
+        }
+      ]
+    },
+    "indecent_content": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "patently_vulgar": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "prohibited_website_referral": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    }
+  },
+  "legal_lenses": {
+    "prurient_theme": {
+      "evidence_found": false,
+      "basis": "Sources reviewed frame objections around specific language/content-category tags (profanity, sexual references, violence), not an argument that the work as a whole appeals to prurient interest. No admissible source reviewed today makes that whole-work claim."
+    },
+    "onpage_explicit_scenes": {
+      "evidence_found": false,
+      "basis": "No admissible source reviewed today names or quotes a specific on-page explicit scene or passage; the challenge-record reason tags found are categorical, not scene-level."
+    }
+  },
+  "synopsis": "This YA novel is one of the most-challenged titles in the U.S., appearing on ALA OIF's Top Ten Most Challenged Books list across multiple years (2010-2020, 2022) and on PEN America's Index of School Book Bans since the 2021-22 school year per School Library Journal's reporting. Challenge records attribute objections primarily to profanity/offensive language, sexual references, and violence using ALA's own categorical reason-tags; no admissible source reviewed today quotes a specific on-page scene, passage, or word count for any category. Evidence is therefore YELLOW for sexually_explicit, profane_content, and extreme_violence — general and attributed, not scene-specific — and NO_EVIDENCE_FOUND for sustained_nudity, indecent_content, patently_vulgar, and prohibited_website_referral. Neither legal lens found supporting evidence: sources frame objections around discrete content categories rather than a whole-work prurient-interest argument, and none names a specific explicit scene. No match was found naming this book on the Utah USBE, South Carolina SCDE, or Florida FLDOE state removal lists, on Moms for Liberty/BookLooks-lineage material, or on Take Back the Classroom in sources reviewed today. This reflects the limits of the sources surfaced in this run, not a confirmed absence of such listings.",
+  "review_priority": "LOOK_CLOSER",
+  "provenance": {
+    "model": "Claude research agent (stop-gap run)",
+    "prompt_version": "1.0",
+    "run_date": "2026-08-20",
+    "sources_reviewed_count": 3,
+    "disclaimer": "This summary is AI generated and unverified. Confirm findings against the cited sources before acting."
+  },
+  "feedback": {
+    "thumbs": null,
+    "note": null
+  }
+}
