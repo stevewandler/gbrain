@@ -19,3 +19,12 @@ Run order: profile → roles → emit.
 `scope` is `district` or `esc`. Batch size 300 keeps each file near 43 KB, which
 is what the agent transport can carry in one hop; a direct database connection
 does not need the batching at all.
+
+## Validation scripts
+
+| Script | Purpose |
+|---|---|
+| `askted_validate_csv.py` | Structural validation of the generated CSV: field counts, `natural_key` shape + uniqueness, `org_level` and `role_code` domains, TEA id format, region range, empty required fields. Exits non-zero on any problem. |
+| `askted_check_fk.py` | Confirms every `district_id` in the CSV exists in `districts`, so the promote's FK filter cannot silently drop a district's staff. Needs `districts_snapshot.txt`. |
+
+Run both before any import. Both are read-only.

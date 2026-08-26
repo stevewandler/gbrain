@@ -293,37 +293,77 @@ refresh will eventually want. It is a production credential, so it needs explici
 approval and should be created and stored by a human, not generated in an agent
 transcript. Not needed for the one-time backfill.
 
-## What is actually in the 47,070 rows
+## Import scope (decided 2026-08-26)
 
-Not all "district contacts" in the sales sense — worth knowing before anyone
-treats this as an outreach list:
+Load `org_level = 'district'` only — district-office staff **plus** elected
+trustees. **35,043 rows.** Campus principals and ESC staff are deferred: not
+dropped from the pipeline, just not in this import. Re-run the generator with
+`ALL` to pick them up.
 
-| Segment | Rows |
+| In this import (`org_level = 'district'`) | Rows |
 |---|---|
-| Campus principals | 9,458 |
-| **School board members + officers** (elected trustees, not staff) | 8,177 |
-| Special education | 4,220 |
-| Student services / liaisons | 4,215 |
-| Data / PEIMS / TREX reporting | 3,922 |
-| Assessment & accountability | 2,693 |
-| Technology & cybersecurity | 2,232 |
-| Federal programs | 2,132 |
-| Operations, transport, facilities | 1,627 |
-| Safety, security, discipline | 1,506 |
-| Business / finance | 1,253 |
+| **Elected board members + officers** | **7,958** |
+| Student services / liaisons | 4,030 |
+| Special education | 3,937 |
+| Data / PEIMS / TREX reporting | 3,733 |
+| Assessment & accountability | 2,462 |
+| Technology & cybersecurity | 2,144 |
+| Federal programs | 2,022 |
+| Operations, transport, facilities | 1,528 |
+| Safety, security, discipline | 1,382 |
+| Business / finance | 1,233 |
 | **Superintendents** | **1,209** |
-| Human resources | 981 |
-| Curriculum & instruction | 922 |
 | **Assistant / deputy / associate superintendents** | **873** |
-| Administrative support | 837 |
-| ESC program / instructional staff | 754 |
-| Library / media (**ESC only** — AskTED has no district library role) | 38 |
-| Executive director | 21 |
+| Human resources | 861 |
+| Curriculum & instruction | 853 |
+| Administrative support | 817 |
+| Executive director | 1 |
+| **Total** | **35,043** |
 
-Two things to note: 8,177 rows are elected board members rather than employees,
-and 2,569 of the total are ESC staff, not district staff at all. Both are tagged,
-so `role_code` and `org_level` filter them out at query time — which is why the
-whole set is loaded rather than pre-filtered.
+| Deferred — available, not loaded | Rows |
+|---|---|
+| Campus principals (`org_level = 'campus'`) | 9,461 |
+| ESC staff (`org_level = 'esc'`) | 2,576 |
+
+Board-member rows dropped from 8,177 to 7,958 when ESC scope was excluded: 219 of
+them were ESC board members and governance staff, not district trustees.
+
+Library/media disappears entirely from this scope, because all 38 of those rows
+are ESC. AskTED has no district-level library role at all — see
+[FINDINGS.md](FINDINGS.md).
+
+## Pre-import validation (all PASS, 2026-08-26)
+
+The promote path was exercised end to end against a throwaway PostgreSQL 16
+cluster carrying the real migrations, with deliberately hostile staging rows:
+
+| Case | Expected | Result |
+|---|---|---|
+| Valid rows promote | inserted | pass |
+| Duplicate `natural_key` inside staging | collapse to one, keep the richer contact record | pass — no SQLSTATE 21000, email/phone taken from the populated copy |
+| `district_id` not in `districts` | rejected and reported, promote still succeeds | pass |
+| ESC row with no region | rejected by the org-ref check | pass |
+| Unknown `role_code` | falls back to `other`, `role_title` preserved | pass |
+| Promote run 2 and 3 | upsert, no growth, no error | pass — row count stable |
+| Reject report | names exactly the bad rows | pass — 2 of 2 |
+
+The 35,043-row file itself also validates clean: 35,043 distinct `natural_key`s
+and **zero** duplicates, every `org_level` = `district`, every `district_id`
+matching `NNN-NNN`, all 20 ESC regions present, 31,483 rows with email (89.8%)
+and 32,267 with phone (92.1%), and no row missing a name or role title.
+
+**FK pre-check: zero rows would be rejected.** All 1,216 districts in the CSV
+exist in `districts`. The 3 live districts with no AskTED personnel are
+`130-801`, `220-814`, `246-802` — the same three the 2026-08-21 audit identified
+as frozen-only, confirmed independently here.
+
+## The one remaining manual step
+
+Supabase dashboard → Table Editor → `district_contacts_staging` → Import data
+from CSV → `~/Documents/askted-import/askted_contacts_01.csv` (6.6 MB).
+
+Then the promote in `003_promote_staging.sql` runs, the reject report is read
+(expected: zero rows), `row_count_loaded` is recorded, and staging is truncated.
 
 ## Follow-ups
 
