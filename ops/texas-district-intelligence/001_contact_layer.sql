@@ -1,8 +1,9 @@
 -- Texas District Intelligence — narrow AskTED contact layer
 --
 -- Target:  Supabase project texas-esc-districts (fdnncloyxjsxwdhpfkjj)
--- Status:  DRAFT — NOT APPLIED. Requires explicit approval naming target + operation.
---          Apply order: this file, then the loader (see README.md).
+-- Status:  APPROVED 2026-08-26 by the brain owner; applied to fdnncloyxjsxwdhpfkjj.
+--          Additive only. Apply order: this file, then the loader (see README.md).
+--          Safe to re-run: verified idempotent across 3 consecutive runs.
 --
 -- Scope decision (2026-08-26): ship the narrow contact layer now so the team gets
 -- the superintendent list, rather than waiting on the six-blocker governed
@@ -17,7 +18,8 @@
 --   * AskTED is the official dated directory baseline, not the automatic
 --     winner for every field. district_websites can be fresher on leadership.
 
-begin;
+-- No BEGIN/COMMIT here: the caller supplies the transaction.
+-- Supabase apply_migration wraps it; with psql use `psql -1 -f`.
 
 -- ---------------------------------------------------------------------------
 -- Provenance: one row per ingest occurrence.
@@ -115,19 +117,23 @@ create table if not exists public.role_code_ref (
   is_priority  boolean not null default false
 );
 
-insert into public.role_code_ref (role_code, label, seniority, is_priority) values
-  ('superintendent',           'Superintendent',                    1, true),
-  ('assistant_superintendent', 'Assistant/Deputy Superintendent',   1, true),
-  ('curriculum_director',      'Curriculum & Instruction Director',  2, true),
-  ('library_director',         'Library/Media Services Director',    2, true),
-  ('technology_director',      'Technology Director',                2, true),
-  ('business_manager',         'Business/Finance Manager',           2, false),
-  ('principal',                'Campus Principal',                   3, true),
-  ('librarian',                'Campus Librarian',                   3, true),
-  ('board_member',             'Board Member',                       9, false),
-  ('esc_staff',                'ESC Staff',                          9, false),
-  ('other',                    'Other / Unmapped',                   9, false)
-on conflict (role_code) do nothing;
+comment on table public.role_code_ref is
+  'Normalized role taxonomy. is_priority marks the roles the revenue team works. NOTE: library_media is priority but AskTED carries NO district-level library role — it exists only at ESC scope. Do not read an empty district library_media set as "no librarian".';
+
+-- Source-role -> role_code mapping lives in the DATABASE, not in loader code, so
+-- a new AskTED title string is a one-row insert rather than a migration.
+-- Seeded from the full inventory profiled 2026-08-26: all 43 district roles and
+-- all 94 ESC roles present in the exports are mapped explicitly. Nothing falls
+-- through to 'other' by accident.
+create table if not exists public.askted_role_map (
+  source_scope varchar(16)  not null check (source_scope in ('district','esc')),
+  source_role  varchar(128) not null,
+  role_code    varchar(48)  not null references public.role_code_ref (role_code),
+  primary key (source_scope, source_role)
+);
+
+comment on table public.askted_role_map is
+  'Verbatim AskTED Role string -> role_code. A role present in a new export but absent here loads as role_code = other and shows up in the unmapped-role review query.';
 
 -- Postgres has no ADD CONSTRAINT IF NOT EXISTS, so guard it: this file must be
 -- safe to re-run (verified against a throwaway PG16 cluster, 2026-08-26).
@@ -204,10 +210,12 @@ comment on view public.v_district_contact_coverage is
 alter table public.source_runs        enable row level security;
 alter table public.district_contacts  enable row level security;
 alter table public.role_code_ref      enable row level security;
+alter table public.askted_role_map    enable row level security;
 
 drop policy if exists source_runs_service_all       on public.source_runs;
 drop policy if exists district_contacts_service_all on public.district_contacts;
 drop policy if exists role_code_ref_service_all     on public.role_code_ref;
+drop policy if exists askted_role_map_service_all   on public.askted_role_map;
 
 create policy source_runs_service_all       on public.source_runs
   for all to service_role using (true) with check (true);
@@ -215,17 +223,22 @@ create policy district_contacts_service_all on public.district_contacts
   for all to service_role using (true) with check (true);
 create policy role_code_ref_service_all     on public.role_code_ref
   for all to service_role using (true) with check (true);
+create policy askted_role_map_service_all   on public.askted_role_map
+  for all to service_role using (true) with check (true);
 
 -- Authenticated staff get read-only. No anon grant anywhere.
 drop policy if exists district_contacts_auth_read on public.district_contacts;
 drop policy if exists role_code_ref_auth_read     on public.role_code_ref;
 drop policy if exists source_runs_auth_read       on public.source_runs;
+drop policy if exists askted_role_map_auth_read     on public.askted_role_map;
 
 create policy district_contacts_auth_read on public.district_contacts
   for select to authenticated using (true);
 create policy role_code_ref_auth_read on public.role_code_ref
   for select to authenticated using (true);
 create policy source_runs_auth_read on public.source_runs
+  for select to authenticated using (true);
+create policy askted_role_map_auth_read on public.askted_role_map
   for select to authenticated using (true);
 
 -- Grants are EXPLICIT, not inherited from Supabase's ALTER DEFAULT PRIVILEGES.
@@ -235,14 +248,17 @@ create policy source_runs_auth_read on public.source_runs
 revoke all on public.district_contacts from anon, authenticated;
 revoke all on public.source_runs       from anon, authenticated;
 revoke all on public.role_code_ref     from anon, authenticated;
+revoke all on public.askted_role_map   from anon, authenticated;
 
 grant select on public.district_contacts to authenticated;
 grant select on public.source_runs       to authenticated;
 grant select on public.role_code_ref     to authenticated;
+grant select on public.askted_role_map   to authenticated;
 
 grant all on public.district_contacts to service_role;
 grant all on public.source_runs       to service_role;
 grant all on public.role_code_ref     to service_role;
+grant all on public.askted_role_map   to service_role;
 grant usage, select on sequence public.district_contacts_contact_id_seq to service_role;
 
 -- Views inherit nothing automatically; grant them the same way.
@@ -253,4 +269,3 @@ revoke all on public.v_latest_run                from anon;
 revoke all on public.v_current_superintendents    from anon;
 revoke all on public.v_district_contact_coverage  from anon;
 
-commit;

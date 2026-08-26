@@ -4,9 +4,10 @@ Working package for making `texas-esc-districts` (Supabase `fdnncloyxjsxwdhpfkjj
 the central source for current Texas district contacts, and for completing the
 Take Back the Classroom (TBTC) campus-level scrape.
 
-**Nothing here has been applied to any production system.** The migration is
-drafted and tested; applying it needs explicit approval naming the target and
-the operation.
+**Status 2026-08-26:** the migration is **APPLIED** to `fdnncloyxjsxwdhpfkjj`
+(approved by the brain owner). The contact load is **partial** — see
+"Completing the load" below. Findings from the real artifacts are in
+[FINDINGS.md](FINDINGS.md).
 
 ---
 
@@ -232,3 +233,62 @@ The sweep needs an environment with egress to it.
 3. Where does this package finally live? `BookmarkED-Corp/bookmarked-district-intelligence`
    is the architecturally correct home; it is staged here because that repo is
    not reachable from this session.
+
+
+---
+
+## Applied state (2026-08-26)
+
+Baseline before apply: 6 tables, 1 view, 6 policies, districts 1,219,
+tbtc_districts 848, tbtc_school_books 457.
+
+After `001` + `002`: **10 tables, 4 views, 14 policies**, `role_code_ref` 20 rows,
+`askted_role_map` 137 rows. Pre-existing data unchanged. `anon` holds **zero**
+grants on any new table — verified in production, not assumed.
+
+Two `source_runs` rows are registered, each pinned to its artifact SHA-256:
+
+| source_name | artifact | row_count_raw |
+|---|---|---|
+| `askted_personnel` | district+school personnel, 2026-08-19 | 55,493 |
+| `askted_personnel_esc` | ESC personnel, 2026-08-19 | 2,819 |
+
+`district_contacts` currently holds **300 rows** across 177 districts (176
+superintendents, 123 assistant superintendents, 1 executive director), 0 unmapped
+roles, 299/300 with email. That is the first batch of the leadership tier — the
+load is deliberately incomplete pending the mechanism decision below.
+
+## Completing the load
+
+The remaining named rows are ~47,200 (2,083 leadership − 300 done, plus ~35,000
+other district staff, ~9,461 campus principals, ~2,576 ESC staff).
+
+The blocker is transport, not logic. The loader is proven end to end; but with no
+Supabase credential on the machine holding the CSVs, every row must round-trip
+through the agent's context, which caps batches at ~300 rows and puts the full
+job at ~157 batches.
+
+**Recommended: a scoped loader role.** Create a dedicated Postgres role with
+INSERT/SELECT/UPDATE on `district_contacts` only, and run the loader directly from
+the machine holding the CSVs (it already has `psql` and the Supabase CLI). The
+whole export loads in one pass, in seconds, with no data crossing the agent's
+context. This is a production security change — it needs explicit approval, and
+the credential should be created and stored by a human rather than generated in an
+agent transcript.
+
+**Alternative: keep batching.** Works with what exists today, no new credential,
+but ~157 round trips for the remainder.
+
+Either way the loader is unchanged: `askted_emit_sql.py` (see `loader/`) reads the
+CSVs, reuses the reviewed normalization from `ingest_askted.py`, dedupes on the
+natural key, and emits idempotent upsert batches. Re-running any batch is safe.
+
+## Follow-ups
+
+- Load the organization file (`askted_school_district_2026-08-19.csv`, 9,726 rows)
+  to backfill the `districts` contact columns that are still 0-of-1,219 populated
+  (phone, email, mailing address, website, NCES id).
+- No campus table yet: `district_contacts.campus_id` / `campus_name` carry campus
+  identity inline for the 9,896 principal rows. A real `campuses` table is the
+  right home once the organization file lands.
+- 36 TBTC districts still have no `tea_district_id`.
