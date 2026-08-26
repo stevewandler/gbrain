@@ -383,6 +383,23 @@ discipline as the database-URL vars — so a dev shell configured for a real
 brain can't ride through. `GBRAIN_DEBUG_PRELOAD=1` prints the allocated
 scratch home for debugging.
 
+**Provider-key strip preload.** `test/helpers/provider-keys-preload.ts` (bunfig
+`[test]` preload) strips the ambient provider credentials the canonical fold
+recognizes (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, Gemini/Google, Voyage,
+OpenRouter, ZeroEntropy, DashScope, and the Azure OpenAI endpoint fields) and
+defaults `GBRAIN_MODEL_DISCOVERY=off` (respecting an explicit operator
+override), so key-aware model routing (`resolveTierDefault`) resolves
+identically to keyless CI and latest-model discovery never makes a real
+network call from a test. Without it, a chat key exported in the dev shell
+flips default-model assertions AND turns gated paths into live provider calls
+(observed: 183 unit failures + 15-minute retry hangs on an
+`OPENAI_API_KEY`-exporting shell). Tests that want keys inject them explicitly
+(`configureGateway({env})`, `withEnv`, serial-file `process.env`) — the
+preload removes ambient shell state only, before any test file loads. The e2e
+wrapper (`scripts/run-e2e.sh`) opts back in at its boundary via
+`GBRAIN_TEST_KEEP_PROVIDER_KEYS=1` — e2e is the lane where real keys are
+deliberate (live embed/parity tests skip-gate on them).
+
 **Database-URL run guard (#3485).** A `bun test` invocation REFUSES to start while
 `DATABASE_URL` or `GBRAIN_DATABASE_URL` is ambient in the environment, because some
 tests run destructive SQL against whatever those URLs point at (a bare `bun test`
@@ -512,6 +529,7 @@ Unit tests and what they cover:
 - `test/oauth.test.ts` — OAuth 2.1 provider: register, getClient, `client_credentials` grant exchange, `authorization_code` flow with PKCE challenge/verifier, refresh token rotation, `verifyAccessToken` with both OAuth + legacy `access_tokens` fallback, `revokeToken`, `sweepExpiredTokens`; contract test asserting `scope` + `localOnly` annotations on all operations; `coerceTimestamp` unit cases (null/undefined/string/number/throw-on-NaN); NULL-`expires_at`-as-expired contract for both refresh + access token paths; cascade-delete contract asserting `revoke-client` purges `oauth_tokens` + `oauth_codes` via FK CASCADE; cross-client isolation (wrong-client attempt MUST reject AND rightful owner MUST still succeed atomically afterward); empty-string `redirect_uri` bypass guard; PKCE DCR public-client gate (`token_endpoint_auth_method: "none"` returns no `client_secret`, default `client_secret_post` clients get the one-time-reveal secret, `getClient` NULL→undefined normalization, full PKCE `/authorize` → `/token` round-trip against a public client).
 - `test/mcp-dispatch-summarize.test.ts` — `summarizeMcpParams` invariants: declared-keys allow-list intersection, attacker-key-name leak guard (unknown keys counted not named), 1KB byte bucketing for size-probe defense, missing op falls through to fully-redacted shape, declared-keys sorted for deterministic output.
 - `test/trust-boundary-contract.test.ts` — fail-closed trust semantics under cast bypass: `ctx.remote === undefined` treated as remote/untrusted at every flipped call site; `as any` and `Partial<>` spreads can't downgrade trust by accident.
+- `test/remote-privacy-sweep.test.ts` — registry-driven remote privacy sweep: every non-localOnly op dispatched remote-shaped through `dispatchToolCall` against a corpus seeded with high-entropy private sentinels, in both scalar and federated caller shapes; the full response envelope (structured fields, rendered text, errors, `_meta.brain_hot_memory`) asserted sentinel-free. Fail-closed maintenance contract: a new op fails the suite until classified in `EXPECTED_OUTCOME` (+ `PARAM_FACTORY` if it can return corpus data); localOnly ops asserted denied over non-stdio transports; publish-gated ops must deny naming their gate. Curated static sibling: `test/operations-trust-boundary.test.ts`.
 - `test/check-resolvable-cli.test.ts` — CLI wrapper: exit codes, JSON envelope shape, AGENTS.md fallback chain.
 - `test/regression-v0_16_4.test.ts` — `findRepoRoot` regression guard, hermetic startDir parameterization.
 - `test/repo-root.test.ts` — `findRepoRoot` walk semantics + default-arg parity; the 4-tier `autoDetectSkillsDir` fallback chain (`$OPENCLAW_WORKSPACE` → `~/.openclaw/workspace` → repo-root → `./skills`); RESOLVER.md/AGENTS.md filename precedence; explicit-env-wins-over-repo-root; tier-0 `$GBRAIN_SKILLS_DIR` valid/invalid/precedence-over-`OPENCLAW_WORKSPACE`; the install-path walk in `autoDetectSkillsDirReadOnly`; no-drift on primary success; `AUTO_DETECT_HINT` + `AUTO_DETECT_HINT_READ_ONLY` content; regression guard asserting the shared `autoDetectSkillsDir` MUST NEVER return `'install_path'` source (how the read-path/write-path split stays safe).

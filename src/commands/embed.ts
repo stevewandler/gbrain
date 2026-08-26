@@ -771,12 +771,12 @@ async function embedPage(
   if (chunks.length === 0) {
     const inputs: ChunkInput[] = [];
     if (page.compiled_truth.trim()) {
-      for (const c of chunkText(page.compiled_truth)) {
+      for (const c of chunkText(page.compiled_truth, chunkOpts)) {
         inputs.push({ chunk_index: inputs.length, chunk_text: c.text, chunk_source: 'compiled_truth', model: getEmbeddingModel() });
       }
     }
     if (page.timeline.trim()) {
-      for (const c of chunkText(page.timeline)) {
+      for (const c of chunkText(page.timeline, chunkOpts)) {
         inputs.push({ chunk_index: inputs.length, chunk_text: c.text, chunk_source: 'timeline', model: getEmbeddingModel() });
       }
     }
