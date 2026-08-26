@@ -1,0 +1,1209 @@
+- generic [ref=f1e2]:
+  - navigation [ref=f1e3]:
+    - generic [ref=f1e4]:
+      - text: District Intelligence Portal
+      - button "Sign in as Jan / Teela / Steve" [ref=f1e7] [cursor=pointer]
+    - generic [ref=f1e8]:
+      - link "Our Focus and Metrics" [ref=f1e9] [cursor=pointer]:
+        - /url: focus-metrics.html
+      - link "Board Intelligence" [ref=f1e11] [cursor=pointer]:
+        - /url: board-minutes-dashboard.html
+      - link "IMTA Intelligence" [ref=f1e13] [cursor=pointer]:
+        - /url: imta-intelligence-dashboard.html
+      - link "Media Intelligence" [ref=f1e15] [cursor=pointer]:
+        - /url: media-intelligence-dashboard.html
+      - link "Supt Movement New" [ref=f1e17] [cursor=pointer]:
+        - /url: supt-movement-dashboard.html
+        - generic [ref=f1e18]: Supt Movement
+        - generic [ref=f1e19]: New
+      - link "District Profile" [ref=f1e20] [cursor=pointer]:
+        - /url: district-profile.html
+  - banner [ref=f1e22]:
+    - generic [ref=f1e23]:
+      - generic [ref=f1e24]: Bookmarked
+      - heading "Media Intelligence" [level=1] [ref=f1e25]
+    - generic [ref=f1e26]:
+      - generic [ref=f1e27]: Last scan
+      - generic [ref=f1e29]:
+        - generic [ref=f1e30]: Tracked mentions
+        - generic [ref=f1e31]: "85"
+  - generic [ref=f1e32]:
+    - generic [ref=f1e33]:
+      - generic [ref=f1e34]: Total mentions
+      - generic [ref=f1e35]: "85"
+      - generic [ref=f1e36]: since tracker inception
+    - generic [ref=f1e37]:
+      - generic [ref=f1e38]: Positive
+      - generic [ref=f1e39]: "8"
+      - generic [ref=f1e40]: amplification opportunities
+    - generic [ref=f1e41]:
+      - generic [ref=f1e42]: Neutral
+      - generic [ref=f1e43]: "20"
+      - generic [ref=f1e44]: factual coverage
+    - generic [ref=f1e45]:
+      - generic [ref=f1e46]: Mixed
+      - generic [ref=f1e47]: "14"
+      - generic [ref=f1e48]: engage / clarify
+    - generic [ref=f1e49]:
+      - generic [ref=f1e50]: Negative
+      - generic [ref=f1e51]: "43"
+      - generic [ref=f1e52]: counternarrative targets
+    - generic [ref=f1e53]:
+      - generic [ref=f1e54]: Districts in the news
+      - generic [ref=f1e55]: "30"
+      - generic [ref=f1e56]: cross-referenced to portal
+  - generic [ref=f1e59]:
+    - generic [ref=f1e60]: Districts in the News
+    - generic [ref=f1e61]: Districts named in tracked media coverage sorted by urgency (worst sentiment first), then recency.
+  - generic [ref=f1e62]:
+    - generic [ref=f1e64]:
+      - generic [ref=f1e65]: All tracked mentions
+      - generic [ref=f1e66]: Every article in the media tracker. Filter by sentiment, publication, or district.
+    - generic [ref=f1e67]:
+      - generic [ref=f1e68]:
+        - generic [ref=f1e69]: Sentiment
+        - combobox "Sentiment" [ref=f1e70]:
+          - option "All" [selected]
+          - option "Negative"
+          - option "Mixed"
+          - option "Neutral"
+          - option "Positive"
+      - generic [ref=f1e71]:
+        - generic [ref=f1e72]: District
+        - combobox "District" [ref=f1e73]:
+          - option "All districts" [selected]
+          - option "Any district named"
+          - option "Industry / no district"
+          - option "LEANDER ISD (10)"
+          - option "NEW BRAUNFELS ISD (16)"
+          - option "NORTHSIDE ISD (1)"
+          - option "HAYS CISD (2)"
+          - option "KATY ISD (3)"
+          - option "CYPRESS-FAIRBANKS ISD (3)"
+          - option "CONROE ISD (6)"
+          - option "LAMAR CISD (6)"
+          - option "NORTH EAST ISD (6)"
+          - option "CARROLL ISD (2)"
+          - option "MCALLEN ISD (1)"
+          - option "ARGYLE ISD (1)"
+          - option "LA GRANGE ISD (1)"
+          - option "SAN MARCOS CISD (1)"
+          - option "ABILENE ISD (1)"
+          - option "HARLINGEN CISD (1)"
+          - option "BOERNE ISD (1)"
+          - option "MCKINNEY ISD (2)"
+          - option "KRUM ISD (2)"
+          - option "GRANBURY ISD (2)"
+          - option "WHITE OAK ISD (1)"
+          - option "KILLEEN ISD (5)"
+          - option "LLANO ISD (2)"
+          - option "PILOT POINT ISD (1)"
+          - option "BRAZOSPORT ISD (1)"
+          - option "MONTGOMERY ISD (1)"
+          - option "LUBBOCK ISD (1)"
+          - option "LORENA ISD (1)"
+          - option "PEARLAND ISD (1)"
+          - option "COMAL ISD (2)"
+      - generic [ref=f1e74]:
+        - generic [ref=f1e75]: Search
+        - textbox "Search" [ref=f1e76]:
+          - /placeholder: Headline, publication, tag...
+    - table [ref=f1e78]:
+      - rowgroup [ref=f1e79]:
+        - row [ref=f1e80]:
+          - columnheader "Date" [ref=f1e81]
+          - columnheader "Publication" [ref=f1e82]
+          - columnheader "Headline" [ref=f1e83]
+          - columnheader "Sentiment" [ref=f1e84]
+          - columnheader "Reach" [ref=f1e85]
+          - columnheader "Districts" [ref=f1e86]
+          - columnheader "Narrative tags" [ref=f1e87]
+      - rowgroup [ref=f1e88]:
+        - row [ref=f1e89]:
+          - cell [ref=f1e90]
+          - cell "Texas Scorecard" [ref=f1e91]
+          - cell [ref=f1e92]:
+            - link "Lawmaker Rebuts Texas Library Association's Downplay of New Book Removal Requirements" [ref=f1e93] [cursor=pointer]:
+              - /url: https://texasscorecard.com/state/lawmaker-rebuts-texas-library-associations-downplay-of-new-book-removal-requirements/
+          - cell "Neutral" [ref=f1e94]
+          - cell "22" [ref=f1e96]
+          - cell "—" [ref=f1e97]
+          - cell "INDUSTRY_NARRATIVE" [ref=f1e98]
+        - row [ref=f1e100]:
+          - cell [ref=f1e101]
+          - cell "ISBNdb Blog" [ref=f1e102]
+          - cell [ref=f1e103]:
+            - link "How Bookmarked Uses ISBNdb and Helps Schools, Publishers, and Readers Navigate Book Policy with Clarity" [ref=f1e104] [cursor=pointer]:
+              - /url: https://isbndb.com/blog/how-bookmarked-uses-isbndb/
+          - cell "Positive" [ref=f1e105]
+          - cell "32" [ref=f1e107]
+          - cell "—" [ref=f1e108]
+          - cell [ref=f1e109]
+        - row [ref=f1e110]:
+          - cell "Jul 30, 2026" [ref=f1e111]
+          - cell "Publishers Weekly" [ref=f1e112]
+          - cell [ref=f1e113]:
+            - link "The Evolving Vendor–School Library Ecosystem" [ref=f1e114] [cursor=pointer]:
+              - /url: https://www.publishersweekly.com/pw/by-topic/industry-news/libraries/article/100947-the-evolving-vendor-school-library-ecosystem.html
+          - cell "Neutral" [ref=f1e115]
+          - cell "68" [ref=f1e117]
+          - cell [ref=f1e118]:
+            - link "LEANDER ISD" [ref=f1e119] [cursor=pointer]:
+              - /url: district-profile.html?d=leander-isd
+          - cell "INDUSTRY_NARRATIVE INSERTION_OPPORTUNITY" [ref=f1e120]:
+            - generic [ref=f1e121]: INDUSTRY_NARRATIVE
+            - generic [ref=f1e122]: INSERTION_OPPORTUNITY
+        - row [ref=f1e123]:
+          - cell "Jul 24, 2026" [ref=f1e124]
+          - cell "Uncloseted Media" [ref=f1e125]
+          - cell [ref=f1e126]:
+            - 'link "Demoted and Doxed: What Happened When a Texas Librarian Fought to Keep LGBTQ Books on Her Shelves" [ref=f1e127] [cursor=pointer]':
+              - /url: https://www.unclosetedmedia.com/p/demoted-and-doxxed-what-happened
+          - cell "Negative" [ref=f1e128]
+          - cell "58" [ref=f1e130]
+          - cell [ref=f1e131]:
+            - link "NEW BRAUNFELS ISD" [ref=f1e132] [cursor=pointer]:
+              - /url: district-profile.html?d=new-braunfels-isd
+          - cell "INDUSTRY_NARRATIVE AI_OVERREACH REPLACING_LIBRARIANS" [ref=f1e133]:
+            - generic [ref=f1e134]: INDUSTRY_NARRATIVE
+            - generic [ref=f1e135]: AI_OVERREACH
+            - generic [ref=f1e136]: REPLACING_LIBRARIANS
+        - row [ref=f1e137]:
+          - cell "Jul 24, 2026" [ref=f1e138]
+          - cell "Frank Strong (Substack)" [ref=f1e139]
+          - cell [ref=f1e140]:
+            - link "More Than 100 Classic and Acclaimed Works of Literature Removed from Texas Schools Last Year" [ref=f1e141] [cursor=pointer]:
+              - /url: https://franklinstrong.substack.com/p/more-than-100-classic-and-acclaimed
+          - cell "Neutral" [ref=f1e142]
+          - cell "33" [ref=f1e144]
+          - cell [ref=f1e145]:
+            - link "NEW BRAUNFELS ISD" [ref=f1e146] [cursor=pointer]:
+              - /url: district-profile.html?d=new-braunfels-isd
+            - link "PILOT POINT ISD" [ref=f1e147] [cursor=pointer]:
+              - /url: district-profile.html?d=pilot-point-isd
+            - link "BRAZOSPORT ISD" [ref=f1e148] [cursor=pointer]:
+              - /url: district-profile.html?d=brazosport-isd
+            - link "MONTGOMERY ISD" [ref=f1e149] [cursor=pointer]:
+              - /url: district-profile.html?d=montgomery-isd
+          - cell "INDUSTRY_NARRATIVE INSERTION_OPPORTUNITY" [ref=f1e150]:
+            - generic [ref=f1e151]: INDUSTRY_NARRATIVE
+            - generic [ref=f1e152]: INSERTION_OPPORTUNITY
+        - row [ref=f1e153]:
+          - cell "Jul 18, 2026" [ref=f1e154]
+          - cell "Frank Strong (Substack)" [ref=f1e155]
+          - cell [ref=f1e156]:
+            - 'link "An Interview with Librarian Amanda Hunt, Part 1: \"This Has Been the Hardest Year of My Life.\"" [ref=f1e157] [cursor=pointer]':
+              - /url: https://franklinstrong.substack.com/p/an-interview-with-librarian-amanda
+          - cell "Negative" [ref=f1e158]
+          - cell "61" [ref=f1e160]
+          - cell [ref=f1e161]:
+            - link "NEW BRAUNFELS ISD" [ref=f1e162] [cursor=pointer]:
+              - /url: district-profile.html?d=new-braunfels-isd
+            - link "LEANDER ISD" [ref=f1e163] [cursor=pointer]:
+              - /url: district-profile.html?d=leander-isd
+            - link "NORTHSIDE ISD" [ref=f1e164] [cursor=pointer]:
+              - /url: district-profile.html?d=northside-isd
+          - cell "CENSORSHIP_TOOL AI_OVERREACH REPLACING_LIBRARIANS" [ref=f1e165]:
+            - generic [ref=f1e166]: CENSORSHIP_TOOL
+            - generic [ref=f1e167]: AI_OVERREACH
+            - generic [ref=f1e168]: REPLACING_LIBRARIANS
+        - row [ref=f1e169]:
+          - cell "Jul 13, 2026" [ref=f1e170]
+          - cell "KWBU (Waco NPR)" [ref=f1e171]
+          - cell [ref=f1e172]:
+            - link "Book bans take center stage at Lubbock ISD budget meeting, Sen. Perry says state law revisions may be needed" [ref=f1e173] [cursor=pointer]:
+              - /url: https://www.kwbu.org/news-from-across-texas/2026-07-14/book-bans-take-center-stage-at-lubbock-isd-budget-meeting-sen-perry-says-state-law-revisions-may-be-needed
+          - cell "Neutral" [ref=f1e174]
+          - cell "39" [ref=f1e176]
+          - cell [ref=f1e177]:
+            - link "LUBBOCK ISD" [ref=f1e178] [cursor=pointer]:
+              - /url: district-profile.html?d=lubbock-isd
+          - cell "INDUSTRY_NARRATIVE INSERTION_OPPORTUNITY" [ref=f1e179]:
+            - generic [ref=f1e180]: INDUSTRY_NARRATIVE
+            - generic [ref=f1e181]: INSERTION_OPPORTUNITY
+        - row [ref=f1e182]:
+          - cell "Apr 20, 2026" [ref=f1e183]
+          - cell "Community Impact (Austin)" [ref=f1e184]
+          - cell [ref=f1e185]:
+            - link "Hays CISD considers employee compensation, librarian pay for 2026-27" [ref=f1e186] [cursor=pointer]:
+              - /url: https://communityimpact.com/austin/san-marcos-buda-kyle/education/2026/04/21/hays-cisd-considers-employee-compensation-librarian-pay-for-2026-27/
+          - cell "Mixed" [ref=f1e187]
+          - cell "40" [ref=f1e189]
+          - cell [ref=f1e190]:
+            - link "HAYS CISD" [ref=f1e191] [cursor=pointer]:
+              - /url: district-profile.html?d=hays-cisd
+          - cell [ref=f1e192]
+        - row [ref=f1e193]:
+          - cell "Apr 11, 2026" [ref=f1e194]
+          - cell "KWTX (Waco CBS)" [ref=f1e195]
+          - cell [ref=f1e196]:
+            - link "Some districts use AI to review books under Texas Senate Bill 13" [ref=f1e197] [cursor=pointer]:
+              - /url: https://www.kwtx.com/2026/04/13/some-districts-use-ai-review-books-under-texas-senate-bill-13/
+          - cell "Neutral" [ref=f1e198]
+          - cell "35" [ref=f1e200]
+          - cell [ref=f1e201]:
+            - link "LORENA ISD" [ref=f1e202] [cursor=pointer]:
+              - /url: district-profile.html?d=lorena-isd
+          - cell "INDUSTRY_NARRATIVE INSERTION_OPPORTUNITY" [ref=f1e203]:
+            - generic [ref=f1e204]: INDUSTRY_NARRATIVE
+            - generic [ref=f1e205]: INSERTION_OPPORTUNITY
+        - row [ref=f1e206]:
+          - cell "Apr 1, 2026" [ref=f1e207]
+          - cell "K-12 Dive" [ref=f1e208]
+          - cell [ref=f1e209]:
+            - link "As AI enters book ban disputes, here's what it means for school districts" [ref=f1e210] [cursor=pointer]:
+              - /url: https://www.k12dive.com/news/as-ai-enters-book-ban-disputes-heres-what-it-means-for-school-districts/816385/
+          - cell "Mixed" [ref=f1e211]
+          - cell "85" [ref=f1e213]
+          - cell [ref=f1e214]:
+            - link "NEW BRAUNFELS ISD" [ref=f1e215] [cursor=pointer]:
+              - /url: district-profile.html?d=new-braunfels-isd
+          - cell "PROFIT_FROM_BANS POLITICAL_FRAMING ADVOCACY_CRITICISM" [ref=f1e216]:
+            - generic [ref=f1e217]: PROFIT_FROM_BANS
+            - generic [ref=f1e218]: POLITICAL_FRAMING
+            - generic [ref=f1e219]: ADVOCACY_CRITICISM
+        - row [ref=f1e220]:
+          - cell "Mar 31, 2026" [ref=f1e221]
+          - cell "404 Media" [ref=f1e222]
+          - cell [ref=f1e223]:
+            - link "The Right Is Using AI Content Scanners to Try to Supercharge Book Banning" [ref=f1e224] [cursor=pointer]:
+              - /url: https://www.404media.co/the-right-is-using-ai-content-scanners-to-try-to-supercharge-book-banning/
+          - cell "Negative" [ref=f1e225]
+          - cell "88" [ref=f1e227]
+          - cell [ref=f1e228]:
+            - link "NEW BRAUNFELS ISD" [ref=f1e229] [cursor=pointer]:
+              - /url: district-profile.html?d=new-braunfels-isd
+          - cell "CENSORSHIP_TOOL AI_OVERREACH" [ref=f1e230]:
+            - generic [ref=f1e231]: CENSORSHIP_TOOL
+            - generic [ref=f1e232]: AI_OVERREACH
+        - row [ref=f1e233]:
+          - cell "Mar 31, 2026" [ref=f1e234]
+          - cell "The 19th" [ref=f1e235]
+          - cell [ref=f1e236]:
+            - link "Book bans and culture wars came for libraries. They're still standing strong." [ref=f1e237] [cursor=pointer]:
+              - /url: https://19thnews.org/2026/04/book-bans-culture-wars-libraries/
+          - cell "Neutral" [ref=f1e238]
+          - cell "35" [ref=f1e240]
+          - cell "—" [ref=f1e241]
+          - cell "INDUSTRY_NARRATIVE INSERTION_OPPORTUNITY" [ref=f1e242]:
+            - generic [ref=f1e243]: INDUSTRY_NARRATIVE
+            - generic [ref=f1e244]: INSERTION_OPPORTUNITY
+        - row [ref=f1e245]:
+          - cell "Mar 28, 2026" [ref=f1e246]
+          - cell "Victoria Waddle (Substack)" [ref=f1e247]
+          - cell [ref=f1e248]:
+            - link "Tweaking the Law in Order to Ban Books" [ref=f1e249] [cursor=pointer]:
+              - /url: https://victoriawaddle.substack.com/p/tweaking-the-law-in-order-to-ban
+          - cell "Negative" [ref=f1e250]
+          - cell "39" [ref=f1e252]
+          - cell [ref=f1e253]:
+            - link "NEW BRAUNFELS ISD" [ref=f1e254] [cursor=pointer]:
+              - /url: district-profile.html?d=new-braunfels-isd
+          - cell "CENSORSHIP_TOOL AI_OVERREACH" [ref=f1e255]:
+            - generic [ref=f1e256]: CENSORSHIP_TOOL
+            - generic [ref=f1e257]: AI_OVERREACH
+        - row [ref=f1e258]:
+          - cell "Mar 26, 2026" [ref=f1e259]
+          - cell "Longview News-Journal" [ref=f1e260]
+          - cell [ref=f1e261]:
+            - link "White Oak ISD book challenges have resulted in seven library removals this year" [ref=f1e262] [cursor=pointer]:
+              - /url: https://news-journal.com/2026/03/27/white-oak-isd-book-challenges-have-resulted-in-seven-library-removals-this-year/
+          - cell "Mixed" [ref=f1e263]
+          - cell "35" [ref=f1e265]
+          - cell [ref=f1e266]:
+            - link "WHITE OAK ISD" [ref=f1e267] [cursor=pointer]:
+              - /url: district-profile.html?d=white-oak-isd
+          - cell [ref=f1e268]
+        - row [ref=f1e269]:
+          - cell "Mar 26, 2026" [ref=f1e270]
+          - cell "Complete AI Training" [ref=f1e271]
+          - cell [ref=f1e272]:
+            - link "Greater Manchester school uses AI to flag 200 books for removal, forcing librarian to resign" [ref=f1e273] [cursor=pointer]:
+              - /url: https://completeaitraining.com/news/greater-manchester-school-uses-ai-to-flag-200-books-for/
+          - cell "Neutral" [ref=f1e274]
+          - cell "13" [ref=f1e276]
+          - cell "—" [ref=f1e277]
+          - cell "INDUSTRY_NARRATIVE AI_OVERREACH" [ref=f1e278]:
+            - generic [ref=f1e279]: INDUSTRY_NARRATIVE
+            - generic [ref=f1e280]: AI_OVERREACH
+        - row [ref=f1e281]:
+          - cell "Mar 25, 2026" [ref=f1e282]
+          - cell "KSAT (San Antonio)" [ref=f1e283]
+          - cell [ref=f1e284]:
+            - link "Records show New Braunfels ISD pulling, restricting more books than it has publicly listed" [ref=f1e285] [cursor=pointer]:
+              - /url: https://www.ksat.com/news/local/2026/03/26/records-show-new-braunfels-isd-pulling-restricting-more-books-than-it-has-publicly-listed/
+          - cell "Negative" [ref=f1e286]
+          - cell "68" [ref=f1e288]
+          - cell [ref=f1e289]:
+            - link "NEW BRAUNFELS ISD" [ref=f1e290] [cursor=pointer]:
+              - /url: district-profile.html?d=new-braunfels-isd
+          - cell "OTHER_NEGATIVE" [ref=f1e291]
+        - row [ref=f1e293]:
+          - cell "Mar 25, 2026" [ref=f1e294]
+          - cell "LBC (UK)" [ref=f1e295]
+          - cell [ref=f1e296]:
+            - link "Librarian 'gobsmacked' after school uses AI to remove 200 books including 1984 and Twilight" [ref=f1e297] [cursor=pointer]:
+              - /url: https://www.lbc.co.uk/article/librarian-gobsmacked-school-ai-remove-books-5HjdWsc_2/
+          - cell "Neutral" [ref=f1e298]
+          - cell "55" [ref=f1e300]
+          - cell "—" [ref=f1e301]
+          - cell "INSERTION_OPPORTUNITY" [ref=f1e302]
+        - row [ref=f1e304]:
+          - cell "Mar 18, 2026" [ref=f1e305]
+          - cell "AI School Librarian (Substack)" [ref=f1e306]
+          - cell [ref=f1e307]:
+            - link "The Rise of Book-Ban Technology" [ref=f1e308] [cursor=pointer]:
+              - /url: https://aischoollibrarian.substack.com/p/the-rise-of-book-ban-technology
+          - cell "Negative" [ref=f1e309]
+          - cell "55" [ref=f1e311]
+          - cell "—" [ref=f1e312]
+          - cell "CENSORSHIP_TOOL AI_OVERREACH" [ref=f1e313]:
+            - generic [ref=f1e314]: CENSORSHIP_TOOL
+            - generic [ref=f1e315]: AI_OVERREACH
+        - row [ref=f1e316]:
+          - cell "Mar 14, 2026" [ref=f1e317]
+          - cell "I Love Libraries (ALA)" [ref=f1e318]
+          - cell [ref=f1e319]:
+            - 'link "U.S. Book Challenges Update: March 2026 Edition" [ref=f1e320] [cursor=pointer]':
+              - /url: https://ilovelibraries.org/article/u-s-book-challenges-update-march-2026-edition/
+          - cell "Negative" [ref=f1e321]
+          - cell "55" [ref=f1e323]
+          - cell [ref=f1e324]:
+            - link "NEW BRAUNFELS ISD" [ref=f1e325] [cursor=pointer]:
+              - /url: district-profile.html?d=new-braunfels-isd
+          - cell "ADVOCACY_CRITICISM" [ref=f1e326]
+        - row [ref=f1e328]:
+          - cell "Mar 4, 2026" [ref=f1e329]
+          - cell "Texas Scorecard" [ref=f1e330]
+          - cell [ref=f1e331]:
+            - link "New Braunfels ISD Nears End of Book Reviews" [ref=f1e332] [cursor=pointer]:
+              - /url: https://texasscorecard.com/local/new-braunfels-isd-nears-end-of-book-reviews/
+          - cell "Positive" [ref=f1e333]
+          - cell "42" [ref=f1e335]
+          - cell [ref=f1e336]:
+            - link "NEW BRAUNFELS ISD" [ref=f1e337] [cursor=pointer]:
+              - /url: district-profile.html?d=new-braunfels-isd
+          - cell [ref=f1e338]
+        - row [ref=f1e339]:
+          - cell "Mar 2, 2026" [ref=f1e340]
+          - cell "Fast Company" [ref=f1e341]
+          - cell [ref=f1e342]:
+            - link "The startup that turned Texas's book ban law into big business" [ref=f1e343] [cursor=pointer]:
+              - /url: https://www.fastcompany.com/91496176/bookmarked-steve-wandler-texas-book-bans
+          - cell "Negative" [ref=f1e344]
+          - cell "85" [ref=f1e346]
+          - cell "—" [ref=f1e347]
+          - cell "PROFIT_FROM_BANS" [ref=f1e348]
+        - row [ref=f1e350]:
+          - cell "Feb 19, 2026" [ref=f1e351]
+          - cell "Texas Freedom to Read Project" [ref=f1e352]
+          - cell [ref=f1e353]:
+            - link "New Braunfels ISD bans 600+ books, ages up 800+ titles using AI & overly-restrictive selection criteria" [ref=f1e354] [cursor=pointer]:
+              - /url: https://www.txftrp.org/new_braunfels_isd_bans_600_books
+          - cell "Negative" [ref=f1e355]
+          - cell "52" [ref=f1e357]
+          - cell [ref=f1e358]:
+            - link "NEW BRAUNFELS ISD" [ref=f1e359] [cursor=pointer]:
+              - /url: district-profile.html?d=new-braunfels-isd
+          - cell "ADVOCACY_CRITICISM AI_OVERREACH" [ref=f1e360]:
+            - generic [ref=f1e361]: ADVOCACY_CRITICISM
+            - generic [ref=f1e362]: AI_OVERREACH
+        - row [ref=f1e363]:
+          - cell "Feb 17, 2026" [ref=f1e364]
+          - cell "LGBTQ Nation" [ref=f1e365]
+          - cell [ref=f1e366]:
+            - link "This infamous school district banned 142 LGBTQ+ books just this year already" [ref=f1e367] [cursor=pointer]:
+              - /url: https://www.lgbtqnation.com/2026/02/this-infamous-school-district-banned-142-lgbtq-books-just-this-year-already/
+          - cell "Negative" [ref=f1e368]
+          - cell "60" [ref=f1e370]
+          - cell [ref=f1e371]:
+            - link "KATY ISD" [ref=f1e372] [cursor=pointer]:
+              - /url: district-profile.html?d=katy-isd
+          - cell "OTHER_NEGATIVE" [ref=f1e373]
+        - row [ref=f1e375]:
+          - cell "Feb 9, 2026" [ref=f1e376]
+          - cell "Houston Public Media (NPR)" [ref=f1e377]
+          - cell [ref=f1e378]:
+            - link "Cy-Fair ISD board votes to reinstate removed textbook chapters" [ref=f1e379] [cursor=pointer]:
+              - /url: https://www.houstonpublicmedia.org/articles/education/2026/02/10/543080/cy-fair-isd-board-votes-to-reinstate-removed-textbook-chapters/
+          - cell "Positive" [ref=f1e380]
+          - cell "58" [ref=f1e382]
+          - cell [ref=f1e383]:
+            - link "CYPRESS-FAIRBANKS ISD" [ref=f1e384] [cursor=pointer]:
+              - /url: district-profile.html?d=cypress-fairbanks-isd
+          - cell [ref=f1e385]
+        - row [ref=f1e386]:
+          - cell "Feb 9, 2026" [ref=f1e387]
+          - cell "Frank Strong (Substack)" [ref=f1e388]
+          - cell [ref=f1e389]:
+            - link "New Braunfels ISD is gaslighting the community over its book removals" [ref=f1e390] [cursor=pointer]:
+              - /url: https://franklinstrong.substack.com/p/new-braunfels-isd-is-gaslighting
+          - cell "Negative" [ref=f1e391]
+          - cell "48" [ref=f1e393]
+          - cell [ref=f1e394]:
+            - link "NEW BRAUNFELS ISD" [ref=f1e395] [cursor=pointer]:
+              - /url: district-profile.html?d=new-braunfels-isd
+          - cell "OTHER_NEGATIVE" [ref=f1e396]
+        - row [ref=f1e398]:
+          - cell "Jan 14, 2026" [ref=f1e399]
+          - cell "Frank Strong (Substack)" [ref=f1e400]
+          - cell [ref=f1e401]:
+            - link "Mapping One Semester of Texas School Book Bans" [ref=f1e402] [cursor=pointer]:
+              - /url: https://franklinstrong.substack.com/p/mapping-one-semester-of-texas-school
+          - cell "Negative" [ref=f1e403]
+          - cell "72" [ref=f1e405]
+          - cell [ref=f1e406]:
+            - link "NEW BRAUNFELS ISD" [ref=f1e407] [cursor=pointer]:
+              - /url: district-profile.html?d=new-braunfels-isd
+            - link "CONROE ISD" [ref=f1e408] [cursor=pointer]:
+              - /url: district-profile.html?d=conroe-isd
+            - link "HAYS CISD" [ref=f1e409] [cursor=pointer]:
+              - /url: district-profile.html?d=hays-cisd
+            - link "LAMAR CISD" [ref=f1e410] [cursor=pointer]:
+              - /url: district-profile.html?d=lamar-cisd
+            - link "LEANDER ISD" [ref=f1e411] [cursor=pointer]:
+              - /url: district-profile.html?d=leander-isd
+            - link "MCALLEN ISD" [ref=f1e412] [cursor=pointer]:
+              - /url: district-profile.html?d=mcallen-isd
+            - link "NORTH EAST ISD" [ref=f1e413] [cursor=pointer]:
+              - /url: district-profile.html?d=north-east-isd
+            - link "ARGYLE ISD" [ref=f1e414] [cursor=pointer]:
+              - /url: district-profile.html?d=argyle-isd
+            - link "CARROLL ISD" [ref=f1e415] [cursor=pointer]:
+              - /url: district-profile.html?d=carroll-isd
+            - link "LA GRANGE ISD" [ref=f1e416] [cursor=pointer]:
+              - /url: district-profile.html?d=la-grange-isd
+            - link "SAN MARCOS CISD" [ref=f1e417] [cursor=pointer]:
+              - /url: district-profile.html?d=san-marcos-cisd
+            - link "ABILENE ISD" [ref=f1e418] [cursor=pointer]:
+              - /url: district-profile.html?d=abilene-isd
+            - link "HARLINGEN CISD" [ref=f1e419] [cursor=pointer]:
+              - /url: district-profile.html?d=harlingen-cisd
+            - link "BOERNE ISD" [ref=f1e420] [cursor=pointer]:
+              - /url: district-profile.html?d=boerne-isd
+          - cell "CENSORSHIP_TOOL OTHER_NEGATIVE" [ref=f1e421]:
+            - generic [ref=f1e422]: CENSORSHIP_TOOL
+            - generic [ref=f1e423]: OTHER_NEGATIVE
+        - row [ref=f1e424]:
+          - cell "Jan 1, 2026" [ref=f1e425]
+          - cell "American Libraries Magazine (ALA)" [ref=f1e426]
+          - cell [ref=f1e427]:
+            - link "2025 Year in Review" [ref=f1e428] [cursor=pointer]:
+              - /url: https://americanlibrariesmagazine.org/2026/01/02/2025-year-in-review/
+          - cell "Neutral" [ref=f1e429]
+          - cell "70" [ref=f1e431]
+          - cell "—" [ref=f1e432]
+          - cell "INSERTION_OPPORTUNITY" [ref=f1e433]
+        - row [ref=f1e435]:
+          - cell "Dec 31, 2025" [ref=f1e436]
+          - cell "San Antonio Current" [ref=f1e437]
+          - cell [ref=f1e438]:
+            - link "New Braunfels ISD bans books written by Obama, Shakespeare and Matthew McConaughey" [ref=f1e439] [cursor=pointer]:
+              - /url: https://www.sacurrent.com/news/texas-news/new-braunfels-isd-bans-books-written-by-obama-shakespeare-and-matthew-mcconaughey/
+          - cell "Negative" [ref=f1e440]
+          - cell "45" [ref=f1e442]
+          - cell [ref=f1e443]:
+            - link "NEW BRAUNFELS ISD" [ref=f1e444] [cursor=pointer]:
+              - /url: district-profile.html?d=new-braunfels-isd
+          - cell "CENSORSHIP_TOOL" [ref=f1e445]
+        - row [ref=f1e447]:
+          - cell "Dec 4, 2025" [ref=f1e448]
+          - cell "HPPR News (High Plains Public Radio)" [ref=f1e449]
+          - cell [ref=f1e450]:
+            - link "School libraries must comply with new laws on book content. This company is selling a solution." [ref=f1e451] [cursor=pointer]:
+              - /url: https://www.hppr.org/hppr-news/2025-12-05/school-libraries-must-comply-with-new-laws-on-book-content-this-company-is-selling-a-solution
+          - cell "Mixed" [ref=f1e452]
+          - cell "48" [ref=f1e454]
+          - cell "—" [ref=f1e455]
+          - cell "PROFIT_FROM_BANS" [ref=f1e456]
+        - row [ref=f1e458]:
+          - cell "Dec 3, 2025" [ref=f1e459]
+          - cell "Texas Standard" [ref=f1e460]
+          - cell [ref=f1e461]:
+            - link "School libraries must comply with new laws on book content. This company is selling a solution." [ref=f1e462] [cursor=pointer]:
+              - /url: https://www.texasstandard.org/stories/bookmarked-texas-sb-13-profane-indecent-library-book-ban/
+          - cell "Mixed" [ref=f1e463]
+          - cell "58" [ref=f1e465]
+          - cell "—" [ref=f1e466]
+          - cell "PROFIT_FROM_BANS" [ref=f1e467]
+        - row [ref=f1e469]:
+          - cell "Dec 3, 2025" [ref=f1e470]
+          - cell "KWBU (Waco NPR)" [ref=f1e471]
+          - cell [ref=f1e472]:
+            - link "School libraries must comply with new laws on book content. This company is selling a solution." [ref=f1e473] [cursor=pointer]:
+              - /url: https://www.kwbu.org/news-from-across-texas/2025-12-04/school-libraries-must-comply-with-new-laws-on-book-content-this-company-is-selling-a-solution
+          - cell "Mixed" [ref=f1e474]
+          - cell "44" [ref=f1e476]
+          - cell [ref=f1e477]:
+            - link "NEW BRAUNFELS ISD" [ref=f1e478] [cursor=pointer]:
+              - /url: district-profile.html?d=new-braunfels-isd
+            - link "KILLEEN ISD" [ref=f1e479] [cursor=pointer]:
+              - /url: district-profile.html?d=killeen-isd
+            - link "LLANO ISD" [ref=f1e480] [cursor=pointer]:
+              - /url: district-profile.html?d=llano-isd
+          - cell "POLITICAL_FRAMING" [ref=f1e481]
+        - row [ref=f1e483]:
+          - cell "Dec 1, 2025" [ref=f1e484]
+          - cell "San Antonio Express-News" [ref=f1e485]
+          - cell [ref=f1e486]:
+            - 'link "''Antivirus for libraries'': How a Texas startup is capitalizing on school book bans" [ref=f1e487] [cursor=pointer]':
+              - /url: https://www.expressnews.com/news/education/article/antivirus-for-libraries-texas-company-helps-20005217.php
+          - cell "Mixed" [ref=f1e488]
+          - cell "62" [ref=f1e490]
+          - cell [ref=f1e491]:
+            - link "KILLEEN ISD" [ref=f1e492] [cursor=pointer]:
+              - /url: district-profile.html?d=killeen-isd
+            - link "LLANO ISD" [ref=f1e493] [cursor=pointer]:
+              - /url: district-profile.html?d=llano-isd
+            - link "NEW BRAUNFELS ISD" [ref=f1e494] [cursor=pointer]:
+              - /url: district-profile.html?d=new-braunfels-isd
+          - cell "PROFIT_FROM_BANS" [ref=f1e495]
+        - row [ref=f1e497]:
+          - cell "Nov 27, 2025" [ref=f1e498]
+          - cell "Book Riot" [ref=f1e499]
+          - cell [ref=f1e500]:
+            - 'link "11 Book Censorship Posts to Revisit: Book Censorship News, November 28, 2025" [ref=f1e501] [cursor=pointer]':
+              - /url: https://bookriot.com/book-censorship-posts-to-revisit-3
+          - cell "Negative" [ref=f1e502]
+          - cell "56" [ref=f1e504]
+          - cell [ref=f1e505]:
+            - link "CONROE ISD" [ref=f1e506] [cursor=pointer]:
+              - /url: district-profile.html?d=conroe-isd
+            - link "NORTH EAST ISD" [ref=f1e507] [cursor=pointer]:
+              - /url: district-profile.html?d=north-east-isd
+          - cell "CENSORSHIP_TOOL POLITICAL_FRAMING" [ref=f1e508]:
+            - generic [ref=f1e509]: CENSORSHIP_TOOL
+            - generic [ref=f1e510]: POLITICAL_FRAMING
+        - row [ref=f1e511]:
+          - cell "Nov 19, 2025" [ref=f1e512]
+          - cell "CBS Austin (KEYE)" [ref=f1e513]
+          - cell [ref=f1e514]:
+            - link "Leander ISD pulls 11 books, graphic novels from libraries after review" [ref=f1e515] [cursor=pointer]:
+              - /url: https://cbsaustin.com/news/local/leander-isd-pulls-11-books-graphic-novels-from-libraries-after-review
+          - cell "Mixed" [ref=f1e516]
+          - cell "55" [ref=f1e518]
+          - cell [ref=f1e519]:
+            - link "LEANDER ISD" [ref=f1e520] [cursor=pointer]:
+              - /url: district-profile.html?d=leander-isd
+          - cell [ref=f1e521]
+        - row [ref=f1e522]:
+          - cell "Nov 18, 2025" [ref=f1e523]
+          - cell "KXAN (Austin NBC)" [ref=f1e524]
+          - cell [ref=f1e525]:
+            - link "Leander ISD removes books, graphic novels from classroom libraries" [ref=f1e526] [cursor=pointer]:
+              - /url: https://www.kxan.com/news/education/leander-isd-removes-books-graphic-novels-from-libraries-after-review/
+          - cell "Mixed" [ref=f1e527]
+          - cell "55" [ref=f1e529]
+          - cell [ref=f1e530]:
+            - link "LEANDER ISD" [ref=f1e531] [cursor=pointer]:
+              - /url: district-profile.html?d=leander-isd
+          - cell [ref=f1e532]
+        - row [ref=f1e533]:
+          - cell "Nov 11, 2025" [ref=f1e534]
+          - cell "AI School Librarian (Substack)" [ref=f1e535]
+          - cell [ref=f1e536]:
+            - link "The Most Dangerous AI Tool for Libraries Yet" [ref=f1e537] [cursor=pointer]:
+              - /url: https://aischoollibrarian.substack.com/p/the-most-dangerous-ai-tool-for-libraries
+          - cell "Negative" [ref=f1e538]
+          - cell "44" [ref=f1e540]
+          - cell "—" [ref=f1e541]
+          - cell "INDUSTRY_NARRATIVE AI_OVERREACH" [ref=f1e542]:
+            - generic [ref=f1e543]: INDUSTRY_NARRATIVE
+            - generic [ref=f1e544]: AI_OVERREACH
+        - row [ref=f1e545]:
+          - cell "Nov 11, 2025" [ref=f1e546]
+          - cell "Texas Scorecard" [ref=f1e547]
+          - cell [ref=f1e548]:
+            - link "McKinney ISD Finally Removes Sexually Explicit Books" [ref=f1e549] [cursor=pointer]:
+              - /url: https://texasscorecard.com/local/mckinney-isd-finally-removes-sexually-explicit-books/
+          - cell "Positive" [ref=f1e550]
+          - cell "40" [ref=f1e552]
+          - cell [ref=f1e553]:
+            - link "MCKINNEY ISD" [ref=f1e554] [cursor=pointer]:
+              - /url: district-profile.html?d=mckinney-isd
+          - cell [ref=f1e555]
+        - row [ref=f1e556]:
+          - cell "Nov 7, 2025" [ref=f1e557]
+          - cell "Texas Freedom to Read Project" [ref=f1e558]
+          - cell [ref=f1e559]:
+            - 'link "Texas School Districts are Overwhelmed by New Library Laws: AI is Not the Answer" [ref=f1e560] [cursor=pointer]':
+              - /url: https://www.txftrp.org/texas_school_districts_overwhelmed_by_new_library_laws_ai_is_not_the_answer
+          - cell "Negative" [ref=f1e561]
+          - cell "50" [ref=f1e563]
+          - cell [ref=f1e564]:
+            - link "LEANDER ISD" [ref=f1e565] [cursor=pointer]:
+              - /url: district-profile.html?d=leander-isd
+          - cell "AI_OVERREACH ADVOCACY_CRITICISM" [ref=f1e566]:
+            - generic [ref=f1e567]: AI_OVERREACH
+            - generic [ref=f1e568]: ADVOCACY_CRITICISM
+        - row [ref=f1e569]:
+          - cell "Nov 5, 2025" [ref=f1e570]
+          - cell "404 Media" [ref=f1e571]
+          - cell [ref=f1e572]:
+            - link "AI Is Supercharging the War on Libraries, Education, and Human Knowledge" [ref=f1e573] [cursor=pointer]:
+              - /url: https://www.404media.co/ai-is-supercharging-the-war-on-libraries-education-and-human-knowledge/
+          - cell "Negative" [ref=f1e574]
+          - cell "63" [ref=f1e576]
+          - cell "—" [ref=f1e577]
+          - cell "INDUSTRY_NARRATIVE AI_OVERREACH INSERTION_OPPORTUNITY" [ref=f1e578]:
+            - generic [ref=f1e579]: INDUSTRY_NARRATIVE
+            - generic [ref=f1e580]: AI_OVERREACH
+            - generic [ref=f1e581]: INSERTION_OPPORTUNITY
+        - row [ref=f1e582]:
+          - cell "Nov 2, 2025" [ref=f1e583]
+          - cell "Texas Standard" [ref=f1e584]
+          - cell [ref=f1e585]:
+            - link "School districts turn to AI to comply with new state laws about library book content" [ref=f1e586] [cursor=pointer]:
+              - /url: https://www.texasstandard.org/stories/texas-school-library-books-law-sb-13-ai/
+          - cell "Neutral" [ref=f1e587]
+          - cell "65" [ref=f1e589]
+          - cell [ref=f1e590]:
+            - link "PEARLAND ISD" [ref=f1e591] [cursor=pointer]:
+              - /url: district-profile.html?d=pearland-isd
+          - cell "INSERTION_OPPORTUNITY" [ref=f1e592]
+        - row [ref=f1e594]:
+          - cell "Nov 1, 2025" [ref=f1e595]
+          - cell "New Braunfels Herald-Zeitung" [ref=f1e596]
+          - cell [ref=f1e597]:
+            - link "Comal ISD trustees approve first book list following SB13" [ref=f1e598] [cursor=pointer]:
+              - /url: https://herald-zeitung.com/news/comal-isd-trustees-approve-first-book-list-following-sb13/article_9b96cad6-e676-4b18-a8c8-d0b585d5ab6e.html
+          - cell "Neutral" [ref=f1e599]
+          - cell "32" [ref=f1e601]
+          - cell [ref=f1e602]:
+            - link "COMAL ISD" [ref=f1e603] [cursor=pointer]:
+              - /url: district-profile.html?d=comal-isd
+          - cell [ref=f1e604]
+        - row [ref=f1e605]:
+          - cell "Oct 24, 2025" [ref=f1e606]
+          - cell "Hill Country News" [ref=f1e607]
+          - cell [ref=f1e608]:
+            - link "Leander ISD faces backlash after pulling books under SB12 review" [ref=f1e609] [cursor=pointer]:
+              - /url: https://www.hillcountrynews.com/stories/leander-isd-faces-backlash-after-pulling-books-under-sb12-review,216293
+          - cell "Negative" [ref=f1e610]
+          - cell "40" [ref=f1e612]
+          - cell [ref=f1e613]:
+            - link "LEANDER ISD" [ref=f1e614] [cursor=pointer]:
+              - /url: district-profile.html?d=leander-isd
+          - cell "OTHER_NEGATIVE" [ref=f1e615]
+        - row [ref=f1e617]:
+          - cell "Oct 19, 2025" [ref=f1e618]
+          - cell "FOX 7 Austin" [ref=f1e619]
+          - cell [ref=f1e620]:
+            - link "Leander ISD pauses dozens of books in classrooms in response to state law" [ref=f1e621] [cursor=pointer]:
+              - /url: https://www.fox7austin.com/news/leander-isd-pauses-classroom-books-senate-bill-12
+          - cell "Mixed" [ref=f1e622]
+          - cell "52" [ref=f1e624]
+          - cell [ref=f1e625]:
+            - link "LEANDER ISD" [ref=f1e626] [cursor=pointer]:
+              - /url: district-profile.html?d=leander-isd
+          - cell [ref=f1e627]
+        - row [ref=f1e628]:
+          - cell "Oct 13, 2025" [ref=f1e629]
+          - cell "PEN America" [ref=f1e630]
+          - cell [ref=f1e631]:
+            - link "Overcomplying With New Laws, Texas School District Closes Entire Library, Others Remove Dozens of Books" [ref=f1e632] [cursor=pointer]:
+              - /url: https://pen.org/press-release/texas-school-district-closes-entire-library-other-remove-dozens-of-books-in-overcomplying-with-new-laws/
+          - cell "Negative" [ref=f1e633]
+          - cell "80" [ref=f1e635]
+          - cell [ref=f1e636]:
+            - link "NEW BRAUNFELS ISD" [ref=f1e637] [cursor=pointer]:
+              - /url: district-profile.html?d=new-braunfels-isd
+            - link "LEANDER ISD" [ref=f1e638] [cursor=pointer]:
+              - /url: district-profile.html?d=leander-isd
+          - cell "ADVOCACY_CRITICISM OTHER_NEGATIVE" [ref=f1e639]:
+            - generic [ref=f1e640]: ADVOCACY_CRITICISM
+            - generic [ref=f1e641]: OTHER_NEGATIVE
+        - row [ref=f1e642]:
+          - cell "Oct 5, 2025" [ref=f1e643]
+          - cell "AI School Librarian (Substack)" [ref=f1e644]
+          - cell [ref=f1e645]:
+            - 'link "Bonus Edition: AI on Trial — How Algorithms Are Being Used to Ban Books" [ref=f1e646] [cursor=pointer]':
+              - /url: https://aischoollibrarian.substack.com/p/bonus-edition-ai-on-trial-how-algorithms
+          - cell "Neutral" [ref=f1e647]
+          - cell "22" [ref=f1e649]
+          - cell "—" [ref=f1e650]
+          - cell "INDUSTRY_NARRATIVE INSERTION_OPPORTUNITY AI_OVERREACH" [ref=f1e651]:
+            - generic [ref=f1e652]: INDUSTRY_NARRATIVE
+            - generic [ref=f1e653]: INSERTION_OPPORTUNITY
+            - generic [ref=f1e654]: AI_OVERREACH
+        - row [ref=f1e655]:
+          - cell "Oct 4, 2025" [ref=f1e656]
+          - cell "Book Riot" [ref=f1e657]
+          - cell [ref=f1e658]:
+            - link "Texas School Administrators Use A.I. To Ban Books Like TO KILL A MOCKINGBIRD" [ref=f1e659] [cursor=pointer]:
+              - /url: https://bookriot.com/leander-sb-13/
+          - cell "Negative" [ref=f1e660]
+          - cell "72" [ref=f1e662]
+          - cell [ref=f1e663]:
+            - link "LEANDER ISD" [ref=f1e664] [cursor=pointer]:
+              - /url: district-profile.html?d=leander-isd
+          - cell "AI_OVERREACH CENSORSHIP_TOOL" [ref=f1e665]:
+            - generic [ref=f1e666]: AI_OVERREACH
+            - generic [ref=f1e667]: CENSORSHIP_TOOL
+        - row [ref=f1e668]:
+          - cell "Sep 30, 2025" [ref=f1e669]
+          - cell "Frank Strong (Substack)" [ref=f1e670]
+          - cell [ref=f1e671]:
+            - link "McKinney ISD Changes Its Definition of Obscenity" [ref=f1e672] [cursor=pointer]:
+              - /url: https://franklinstrong.substack.com/p/mckinney-isd-changes-its-definition
+          - cell "Negative" [ref=f1e673]
+          - cell "42" [ref=f1e675]
+          - cell [ref=f1e676]:
+            - link "MCKINNEY ISD" [ref=f1e677] [cursor=pointer]:
+              - /url: district-profile.html?d=mckinney-isd
+          - cell "OTHER_NEGATIVE" [ref=f1e678]
+        - row [ref=f1e680]:
+          - cell "Sep 21, 2025" [ref=f1e681]
+          - cell "US 105 FM (Killeen, TX)" [ref=f1e682]
+          - cell [ref=f1e683]:
+            - 'link "Bookmarked: Killeen ISD''s Tool For Supporting Student Reading Habits" [ref=f1e684] [cursor=pointer]':
+              - /url: https://us105fm.com/killeen-bookmarked-library-service/
+          - cell "Positive" [ref=f1e685]
+          - cell "25" [ref=f1e687]
+          - cell [ref=f1e688]:
+            - link "KILLEEN ISD" [ref=f1e689] [cursor=pointer]:
+              - /url: district-profile.html?d=killeen-isd
+          - cell [ref=f1e690]
+        - row [ref=f1e691]:
+          - cell "Sep 17, 2025" [ref=f1e692]
+          - cell "Community Impact (SA/NB)" [ref=f1e693]
+          - cell [ref=f1e694]:
+            - link "Comal ISD updates library materials policy following passage of Senate Bill 13" [ref=f1e695] [cursor=pointer]:
+              - /url: https://communityimpact.com/san-antonio/new-braunfels/education/2025/09/18/comal-isd-updates-library-materials-policy-following-passage-of-senate-bill-13/
+          - cell "Neutral" [ref=f1e696]
+          - cell "38" [ref=f1e698]
+          - cell [ref=f1e699]:
+            - link "COMAL ISD" [ref=f1e700] [cursor=pointer]:
+              - /url: district-profile.html?d=comal-isd
+          - cell [ref=f1e701]
+        - row [ref=f1e702]:
+          - cell "Sep 14, 2025" [ref=f1e703]
+          - cell "Dallas Observer" [ref=f1e704]
+          - cell [ref=f1e705]:
+            - 'link "UPDATED: Every Texas School District Book Ban" [ref=f1e706] [cursor=pointer]':
+              - /url: https://www.dallasobserver.com/news/list-of-texas-banned-books-shows-state-has-second-most-in-us-17480532/
+          - cell "Negative" [ref=f1e707]
+          - cell "60" [ref=f1e709]
+          - cell "—" [ref=f1e710]
+          - cell "OTHER_NEGATIVE" [ref=f1e711]
+        - row [ref=f1e713]:
+          - cell "Sep 9, 2025" [ref=f1e714]
+          - cell "Yahoo News" [ref=f1e715]
+          - cell [ref=f1e716]:
+            - link "This beloved children's book was just banned in Texas—along with hundreds more" [ref=f1e717] [cursor=pointer]:
+              - /url: https://www.yahoo.com/news/articles/beloved-childrens-book-just-banned-203511652.html
+          - cell "Negative" [ref=f1e718]
+          - cell "58" [ref=f1e720]
+          - cell [ref=f1e721]:
+            - link "LAMAR CISD" [ref=f1e722] [cursor=pointer]:
+              - /url: district-profile.html?d=lamar-cisd
+          - cell "OTHER_NEGATIVE" [ref=f1e723]
+        - row [ref=f1e725]:
+          - cell "Sep 4, 2025" [ref=f1e726]
+          - cell "Yahoo News / Local" [ref=f1e727]
+          - cell [ref=f1e728]:
+            - link "Lamar CISD bans more than 700 books from its libraries before start of 2025-26 school year" [ref=f1e729] [cursor=pointer]:
+              - /url: https://www.yahoo.com/news/articles/lamar-cisd-bans-more-700-220536188.html
+          - cell "Negative" [ref=f1e730]
+          - cell "55" [ref=f1e732]
+          - cell [ref=f1e733]:
+            - link "LAMAR CISD" [ref=f1e734] [cursor=pointer]:
+              - /url: district-profile.html?d=lamar-cisd
+          - cell "OTHER_NEGATIVE" [ref=f1e735]
+        - row [ref=f1e737]:
+          - cell "Sep 1, 2025" [ref=f1e738]
+          - cell "Texas Freedom to Read Project" [ref=f1e739]
+          - cell [ref=f1e740]:
+            - link "Pinkalicious and 700+ other titles removed from Lamar Consolidated ISD, near Houston" [ref=f1e741] [cursor=pointer]:
+              - /url: https://www.txftrp.org/pinkalicious_and_700_other_titles_removed_from_lcisd
+          - cell "Negative" [ref=f1e742]
+          - cell "58" [ref=f1e744]
+          - cell [ref=f1e745]:
+            - link "LAMAR CISD" [ref=f1e746] [cursor=pointer]:
+              - /url: district-profile.html?d=lamar-cisd
+          - cell "ADVOCACY_CRITICISM" [ref=f1e747]
+        - row [ref=f1e749]:
+          - cell "Aug 31, 2025" [ref=f1e750]
+          - cell "KCEN TV (Central Texas NBC)" [ref=f1e751]
+          - cell [ref=f1e752]:
+            - link "Killeen ISD parents can track student reading choices" [ref=f1e753] [cursor=pointer]:
+              - /url: https://www.kcentv.com/article/news/local/killeen-isd-unveils-bookmarked-connect-parents-with-student-reading-choices/500-60a2fb20-686e-43fa-aeab-1335a68c48f5
+          - cell "Positive" [ref=f1e754]
+          - cell "28" [ref=f1e756]
+          - cell [ref=f1e757]:
+            - link "KILLEEN ISD" [ref=f1e758] [cursor=pointer]:
+              - /url: district-profile.html?d=killeen-isd
+          - cell [ref=f1e759]
+        - row [ref=f1e760]:
+          - cell "Aug 31, 2025" [ref=f1e761]
+          - cell "KDH News (Killeen Daily Herald)" [ref=f1e762]
+          - cell [ref=f1e763]:
+            - link "KISD expands library oversight for parents" [ref=f1e764] [cursor=pointer]:
+              - /url: https://kdhnews.com/news/education/kisd-expands-library-oversight-for-parents/article_502ca11a-b3f3-4607-a9a5-4f90b3ef87b5.html
+          - cell "Positive" [ref=f1e765]
+          - cell "22" [ref=f1e767]
+          - cell [ref=f1e768]:
+            - link "KILLEEN ISD" [ref=f1e769] [cursor=pointer]:
+              - /url: district-profile.html?d=killeen-isd
+          - cell [ref=f1e770]
+        - row [ref=f1e771]:
+          - cell "Aug 4, 2025" [ref=f1e772]
+          - cell "Houston Press" [ref=f1e773]
+          - cell [ref=f1e774]:
+            - link "Conroe ISD Trustees Vote To Throw Out Thousands Of Classroom Books" [ref=f1e775] [cursor=pointer]:
+              - /url: https://www.houstonpress.com/news/teachers-were-asked-to-return-books-now-these-books-face-disposal-17526763
+          - cell "Negative" [ref=f1e776]
+          - cell "62" [ref=f1e778]
+          - cell [ref=f1e779]:
+            - link "CONROE ISD" [ref=f1e780] [cursor=pointer]:
+              - /url: district-profile.html?d=conroe-isd
+          - cell "OTHER_NEGATIVE" [ref=f1e781]
+        - row [ref=f1e783]:
+          - cell "Jun 3, 2025" [ref=f1e784]
+          - cell "KUT (Austin NPR)" [ref=f1e785]
+          - cell [ref=f1e786]:
+            - link "Texas school boards could remove library books under bill on governor's desk" [ref=f1e787] [cursor=pointer]:
+              - /url: https://www.kut.org/news/2025-06-04/texas-school-boards-could-remove-library-books-under-bill-on-governors-desk-book-ban-sb-13-libraries
+          - cell "Neutral" [ref=f1e788]
+          - cell "34" [ref=f1e790]
+          - cell "—" [ref=f1e791]
+          - cell "INDUSTRY_NARRATIVE" [ref=f1e792]
+        - row [ref=f1e794]:
+          - cell "May 25, 2025" [ref=f1e795]
+          - cell "Texas Tribune" [ref=f1e796]
+          - cell [ref=f1e797]:
+            - link "Bill to restrict school library books approved by lawmakers" [ref=f1e798] [cursor=pointer]:
+              - /url: https://www.texastribune.org/2025/05/26/texas-school-library-bill/
+          - cell "Neutral" [ref=f1e799]
+          - cell "70" [ref=f1e801]
+          - cell [ref=f1e802]:
+            - link "LAMAR CISD" [ref=f1e803] [cursor=pointer]:
+              - /url: district-profile.html?d=lamar-cisd
+          - cell [ref=f1e804]
+        - row [ref=f1e805]:
+          - cell "May 13, 2025" [ref=f1e806]
+          - cell "Houston Public Media (NPR)" [ref=f1e807]
+          - cell [ref=f1e808]:
+            - link "Katy ISD students call for repeal of book and gender policies following school board election" [ref=f1e809] [cursor=pointer]:
+              - /url: https://www.houstonpublicmedia.org/articles/news/education-news/2025/05/14/521313/katy-isd-constituents-call-for-repeal-of-book-gender-policies-following-shake-up-in-leadership/
+          - cell "Mixed" [ref=f1e810]
+          - cell "55" [ref=f1e812]
+          - cell [ref=f1e813]:
+            - link "KATY ISD" [ref=f1e814] [cursor=pointer]:
+              - /url: district-profile.html?d=katy-isd
+          - cell [ref=f1e815]
+        - row [ref=f1e816]:
+          - cell "May 11, 2025" [ref=f1e817]
+          - cell "FOX 26 Houston" [ref=f1e818]
+          - cell [ref=f1e819]:
+            - link "Katy ISD community calls for transgender, banned book policy changes under new leadership" [ref=f1e820] [cursor=pointer]:
+              - /url: https://www.fox26houston.com/news/katy-isd-board-president-ousted-community-calls-policy-changes
+          - cell "Mixed" [ref=f1e821]
+          - cell "52" [ref=f1e823]
+          - cell [ref=f1e824]:
+            - link "KATY ISD" [ref=f1e825] [cursor=pointer]:
+              - /url: district-profile.html?d=katy-isd
+          - cell [ref=f1e826]
+        - row [ref=f1e827]:
+          - cell "Apr 1, 2025" [ref=f1e828]
+          - cell "Texas Tribune" [ref=f1e829]
+          - cell [ref=f1e830]:
+            - link "A Texas school leader says material about diversity in state-approved textbooks violated the law" [ref=f1e831] [cursor=pointer]:
+              - /url: https://www.texastribune.org/2025/04/02/texas-cypress-fairbanks-removed-textbook-chapters/
+          - cell "Negative" [ref=f1e832]
+          - cell "70" [ref=f1e834]
+          - cell [ref=f1e835]:
+            - link "CYPRESS-FAIRBANKS ISD" [ref=f1e836] [cursor=pointer]:
+              - /url: district-profile.html?d=cypress-fairbanks-isd
+          - cell "OTHER_NEGATIVE" [ref=f1e837]
+        - row [ref=f1e839]:
+          - cell "Mar 9, 2025" [ref=f1e840]
+          - cell "Houston Press" [ref=f1e841]
+          - cell [ref=f1e842]:
+            - link "In Conroe ISD the Books Are Quietly Disappearing Off Classroom Shelves" [ref=f1e843] [cursor=pointer]:
+              - /url: https://www.houstonpress.com/news/are-book-removals-flying-under-the-radar-at-local-area-school-districts-17387787/
+          - cell "Negative" [ref=f1e844]
+          - cell "58" [ref=f1e846]
+          - cell [ref=f1e847]:
+            - link "CONROE ISD" [ref=f1e848] [cursor=pointer]:
+              - /url: district-profile.html?d=conroe-isd
+          - cell "OTHER_NEGATIVE" [ref=f1e849]
+        - row [ref=f1e851]:
+          - cell "Dec 31, 2024" [ref=f1e852]
+          - cell "Book Riot" [ref=f1e853]
+          - cell [ref=f1e854]:
+            - link "The People Behind BookmarkED Are Behind Book Bans in Texas" [ref=f1e855] [cursor=pointer]:
+              - /url: https://bookriot.com/the-people-behind-bookmarked-are-behind-book-bans-in-texas/
+          - cell "Negative" [ref=f1e856]
+          - cell "72" [ref=f1e858]
+          - cell [ref=f1e859]:
+            - link "KRUM ISD" [ref=f1e860] [cursor=pointer]:
+              - /url: district-profile.html?d=krum-isd
+          - cell "CENSORSHIP_TOOL POLITICAL_FRAMING" [ref=f1e861]:
+            - generic [ref=f1e862]: CENSORSHIP_TOOL
+            - generic [ref=f1e863]: POLITICAL_FRAMING
+        - row [ref=f1e864]:
+          - cell "Dec 31, 2024" [ref=f1e865]
+          - cell "Book Riot" [ref=f1e866]
+          - cell [ref=f1e867]:
+            - link "How The BookmarkED/OnShelf App, Created to Help Schools Ban Books, Fuels Them Instead" [ref=f1e868] [cursor=pointer]:
+              - /url: https://bookriot.com/bookmarked-onshelf-book-banning-app/
+          - cell "Negative" [ref=f1e869]
+          - cell "68" [ref=f1e871]
+          - cell "—" [ref=f1e872]
+          - cell "CENSORSHIP_TOOL" [ref=f1e873]
+        - row [ref=f1e875]:
+          - cell "Dec 31, 2024" [ref=f1e876]
+          - cell "Book Riot" [ref=f1e877]
+          - cell [ref=f1e878]:
+            - link "BookmarkED App Connected to Book Ban Efforts in Texas" [ref=f1e879] [cursor=pointer]:
+              - /url: https://bookriot.com/bookmarked-app-to-ban-books/
+          - cell "Negative" [ref=f1e880]
+          - cell "65" [ref=f1e882]
+          - cell [ref=f1e883]:
+            - link "KRUM ISD" [ref=f1e884] [cursor=pointer]:
+              - /url: district-profile.html?d=krum-isd
+          - cell "CENSORSHIP_TOOL ADVOCACY_CRITICISM" [ref=f1e885]:
+            - generic [ref=f1e886]: CENSORSHIP_TOOL
+            - generic [ref=f1e887]: ADVOCACY_CRITICISM
+        - row [ref=f1e888]:
+          - cell "Dec 31, 2024" [ref=f1e889]
+          - cell "Texans Wake Up" [ref=f1e890]
+          - cell [ref=f1e891]:
+            - link "OnShelf by Bookmarked" [ref=f1e892] [cursor=pointer]:
+              - /url: https://www.texanswakeup.com/post/onshelf-by-bookedmarked
+          - cell "Neutral" [ref=f1e893]
+          - cell "15" [ref=f1e895]
+          - cell "—" [ref=f1e896]
+          - cell [ref=f1e897]
+        - row [ref=f1e898]:
+          - cell "Nov 21, 2024" [ref=f1e899]
+          - cell "ABC13 Houston" [ref=f1e900]
+          - cell [ref=f1e901]:
+            - link "Lamar CISD to remove, restrict books about gender fluidity from school libraries and instructional material" [ref=f1e902] [cursor=pointer]:
+              - /url: https://abc13.com/post/lamar-cisd-remove-restrict-books-gender-fluidity-school-libraries-instructional-material/15574517/
+          - cell "Negative" [ref=f1e903]
+          - cell "62" [ref=f1e905]
+          - cell [ref=f1e906]:
+            - link "LAMAR CISD" [ref=f1e907] [cursor=pointer]:
+              - /url: district-profile.html?d=lamar-cisd
+          - cell "OTHER_NEGATIVE" [ref=f1e908]
+        - row [ref=f1e910]:
+          - cell "Aug 22, 2024" [ref=f1e911]
+          - cell "Click2Houston (KPRC NBC)" [ref=f1e912]
+          - cell [ref=f1e913]:
+            - 'link "''Unintended consequences'': Conroe ISD board to alter book review policy after 25 A.P. books banned" [ref=f1e914] [cursor=pointer]':
+              - /url: https://www.click2houston.com/news/local/2024/08/23/unintended-consequences-conroe-isd-board-to-alter-book-review-policy-after-25-ap-books-pulled/
+          - cell "Mixed" [ref=f1e915]
+          - cell "55" [ref=f1e917]
+          - cell [ref=f1e918]:
+            - link "CONROE ISD" [ref=f1e919] [cursor=pointer]:
+              - /url: district-profile.html?d=conroe-isd
+          - cell "OTHER_NEGATIVE" [ref=f1e920]
+        - row [ref=f1e922]:
+          - cell "Jun 19, 2024" [ref=f1e923]
+          - cell "ABC13 Houston" [ref=f1e924]
+          - cell [ref=f1e925]:
+            - link "Cy-Fair ISD trustees gain power in book banning process" [ref=f1e926] [cursor=pointer]:
+              - /url: https://abc13.com/post/cyfair-isd-book-ban-textbook-censorship-board-meeting-cfisd/14966151/
+          - cell "Negative" [ref=f1e927]
+          - cell "58" [ref=f1e929]
+          - cell [ref=f1e930]:
+            - link "CYPRESS-FAIRBANKS ISD" [ref=f1e931] [cursor=pointer]:
+              - /url: district-profile.html?d=cypress-fairbanks-isd
+          - cell "OTHER_NEGATIVE" [ref=f1e932]
+        - row [ref=f1e934]:
+          - cell "May 9, 2024" [ref=f1e935]
+          - cell "San Antonio Current" [ref=f1e936]
+          - cell [ref=f1e937]:
+            - link "ACLU demands San Antonio's North East ISD end ban on 110 books it removed from its libraries" [ref=f1e938] [cursor=pointer]:
+              - /url: https://www.sacurrent.com/news/aclu-demands-san-antonios-north-east-isd-end-ban-on-110-books-it-removed-from-its-libraries-28740277
+          - cell "Negative" [ref=f1e939]
+          - cell "48" [ref=f1e941]
+          - cell [ref=f1e942]:
+            - link "NORTH EAST ISD" [ref=f1e943] [cursor=pointer]:
+              - /url: district-profile.html?d=north-east-isd
+          - cell "ADVOCACY_CRITICISM" [ref=f1e944]
+        - row [ref=f1e946]:
+          - cell "Dec 7, 2023" [ref=f1e947]
+          - cell "Book Riot" [ref=f1e948]
+          - cell [ref=f1e949]:
+            - link "Manufacturing Problems with School and Library Books to Cash in on Solutions" [ref=f1e950] [cursor=pointer]:
+              - /url: https://bookriot.com/organizations-cashing-in-on-book-bans
+          - cell "Negative" [ref=f1e951]
+          - cell "55" [ref=f1e953]
+          - cell "—" [ref=f1e954]
+          - cell "PROFIT_FROM_BANS" [ref=f1e955]
+        - row [ref=f1e957]:
+          - cell "Nov 14, 2023" [ref=f1e958]
+          - cell "Houston Public Media (NPR)" [ref=f1e959]
+          - cell [ref=f1e960]:
+            - link "Conroe ISD school board strengthens controversial library review process, OK's removing book from some schools" [ref=f1e961] [cursor=pointer]:
+              - /url: https://www.houstonpublicmedia.org/articles/education/books-libraries/2023/11/15/469771/conroe-isd-school-board-strengthens-controversial-library-review-process-oks-removing-book-from-some-schools/
+          - cell "Negative" [ref=f1e962]
+          - cell "60" [ref=f1e964]
+          - cell [ref=f1e965]:
+            - link "CONROE ISD" [ref=f1e966] [cursor=pointer]:
+              - /url: district-profile.html?d=conroe-isd
+          - cell "OTHER_NEGATIVE" [ref=f1e967]
+        - row [ref=f1e969]:
+          - cell "Aug 28, 2023" [ref=f1e970]
+          - cell "eSchool News" [ref=f1e971]
+          - cell [ref=f1e972]:
+            - link "BookmarkED Addresses the State of Challenged Books with Industry-First Technology" [ref=f1e973] [cursor=pointer]:
+              - /url: https://www.eschoolnews.com/newsline/2023/08/29/bookmarked-addresses-the-state-of-challenged-books-with-industry-first-technology-to-enable-parental-choice-in-school-libraries/
+          - cell "Neutral" [ref=f1e974]
+          - cell "32" [ref=f1e976]
+          - cell "—" [ref=f1e977]
+          - cell [ref=f1e978]
+        - row [ref=f1e979]:
+          - cell "Aug 28, 2023" [ref=f1e980]
+          - cell "TechStory" [ref=f1e981]
+          - cell [ref=f1e982]:
+            - 'link "BookmarkED Empowering Literary Choices: A Conversation with Steve Wandler, CEO and Co-Founder of BookmarkED" [ref=f1e983] [cursor=pointer]':
+              - /url: https://techstory.in/bookmarked-empowering-literary-choices-a-conversation-with-steve-wandler-ceo-and-co-founder-of-bookmarked/
+          - cell "Positive" [ref=f1e984]
+          - cell "27" [ref=f1e986]
+          - cell "—" [ref=f1e987]
+          - cell [ref=f1e988]
+        - row [ref=f1e989]:
+          - cell "Aug 21, 2023" [ref=f1e990]
+          - cell "BusinessWire" [ref=f1e991]
+          - cell [ref=f1e992]:
+            - link "BookmarkED Addresses the State of Challenged Books with Industry-First Technology" [ref=f1e993] [cursor=pointer]:
+              - /url: https://www.businesswire.com/news/home/20230822381201/en/BookmarkED-Addresses-the-State-of-Challenged-Books-with-Industry-First-Technology-to-Enable-Parental-Choice-in-School-Libraries
+          - cell "Neutral" [ref=f1e994]
+          - cell "35" [ref=f1e996]
+          - cell "—" [ref=f1e997]
+          - cell [ref=f1e998]
+        - row [ref=f1e999]:
+          - cell "Aug 20, 2023" [ref=f1e1000]
+          - cell "Smithsonian Magazine" [ref=f1e1001]
+          - cell [ref=f1e1002]:
+            - link "Why This School District Used A.I. to Help Determine Which Books to Ban" [ref=f1e1003] [cursor=pointer]:
+              - /url: https://www.smithsonianmag.com/smart-news/why-this-school-district-used-ai-to-help-remove-library-books-180982762/
+          - cell "Neutral" [ref=f1e1004]
+          - cell "60" [ref=f1e1006]
+          - cell "—" [ref=f1e1007]
+          - cell "INSERTION_OPPORTUNITY" [ref=f1e1008]
+        - row [ref=f1e1010]:
+          - cell "Aug 13, 2023" [ref=f1e1011]
+          - cell "PEN America" [ref=f1e1012]
+          - cell [ref=f1e1013]:
+            - 'link "PEN America: Using Artificial Intelligence to Ban Books Only Makes the Problem Worse" [ref=f1e1014] [cursor=pointer]':
+              - /url: https://pen.org/press-release/pen-america-using-artificial-intelligence-to-ban-books-only-makes-the-problem-worse/
+          - cell "Negative" [ref=f1e1015]
+          - cell "65" [ref=f1e1017]
+          - cell "—" [ref=f1e1018]
+          - cell "AI_OVERREACH INDUSTRY_NARRATIVE" [ref=f1e1019]:
+            - generic [ref=f1e1020]: AI_OVERREACH
+            - generic [ref=f1e1021]: INDUSTRY_NARRATIVE
+        - row [ref=f1e1022]:
+          - cell "Jul 31, 2023" [ref=f1e1023]
+          - cell "Book Riot" [ref=f1e1024]
+          - cell [ref=f1e1025]:
+            - link "The First App to 'Help' Libraries and Schools with Book Bans Has Arrived — It's Not What It Seems" [ref=f1e1026] [cursor=pointer]:
+              - /url: https://bookriot.com/bookmarked-book-banning-app/
+          - cell "Negative" [ref=f1e1027]
+          - cell "60" [ref=f1e1029]
+          - cell "—" [ref=f1e1030]
+          - cell "CENSORSHIP_TOOL" [ref=f1e1031]
+        - row [ref=f1e1033]:
+          - cell "Jul 31, 2023" [ref=f1e1034]
+          - cell "CityBiz" [ref=f1e1035]
+          - cell [ref=f1e1036]:
+            - link "BookmarkED Launches New Tech Solution to Aid Texas Schools" [ref=f1e1037] [cursor=pointer]:
+              - /url: https://www.citybiz.co/article/459136/bookmarked-launches-new-tech-solution-to-aid-texas-schools
+          - cell "Neutral" [ref=f1e1038]
+          - cell "20" [ref=f1e1040]
+          - cell "—" [ref=f1e1041]
+          - cell [ref=f1e1042]
+        - row [ref=f1e1043]:
+          - cell "Dec 14, 2022" [ref=f1e1044]
+          - cell "NBC DFW" [ref=f1e1045]
+          - cell [ref=f1e1046]:
+            - link "Granbury ISD Being Investigated for Removing LGBTQ Books From School Libraries" [ref=f1e1047] [cursor=pointer]:
+              - /url: https://www.nbcdfw.com/news/local/carter-in-the-classroom/federal-government-investigates-granbury-isd-superintendents-order-to-remove-lgbtq-books-from-school-libraries/3153831/
+          - cell "Negative" [ref=f1e1048]
+          - cell "62" [ref=f1e1050]
+          - cell [ref=f1e1051]:
+            - link "GRANBURY ISD" [ref=f1e1052] [cursor=pointer]:
+              - /url: district-profile.html?d=granbury-isd
+          - cell "OTHER_NEGATIVE" [ref=f1e1053]
+        - row [ref=f1e1055]:
+          - cell "Jul 28, 2022" [ref=f1e1056]
+          - cell "Community Impact (DFW)" [ref=f1e1057]
+          - cell [ref=f1e1058]:
+            - link "Carroll ISD adopts new book policy for classrooms, libraries" [ref=f1e1059] [cursor=pointer]:
+              - /url: https://communityimpact.com/dallas-fort-worth/grapevine-colleyville-southlake/education/2022/07/29/carroll-isd-adopts-new-book-policy-for-classrooms-libraries/
+          - cell "Mixed" [ref=f1e1060]
+          - cell "42" [ref=f1e1062]
+          - cell [ref=f1e1063]:
+            - link "CARROLL ISD" [ref=f1e1064] [cursor=pointer]:
+              - /url: district-profile.html?d=carroll-isd
+          - cell [ref=f1e1065]
+        - row [ref=f1e1066]:
+          - cell "Feb 24, 2022" [ref=f1e1067]
+          - cell "National Coalition Against Censorship" [ref=f1e1068]
+          - cell [ref=f1e1069]:
+            - link "Granbury, Texas, School District Removes 130 Books While Rewriting Book Review Process" [ref=f1e1070] [cursor=pointer]:
+              - /url: https://ncac.org/news/granbury-texas-book-censorship
+          - cell "Negative" [ref=f1e1071]
+          - cell "45" [ref=f1e1073]
+          - cell [ref=f1e1074]:
+            - link "GRANBURY ISD" [ref=f1e1075] [cursor=pointer]:
+              - /url: district-profile.html?d=granbury-isd
+          - cell "ADVOCACY_CRITICISM" [ref=f1e1076]
+        - row [ref=f1e1078]:
+          - cell "Feb 9, 2022" [ref=f1e1079]
+          - cell "San Antonio Report" [ref=f1e1080]
+          - cell [ref=f1e1081]:
+            - link "NEISD's removal of library books may be unconstitutional, expert says" [ref=f1e1082] [cursor=pointer]:
+              - /url: https://sanantonioreport.org/north-east-isds-removal-library-unconstitutional/
+          - cell "Negative" [ref=f1e1083]
+          - cell "45" [ref=f1e1085]
+          - cell [ref=f1e1086]:
+            - link "NORTH EAST ISD" [ref=f1e1087] [cursor=pointer]:
+              - /url: district-profile.html?d=north-east-isd
+          - cell "OTHER_NEGATIVE" [ref=f1e1088]
+        - row [ref=f1e1090]:
+          - cell "Dec 14, 2021" [ref=f1e1091]
+          - cell "Book Riot" [ref=f1e1092]
+          - cell [ref=f1e1093]:
+            - link "Texas School District Pulls 400+ Books From Shelves" [ref=f1e1094] [cursor=pointer]:
+              - /url: https://bookriot.com/north-east-isd-library-books/
+          - cell "Negative" [ref=f1e1095]
+          - cell "60" [ref=f1e1097]
+          - cell [ref=f1e1098]:
+            - link "NORTH EAST ISD" [ref=f1e1099] [cursor=pointer]:
+              - /url: district-profile.html?d=north-east-isd
+          - cell "OTHER_NEGATIVE" [ref=f1e1100]
+        - row [ref=f1e1102]:
+          - cell "Dec 7, 2021" [ref=f1e1103]
+          - cell "NBC News" [ref=f1e1104]
+          - cell [ref=f1e1105]:
+            - link "Texas school district pulls 400 books from library shelves for review after legislator's inquiry" [ref=f1e1106] [cursor=pointer]:
+              - /url: https://www.nbcnews.com/news/us-news/texas-school-district-pulls-400-books-library-shelves-review-lawmakers-rcna7891
+          - cell "Negative" [ref=f1e1107]
+          - cell "72" [ref=f1e1109]
+          - cell [ref=f1e1110]:
+            - link "NORTH EAST ISD" [ref=f1e1111] [cursor=pointer]:
+              - /url: district-profile.html?d=north-east-isd
+          - cell "OTHER_NEGATIVE" [ref=f1e1112]
+  - generic [ref=f1e1114]:
+    - generic [ref=f1e1116]:
+      - generic [ref=f1e1117]: Sentiment trend
+      - generic [ref=f1e1118]: Net sentiment across scan history.
+    - generic [ref=f1e1119]:
+      - 'generic "2026-04-02: -0.2" [ref=f1e1120]'
+      - 'generic "2026-04-02: -0.24" [ref=f1e1121]'
+      - 'generic "2026-08-07: -0.5" [ref=f1e1122]'
+      - 'generic "2026-08-11: 0.14" [ref=f1e1123]'
+  - contentinfo [ref=f1e1124]:
+    - paragraph [ref=f1e1125]:
+      - text: "Build 20260811-104118 · Data:"
+      - link "media-tracker.json" [ref=f1e1126] [cursor=pointer]:
+        - /url: https://github.com/BookmarkED-Corp/bookmarked-district-intelligence/blob/main/data/media-tracker.json
+      - text: "· Confluence:"
+      - link "Media & PR Intelligence" [ref=f1e1127] [cursor=pointer]:
+        - /url: https://bookmarked-team.atlassian.net/wiki/spaces/TS1/pages/107708461
