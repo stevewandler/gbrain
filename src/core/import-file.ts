@@ -28,6 +28,7 @@ import {
   isQuarantined,
 } from './quarantine.ts';
 import { getEmbeddingModel } from './ai/gateway.ts';
+import { resolveMaxChunkTokens } from './embedding-input-limit.ts';
 import { loadConfig, loadConfigWithEngine } from './config.ts';
 import {
   buildContextualPrefix,
@@ -763,6 +764,7 @@ export async function importFromContent(
   // is NOT here — flagged pages chunk + embed normally, they just carry a
   // warning marker.)
   const embedSkipped = isEmbedSkipped(parsed.frontmatter) || isQuarantined(parsed.frontmatter);
+  const chunkOpts = { maxTokens: resolveMaxChunkTokens() };
   if (!embedSkipped) {
     if (parsed.compiled_truth.trim()) {
       for (const c of chunkText(parsed.compiled_truth, chunkOpts)) {
