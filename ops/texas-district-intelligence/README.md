@@ -258,30 +258,72 @@ superintendents, 123 assistant superintendents, 1 executive director), 0 unmappe
 roles, 299/300 with email. That is the first batch of the leadership tier — the
 load is deliberately incomplete pending the mechanism decision below.
 
-## Completing the load
+## Completing the load — bulk CSV via staging (recommended)
 
-The remaining named rows are ~47,200 (2,083 leadership − 300 done, plus ~35,000
-other district staff, ~9,461 campus principals, ~2,576 ESC staff).
+The remaining rows are **47,070** (the full named set; 300 are already in, and
+re-importing them is a no-op because both paths hash the same `natural_key`).
 
-The blocker is transport, not logic. The loader is proven end to end; but with no
-Supabase credential on the machine holding the CSVs, every row must round-trip
-through the agent's context, which caps batches at ~300 rows and puts the full
-job at ~157 batches.
+The earlier blocker was transport: no Supabase credential on the machine holding
+the CSVs meant every row round-tripped through the agent's context, capping
+batches near 300 rows. The fix avoids the agent entirely and needs **no new
+credential**:
 
-**Recommended: a scoped loader role.** Create a dedicated Postgres role with
-INSERT/SELECT/UPDATE on `district_contacts` only, and run the loader directly from
-the machine holding the CSVs (it already has `psql` and the Supabase CLI). The
-whole export loads in one pass, in seconds, with no data crossing the agent's
-context. This is a production security change — it needs explicit approval, and
-the credential should be created and stored by a human rather than generated in an
-agent transcript.
+1. **Generate the CSVs** — `loader/askted_emit_csv.py` writes
+   `askted_contacts_01.csv` (25,000 rows, 4.8 MB) and `askted_contacts_02.csv`
+   (22,070 rows, 4.2 MB). Every column is precomputed, including `role_code` and
+   the `natural_key` hash, because a CSV import cannot run SQL.
+2. **Import into `district_contacts_staging`** via the Supabase dashboard Table
+   Editor. Staging is all-text with no constraints and no FK, so a type cast or an
+   unknown district id cannot fail the import partway through.
+3. **Promote** with `003_promote_staging.sql`: it casts, resolves the run id from
+   `source_scope`, applies the district FK guard, collapses duplicate
+   `natural_key`s, and upserts.
+4. **Read the reject report** (step 2 of that file — expect zero rows),
+   reconcile the counts, set `row_count_loaded`, then truncate staging.
 
-**Alternative: keep batching.** Works with what exists today, no new credential,
-but ~157 round trips for the remainder.
+Why staging rather than importing straight into `district_contacts`: a dashboard
+CSV import does plain INSERTs, so it would collide with the 300 rows already
+loaded and would hard-fail on any FK miss. Staging turns both into reportable
+data instead of a failed import.
 
-Either way the loader is unchanged: `askted_emit_sql.py` (see `loader/`) reads the
-CSVs, reuses the reviewed normalization from `ingest_askted.py`, dedupes on the
-natural key, and emits idempotent upsert batches. Re-running any batch is safe.
+**Alternative — scoped loader role.** A dedicated Postgres role with
+INSERT/SELECT/UPDATE on `district_contacts` only, driven from `psql` on the
+machine holding the CSVs. Faster and scriptable, which is what the monthly
+refresh will eventually want. It is a production credential, so it needs explicit
+approval and should be created and stored by a human, not generated in an agent
+transcript. Not needed for the one-time backfill.
+
+## What is actually in the 47,070 rows
+
+Not all "district contacts" in the sales sense — worth knowing before anyone
+treats this as an outreach list:
+
+| Segment | Rows |
+|---|---|
+| Campus principals | 9,458 |
+| **School board members + officers** (elected trustees, not staff) | 8,177 |
+| Special education | 4,220 |
+| Student services / liaisons | 4,215 |
+| Data / PEIMS / TREX reporting | 3,922 |
+| Assessment & accountability | 2,693 |
+| Technology & cybersecurity | 2,232 |
+| Federal programs | 2,132 |
+| Operations, transport, facilities | 1,627 |
+| Safety, security, discipline | 1,506 |
+| Business / finance | 1,253 |
+| **Superintendents** | **1,209** |
+| Human resources | 981 |
+| Curriculum & instruction | 922 |
+| **Assistant / deputy / associate superintendents** | **873** |
+| Administrative support | 837 |
+| ESC program / instructional staff | 754 |
+| Library / media (**ESC only** — AskTED has no district library role) | 38 |
+| Executive director | 21 |
+
+Two things to note: 8,177 rows are elected board members rather than employees,
+and 2,569 of the total are ESC staff, not district staff at all. Both are tagged,
+so `role_code` and `org_level` filter them out at query time — which is why the
+whole set is loaded rather than pre-filtered.
 
 ## Follow-ups
 
