@@ -18,8 +18,19 @@ Normalization reuses the REVIEWED helpers from ingest_askted.py rather than
 reimplementing them. Rows with no name in any name field are skipped, not
 invented. Exact duplicate source rows are collapsed, keeping the richer record.
 
-Measured 2026-08-26: 47,070 rows out, 0 unmapped roles, 128 duplicates collapsed,
-11,114 nameless rows skipped.
+Measured 2026-08-26 (org_level=ALL): 47,070 rows out, 0 unmapped roles, 128
+duplicates collapsed, 11,114 nameless rows skipped.
+
+Measured 2026-08-27 (org_level=district, the scope actually loaded into
+district_contacts — see ../README.md): 35,043 rows out, 0 unmapped roles.
+Campus (9,461) and ESC (2,576) rows are excluded from that scope, not dropped
+from the pipeline — rerun with ALL to pick them up later.
+
+The dashboard-import path above is one option; the 2026-08-27 load actually
+went through an HTTPS relay instead (a temporary Edge Function) because the
+direct psql paths were blocked on that machine's network — see ../README.md
+"How the 2026-08-27 load actually moved data" before assuming either path
+will work unmodified for the next refresh.
 """
 from __future__ import annotations
 

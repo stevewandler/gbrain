@@ -1,7 +1,9 @@
 -- Promote bulk-imported AskTED contacts from staging into district_contacts.
 --
--- Run AFTER importing the CSVs into public.district_contacts_staging (the
--- Supabase dashboard Table Editor import works and needs no credential).
+-- Run AFTER the rows are in public.district_contacts_staging. This step is
+-- transport-agnostic -- it doesn't care whether staging was filled via a
+-- dashboard CSV import, a scoped psql role, or an HTTPS relay (see README.md
+-- "How the 2026-08-27 load actually moved data" for what was used and why).
 --
 -- Safe to run repeatedly: the insert upserts on natural_key, so re-promoting the
 -- same staging content is a no-op apart from touching last_seen_run_id. Rows

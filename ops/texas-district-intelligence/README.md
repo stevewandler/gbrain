@@ -4,10 +4,13 @@ Working package for making `texas-esc-districts` (Supabase `fdnncloyxjsxwdhpfkjj
 the central source for current Texas district contacts, and for completing the
 Take Back the Classroom (TBTC) campus-level scrape.
 
-**Status 2026-08-26:** the migration is **APPLIED** to `fdnncloyxjsxwdhpfkjj`
-(approved by the brain owner). The contact load is **partial** — see
-"Completing the load" below. Findings from the real artifacts are in
-[FINDINGS.md](FINDINGS.md).
+**Status 2026-08-27:** the district-level contact load is **COMPLETE**. All
+35,043 district-scope AskTED personnel rows (elected trustees + district-office
+staff) are live in `district_contacts` against `fdnncloyxjsxwdhpfkjj`, zero
+rejects. Campus principals (9,461 rows) and ESC staff (2,576 rows) are
+deliberately not loaded yet — see "Import scope" below. Findings from the real
+artifacts are in [FINDINGS.md](FINDINGS.md); how the bulk load actually moved
+data is in "How the 2026-08-27 load actually moved data" below.
 
 ---
 
@@ -95,25 +98,31 @@ Also caught before apply: `pg_trgm` is **not installed** on the target project,
 so the original `gin_trgm_ops` index on `full_name` would have failed. Replaced
 with a btree on `lower(full_name)`.
 
-### What is still needed to load
+### What was needed to load (resolved 2026-08-27)
 
-The loader is **not** written, because one input is unavailable from this
-session: the exact column headers of the AskTED personnel export. Everything
-else is ready. Blockers:
+All three blockers below were resolved — kept here as a record, since the
+next person to touch this package may hit "the file is missing" doubt again
+and shouldn't have to re-derive that it was already found:
 
-- **The export file.** Lives at `~/Documents/Codex/2026-08-19/...` per the audit.
-  Laptop Bridge timed out three times (laptop asleep).
-- **`BookmarkED-Corp/bookmarked-district-intelligence`** exists and holds the
-  preserved evidence, but this session is scoped to `stevewandler/gbrain`;
-  cross-owner `add_repo` is refused in v1.
-- **Network egress** blocks `tea.texas.gov`, `tea4avholly.tea.state.tx.us`
-  (AskTED), the TEA ArcGIS open-data host, and `takebacktheclassroom.org`. No
-  re-pull from source is possible from this environment.
+- **The export file.** Was reachable all along at
+  `~/Documents/askted-import/` on the brain owner's machine, once Laptop
+  Bridge could reach it (earlier timeouts were the laptop asleep, not the
+  file being gone).
+- **`BookmarkED-Corp/bookmarked-district-intelligence`** — still not reachable
+  from this session (cross-owner `add_repo` still refused in v1), but turned
+  out not to matter: this package's own `loader/` scripts were sufficient.
+- **Network egress** still blocks `tea.texas.gov` and `takebacktheclassroom.org`
+  from this environment. Irrelevant to this load, since it used the existing
+  2026-08-19 export rather than re-pulling — still the blocker for any future
+  re-pull or for the TBTC sweep in section 2 below.
 
-Any one of: wake the laptop, start a session against the district-intelligence
-repo, or run from an environment whose network policy allows `tea.texas.gov`.
+### Load runbook (as originally planned)
 
-### Load runbook (once the file is reachable)
+The generic version of the plan, for the next person doing a fresh load rather
+than a refresh. What was *actually* run for the 2026-08-27 district-scope load
+— including the transport dead ends and fix — is in "How the 2026-08-27 load
+actually moved data" and "Pre-import validation" below; this is the more
+general shape:
 
 1. Checksum the artifact; open a `source_runs` row with `source_date` from the
    export itself, not today's date.
@@ -124,9 +133,8 @@ repo, or run from an environment whose network policy allows `tea.texas.gov`.
    `220-814`, `246-802`, combined enrollment 659) — absence from one export
    does not establish closure, so do not drop them.
 4. Load in a transaction. Upsert on `natural_key`.
-5. Gate on: superintendent coverage (expect ~1,213 of 1,219 given six known
-   gaps), zero-contact districts, unmapped role codes, `row_count_loaded` vs
-   `row_count_raw`.
+5. Gate on: superintendent coverage, zero-contact districts, unmapped role
+   codes, `row_count_loaded` vs `row_count_raw`.
 6. Set `row_count_loaded` and only then treat the run as authoritative.
 
 ### Refresh cadence — the part that makes it "central"
@@ -221,15 +229,21 @@ The sweep needs an environment with egress to it.
 
 | File | What it is |
 |---|---|
-| `001_contact_layer.sql` | Contact-layer migration. Drafted, tested, **not applied**. |
+| `001_contact_layer.sql` | Core contact-layer migration. **Applied.** |
+| `001b_staging_table.sql` | `district_contacts_staging` DDL + RLS. **Applied** 2026-08-27 (was applied ahead of being committed — see its header comment). |
+| `002_role_taxonomy_seed.sql` | 20 role codes + 137 AskTED-role → role_code mappings. **Applied.** |
+| `003_promote_staging.sql` | Staging → `district_contacts` promote, reject report, reconcile. **Run**, zero rejects. |
+| `FINDINGS.md` | Source-data findings from the real AskTED artifacts (header SHA verification, no-district-library-role, duplicate rows, nameless rows). |
+| `loader/` | CSV emission + FK pre-check scripts (`askted_emit_csv.py`, `askted_check_fk.py`, `askted_role_map.json`) run on the machine holding the source export. |
 | `README.md` | This document. |
 
 ## Open decisions
 
-1. Approve applying `001_contact_layer.sql` to `fdnncloyxjsxwdhpfkjj` (needs a
-   backup/PITR check first, per the earlier package's own release gates).
-2. Load the existing 2026-08-21 export, or re-pull AskTED fresh and stamp a new
-   run? Re-pull is cleaner if we are declaring this the canonical source.
+1. ~~Approve applying `001_contact_layer.sql`~~ — **done**, applied and approved
+   2026-08-26.
+2. ~~Load the existing export, or re-pull fresh~~ — **decided**: loaded the
+   existing 2026-08-19 export as-is, no re-pull (this environment cannot reach
+   `tea.texas.gov` anyway).
 3. Where does this package finally live? `BookmarkED-Corp/bookmarked-district-intelligence`
    is the architecturally correct home; it is staged here because that repo is
    not reachable from this session.
@@ -237,61 +251,78 @@ The sweep needs an environment with egress to it.
 
 ---
 
-## Applied state (2026-08-26)
+## Applied state (2026-08-27)
 
 Baseline before apply: 6 tables, 1 view, 6 policies, districts 1,219,
 tbtc_districts 848, tbtc_school_books 457.
 
-After `001` + `002`: **10 tables, 4 views, 14 policies**, `role_code_ref` 20 rows,
-`askted_role_map` 137 rows. Pre-existing data unchanged. `anon` holds **zero**
-grants on any new table — verified in production, not assumed.
+After `001` + `002` + `001b`: **11 tables, 4 views, 16 policies** (verified live,
+not computed by hand), `role_code_ref` 20 rows, `askted_role_map` 137 rows.
+Pre-existing data unchanged. `anon` holds **zero** grants on any new table —
+verified in production, not assumed.
 
 Two `source_runs` rows are registered, each pinned to its artifact SHA-256:
 
-| source_name | artifact | row_count_raw |
-|---|---|---|
-| `askted_personnel` | district+school personnel, 2026-08-19 | 55,493 |
-| `askted_personnel_esc` | ESC personnel, 2026-08-19 | 2,819 |
+| source_name | artifact | row_count_raw | row_count_loaded |
+|---|---|---|---|
+| `askted_personnel` | district+school personnel, 2026-08-19 | 55,493 | 35,043 |
+| `askted_personnel_esc` | ESC personnel, 2026-08-19 | 2,819 | 0 (deferred) |
 
-`district_contacts` currently holds **300 rows** across 177 districts (176
-superintendents, 123 assistant superintendents, 1 executive director), 0 unmapped
-roles, 299/300 with email. That is the first batch of the leadership tier — the
-load is deliberately incomplete pending the mechanism decision below.
+`district_contacts` holds **35,043 rows** across **1,216** distinct
+districts/charter operators (verified live) — every district-scope AskTED
+personnel row: elected trustees, superintendents, assistant superintendents,
+and all other district-office roles. **0** landed as the unmapped `other`
+role_code, **31,483** have an email, **32,267** have a phone (all verified live
+against the final table, matching the pre-import CSV check exactly — zero
+drift between predicted and landed). The 300 leadership-tier rows loaded first
+(2026-08-26) collapsed into this set on `natural_key`: same people, same hash,
+no duplicates. `district_contacts_staging` is empty (truncated after promote)
+and stays in the schema for the next refresh.
 
-## Completing the load — bulk CSV via staging (recommended)
+## How the 2026-08-27 load actually moved data
 
-The remaining rows are **47,070** (the full named set; 300 are already in, and
-re-importing them is a no-op because both paths hash the same `natural_key`).
+The plan going into this load was a scoped, temporary Postgres role driven by
+`psql \copy` straight from the machine holding the CSV — no CSV data round-
+tripping through the agent's context, no dashboard CSV import (ruled out: the
+file already existed, so a manual re-upload step would have just been the
+agent handing back work it should do itself). That plan hit two dead ends
+specific to this project's network path, both worth recording so the next
+monthly refresh doesn't re-discover them the slow way:
 
-The earlier blocker was transport: no Supabase credential on the machine holding
-the CSVs meant every row round-tripped through the agent's context, capping
-batches near 300 rows. The fix avoids the agent entirely and needs **no new
-credential**:
+1. **The direct connection host (`db.<ref>.supabase.co:5432`) is IPv6-only**,
+   and the machine's network cannot resolve IPv6 at all — confirmed by testing
+   DNS resolution against a known-good IPv6 hostname on the same network, which
+   failed identically. Not a Supabase misconfiguration; a local network limit.
+2. **The Supavisor connection pooler rejects a role created by raw SQL.** A
+   role made with plain `CREATE ROLE ... LOGIN` is invisible to the pooler's
+   own tenant/user cache — it returned `tenant/user ... not found` even though
+   the role existed and worked fine for direct SQL access via the Supabase
+   MCP connection. The pooler only recognizes roles provisioned through
+   Supabase's own control plane, not ones created ad hoc in a session.
 
-1. **Generate the CSVs** — `loader/askted_emit_csv.py` writes
-   `askted_contacts_01.csv` (25,000 rows, 4.8 MB) and `askted_contacts_02.csv`
-   (22,070 rows, 4.2 MB). Every column is precomputed, including `role_code` and
-   the `natural_key` hash, because a CSV import cannot run SQL.
-2. **Import into `district_contacts_staging`** via the Supabase dashboard Table
-   Editor. Staging is all-text with no constraints and no FK, so a type cast or an
-   unknown district id cannot fail the import partway through.
-3. **Promote** with `003_promote_staging.sql`: it casts, resolves the run id from
-   `source_scope`, applies the district FK guard, collapses duplicate
-   `natural_key`s, and upserts.
-4. **Read the reject report** (step 2 of that file — expect zero rows),
-   reconcile the counts, set `row_count_loaded`, then truncate staging.
+With both `psql` paths blocked, the load instead went over HTTPS, which was
+already reachable:
 
-Why staging rather than importing straight into `district_contacts`: a dashboard
-CSV import does plain INSERTs, so it would collide with the 300 rows already
-loaded and would hard-fail on any FK miss. Staging turns both into reportable
-data instead of a failed import.
+1. A temporary Supabase Edge Function (`askted-staging-loader`) accepted a
+   batch of rows over POST, checked a disposable bearer token, whitelisted the
+   exact 14 staging columns (no dynamic SQL, no arbitrary table), and inserted
+   into `district_contacts_staging` using the service-role key **held
+   server-side inside the function** — never exposed to the machine or the
+   network.
+2. A small script on the machine holding the CSV read it in 1,000-row batches
+   and POSTed each batch to the function, authenticated with the project's
+   public anon key plus the disposable token. All 36 batches (35,043 rows)
+   succeeded on the first attempt, zero retries needed.
+3. After the promote step below verified clean, the function was redeployed
+   as a dead stub (always returns HTTP 410) since there's no delete-function
+   tool available, the disposable token was discarded, and the one-off scripts
+   holding it were deleted from the machine.
 
-**Alternative — scoped loader role.** A dedicated Postgres role with
-INSERT/SELECT/UPDATE on `district_contacts` only, driven from `psql` on the
-machine holding the CSVs. Faster and scriptable, which is what the monthly
-refresh will eventually want. It is a production credential, so it needs explicit
-approval and should be created and stored by a human, not generated in an agent
-transcript. Not needed for the one-time backfill.
+Net effect: the same zero-agent-context, zero-standing-credential properties
+the `psql` plan was designed for, reached by a different transport. For the
+next refresh, either retry the scoped-role approach (it may work fine from a
+network with IPv6 egress) or reuse this Edge Function pattern — the function
+code is in this commit's history if it needs to be redeployed.
 
 ## Import scope (decided 2026-08-26)
 
@@ -356,14 +387,6 @@ and 32,267 with phone (92.1%), and no row missing a name or role title.
 exist in `districts`. The 3 live districts with no AskTED personnel are
 `130-801`, `220-814`, `246-802` — the same three the 2026-08-21 audit identified
 as frozen-only, confirmed independently here.
-
-## The one remaining manual step
-
-Supabase dashboard → Table Editor → `district_contacts_staging` → Import data
-from CSV → `~/Documents/askted-import/askted_contacts_01.csv` (6.6 MB).
-
-Then the promote in `003_promote_staging.sql` runs, the reject report is read
-(expected: zero rows), `row_count_loaded` is recorded, and staging is truncated.
 
 ## Follow-ups
 

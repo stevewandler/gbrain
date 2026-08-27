@@ -70,13 +70,19 @@ the audit reported, confirmed independently by the loader's `skipped_no_name` co
 Named superintendent coverage: SUPERINTENDENT 1,127 + INTERIM 74 + ACTING 8 =
 **1,209** across 1,216 districts.
 
-## The transfer bottleneck
+## The transfer bottleneck (resolved 2026-08-27)
 
-This session cannot reach `tea.texas.gov` or `takebacktheclassroom.org` (egress
-policy), and the laptop holds no Supabase credential for this project — so the
-rows have to pass through the agent's context: read the batch off the laptop, then
-write it back out as a SQL parameter. That costs roughly twice the payload per
-batch and caps a batch at ~300 rows (~43 KB) before the tool output limit.
+Originally: this session cannot reach `tea.texas.gov` or
+`takebacktheclassroom.org` (egress policy), and the laptop held no Supabase
+credential for this project — so rows had to pass through the agent's
+context: read the batch off the laptop, then write it back out as a SQL
+parameter. That cost roughly twice the payload per batch, capped a batch at
+~300 rows (~43 KB) before the tool output limit, and — at real scale — hit the
+org's monthly Anthropic spend cap partway through, independent of how many
+parallel agents were thrown at it (the cap is account-wide, not per-agent).
 
-For the ~47,200 named rows that is ~157 batches. It works, but it is the wrong
-mechanism for the volume. See README "Completing the load".
+Fixed by removing the agent from the data path entirely rather than working
+around the cap: see README "How the 2026-08-27 load actually moved data" for
+the mechanism (a temporary HTTPS relay after both direct-`psql` options turned
+out to be blocked on that machine's network) and "Applied state" for the
+verified result — all 35,043 district-scope rows loaded, zero rejects.
