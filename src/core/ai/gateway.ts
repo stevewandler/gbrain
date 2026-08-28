@@ -23,7 +23,7 @@
 
 import { embed as aiEmbed, embedMany, generateObject, generateText, jsonSchema } from 'ai';
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { listRecipes } from './recipes/index.ts';
 import { createOpenAI } from '@ai-sdk/openai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
@@ -52,7 +52,8 @@ import {
   OPENROUTER_CACHE_HEADER,
   openrouterRequiresExplicitPromptCache,
 } from './recipes/openrouter.ts';
-import { resolveModel, resolveModelDetailed, resolveEffectiveChatModel, resolveEffectiveExpansionModel } from '../model-config.ts';
+import { resolveModelDetailed, resolveEffectiveChatModel, resolveEffectiveExpansionModel } from '../model-config.ts';
+import { snapshotConfigReader } from '../config-snapshot.ts';
 import { parseLlmJson } from '../llm-json.ts';
 import type { BrainEngine } from '../engine.ts';
 import { dimsProviderOptions } from './dims.ts';
@@ -469,6 +470,9 @@ export function configureGateway(config: AIGatewayConfig): void {
     // fail with a cryptic wrong-width error at embed time. Keep it honest.
     embedding_dimensions: config.embedding_dimensions,
     embedding_multimodal_model: config.embedding_multimodal_model,
+    // #4107: stays undefined when unset so getImageOcrModel() keeps the
+    // "fall back to the expansion model" signal honest.
+    embedding_image_ocr_model: config.embedding_image_ocr_model,
     expansion_model: config.expansion_model ?? DEFAULT_EXPANSION_MODEL,
     chat_model: config.chat_model ?? DEFAULT_CHAT_MODEL,
     chat_fallback_chain: config.chat_fallback_chain,
@@ -550,15 +554,26 @@ export async function reconfigureGatewayWithEngine(engine: BrainEngine): Promise
     env: cfg.env ?? process.env,
     baseUrl: resolveNativeBaseUrl('openai', cfg),
   });
+
+  // The two resolutions below each walk a 5-tier precedence chain that reads
+  // up to 4 config keys, plus alias expansion. Against the engine that is
+  // many sequential round trips before the CLI does any work — seconds of
+  // `gbrain stats`'s wall clock on a hosted brain, for reads the server
+  // answered in microseconds. Take one snapshot of the config table (AFTER
+  // the discovery refresh above, so tier defaults see fresh discovery) and
+  // resolve every model against it. Same keys, same precedence, one round
+  // trip.
+  const reader = await snapshotConfigReader(engine);
+
   // Resolve expansion (utility tier) and chat (reasoning tier). Embedding is
   // intentionally NOT re-resolved here — switching embedding models invalidates
   // the vector index. Out of scope per v0.31.12 plan ("Embedding tier knob").
-  const expansionDetailed = await resolveModelDetailed(engine, {
+  const expansionDetailed = await resolveModelDetailed(reader, {
     configKey: 'models.expansion',
     tier: 'utility',
     fallback: cfg.expansion_model ?? DEFAULT_EXPANSION_MODEL,
   });
-  const chatDetailed = await resolveModelDetailed(engine, {
+  const chatDetailed = await resolveModelDetailed(reader, {
     configKey: 'models.chat',
     tier: 'reasoning',
     fallback: cfg.chat_model ?? DEFAULT_CHAT_MODEL,
@@ -825,6 +840,16 @@ export function getExpansionModel(): string {
   return requireConfig().expansion_model ?? DEFAULT_EXPANSION_MODEL;
 }
 
+/**
+ * #4107: the model generateOcrText() routes to — `embedding_image_ocr_model`
+ * when set, else the expansion model. A direct "provider:model" string like
+ * embedding_multimodal_model (never models.tier-resolved), so `gbrain config
+ * set embedding_image_ocr_model` points OCR exactly where the user aimed it.
+ */
+export function getImageOcrModel(): string {
+  return requireConfig().embedding_image_ocr_model ?? getExpansionModel();
+}
+
 export function getChatModel(): string {
   return requireConfig().chat_model ?? DEFAULT_CHAT_MODEL;
 }
@@ -943,7 +968,14 @@ export function diagnoseEmbedding(modelOverride?: string): EmbeddingDiagnosis {
   }
 
   const required = recipe.auth_env?.required ?? [];
-  const missing = required.filter(k => !_config!.env[k]);
+  // #4385: a configured OPENAI_BASE_URL points native-openai embedding at a
+  // keyless local OpenAI-compatible server, so the override satisfies the
+  // key requirement — mirrors instantiateEmbedding's placeholder path.
+  const keylessBaseUrl =
+    recipe.implementation === 'native-openai' && !!resolveNativeBaseUrl('openai', _config);
+  const missing = required.filter(
+    k => !_config!.env[k] && !(keylessBaseUrl && k === 'OPENAI_API_KEY'),
+  );
   if (missing.length > 0) {
     return {
       ok: false,
@@ -1589,12 +1621,15 @@ async function resolveEmbeddingProvider(modelStr: string): Promise<{ model: any;
 function instantiateEmbedding(recipe: Recipe, modelId: string, cfg: AIGatewayConfig): any {
   switch (recipe.implementation) {
     case 'native-openai': {
-      const apiKey = cfg.env.OPENAI_API_KEY;
+      const baseURL = resolveNativeBaseUrl('openai', cfg);
+      // #4385: a base-URL override targets a local OpenAI-compatible server
+      // (LM Studio, vLLM) that ignores auth — the SDK only requires a
+      // non-empty key, so use the same placeholder as defaultResolveAuth.
+      const apiKey = cfg.env.OPENAI_API_KEY ?? (baseURL ? 'unauthenticated' : undefined);
       if (!apiKey) throw new AIConfigError(
         `OpenAI embedding requires OPENAI_API_KEY.`,
         recipe.setup_hint,
       );
-      const baseURL = resolveNativeBaseUrl('openai', cfg);
       const client = createOpenAI({ apiKey, ...(baseURL ? { baseURL } : {}) });
       // AI SDK v6: use .textEmbeddingModel() for embeddings
       return (client as any).textEmbeddingModel
@@ -1814,7 +1849,17 @@ export async function embed(texts: string[], opts?: EmbedOpts): Promise<Float32A
   const expected = effectiveDims;
 
   const embedding = recipe.touchpoints?.embedding;
-  const maxBatchTokens = embedding?.max_batch_tokens;
+  // GBRAIN_EMBED_MAX_BATCH_TOKENS (#3622): operator-declared cap for recipes
+  // that ship without one (ollama/llama-server/litellm declare no_batch_cap
+  // because real capacity depends on the operator's local server). Without
+  // any cap, a page's entire chunk set goes out as ONE request — on a serial
+  // local server that can outlive the embed timeout and starve the queue.
+  // Recipe-declared caps always win; invalid values are ignored. Read from
+  // the configure-time env snapshot (Codex C3), never process.env at call
+  // time — buildGatewayConfig folds the operator's process env into it.
+  const envCapRaw = parseInt(cfg.env?.GBRAIN_EMBED_MAX_BATCH_TOKENS ?? '', 10);
+  const envCap = Number.isFinite(envCapRaw) && envCapRaw > 0 ? envCapRaw : undefined;
+  const maxBatchTokens = embedding?.max_batch_tokens ?? envCap;
   const charsPerToken = embedding?.chars_per_token ?? DEFAULT_CHARS_PER_TOKEN;
 
   // Pre-split is gated on max_batch_tokens. Recipes without it (e.g. OpenAI)
@@ -2778,6 +2823,21 @@ export async function expand(query: string): Promise<string[]> {
         result = await _generateObjectTransport({
           model,
           schema: ExpansionSchema,
+          // Name the schema. On the native-anthropic path the SDK turns the schema
+          // into a tool, and without a name+description that tool carries no
+          // `description` field. api.anthropic.com tolerates that; an
+          // Anthropic-COMPATIBLE endpoint need not, and at least one (z.ai/GLM)
+          // then ignores `tool_choice: {type:'tool'}` and answers with
+          // markdown-fenced JSON as ordinary text. Measured 3/3 deterministic both
+          // ways against z.ai: with a description, 3/3 tool_use; without it, 3/3
+          // end_turn+text. generateObject then sees no object, `result.object` is
+          // undefined, and expansion degrades to the bare query — on EVERY call,
+          // with no error line, because the catch below only reports AIConfigError.
+          // The two openai-compatible branches already recover via viaText(); this
+          // native branch has no such fallback, so naming the schema is its only
+          // guard.
+          schemaName: 'query_expansions',
+          schemaDescription: 'The rewritten search queries used to retrieve relevant documents.',
           abortSignal: withDefaultTimeout(undefined, AI_CHAT_TIMEOUT_MS),
           prompt: expansionPrompt,
         });
@@ -2795,6 +2855,12 @@ export async function expand(query: string): Promise<string[]> {
         const result = await _generateObjectTransport({
           model,
           schema: ExpansionSchema,
+          // Same schema name+description as the native branch above: an
+          // Anthropic-compatible endpoint reached through this lane can hinge
+          // its tool_choice compliance on the tool carrying a description
+          // (the z.ai/GLM failure mode), and naming costs nothing elsewhere.
+          schemaName: 'query_expansions',
+          schemaDescription: 'The rewritten search queries used to retrieve relevant documents.',
           abortSignal: withDefaultTimeout(undefined, AI_CHAT_TIMEOUT_MS),
           prompt: expansionPrompt,
         });
@@ -2838,7 +2904,8 @@ export async function expand(query: string): Promise<string[]> {
 
 /**
  * Cherry-1: opt-in OCR pass for ingested images. Uses the configured
- * expansion model (default: DEFAULT_EXPANSION_MODEL) with a prompt explicitly
+ * `embedding_image_ocr_model` when set (#4107), else the expansion model
+ * (default: DEFAULT_EXPANSION_MODEL), with a prompt explicitly
  * instructing the model to NOT interpret instructions embedded in the
  * image (mitigation for OCR-as-prompt-injection).
  *
@@ -2850,8 +2917,15 @@ export async function expand(query: string): Promise<string[]> {
  * keeping the gateway focused on the LLM call.
  */
 export async function generateOcrText(imageBytes: Buffer, mime: string): Promise<string> {
-  if (!isAvailable('expansion')) return '';
-  const { model, recipe, modelId } = await resolveExpansionProvider(getExpansionModel());
+  // Unconfigured gateway stays a silent '' no-op (the pre-#4107 isAvailable
+  // gate's behavior), never a requireConfig() throw.
+  if (!_config) return '';
+  const ocrModel = getImageOcrModel();
+  // Fail-closed on a misconfigured OCR model (provider without an expansion
+  // touchpoint, or unkeyed): '' rather than silently OCRing with the
+  // expansion model.
+  if (!isAvailable('expansion', ocrModel)) return '';
+  const { model, recipe, modelId } = await resolveExpansionProvider(ocrModel);
   const base64 = imageBytes.toString('base64');
   const systemPrompt = [
     'Extract any visible text from this image VERBATIM.',
@@ -3069,6 +3143,23 @@ function safeStringify(value: unknown): string {
   }
 }
 
+/**
+ * Some Anthropic-compatible providers (notably z.ai/GLM) occasionally return a
+ * tool-call part WITHOUT a `toolCallId`. AI SDK v6's ModelMessage schema requires
+ * `toolCallId: z.string()`, so an undefined id is invisible on the turn it is
+ * produced but throws "The messages do not match the ModelMessage[] schema" the
+ * moment that assistant turn is replayed as history on the next tool-loop turn —
+ * permanently wedging the job (observed as ~528 identical autopilot failures).
+ * Synthesize a stable, unique id AT THE SOURCE (`chat()` block-normalization) so
+ * the SAME id flows to both the persisted tool-call block and its matching
+ * tool-result block within a turn. Also used defensively in `toModelMessages` to
+ * keep any already-persisted poisoned rows from throwing on replay.
+ */
+function ensureToolCallId(id: unknown, toolName: string): string {
+  if (typeof id === 'string' && id.length > 0) return id;
+  return `glmfix-${toolName}-${randomUUID()}`;
+}
+
 export function toModelMessages(messages: ChatMessage[]): unknown[] {
   return messages.map((m) => {
     if (typeof m.content === 'string') return { role: m.role, content: m.content };
@@ -3120,9 +3211,12 @@ export function toModelMessages(messages: ChatMessage[]): unknown[] {
             };
           }
           if (b.type === 'tool-call') {
+            // ensureToolCallId here is the defensive half: rows persisted before
+            // the chat()-side fix can still carry an undefined id, and replaying
+            // one would throw on the ModelMessage schema.
             return {
               type: 'tool-call' as const,
-              toolCallId: b.toolCallId,
+              toolCallId: ensureToolCallId(b.toolCallId, b.toolName),
               toolName: b.toolName,
               input: b.input,
               ...(b.providerMetadata ? { providerOptions: b.providerMetadata } : {}),
@@ -3221,6 +3315,13 @@ export interface ChatOpts {
   tools?: ChatToolDef[];
   maxTokens?: number;
   abortSignal?: AbortSignal;
+  /**
+   * Per-call provider options keyed by recipe id, deep-merged LAST — after
+   * the derived cache markers and configured `provider_chat_options` — so a
+   * call site can pin provider behavior it depends on (e.g. the triage judge
+   * disabling DeepSeek thinking) without config silently overriding it.
+   */
+  providerOptions?: Record<string, Record<string, unknown>>;
   /**
    * Ask for the stable prefix (system prompt + last tool def) to be cached.
    * Silently ignored on providers whose recipe declares no prompt caching.
@@ -3680,7 +3781,7 @@ export async function chat(opts: ChatOpts): Promise<ChatResult> {
 
   const tools = toAISDKTools(opts.tools);
 
-  const providerOptions: Record<string, any> = {};
+  let providerOptions: Record<string, any> = {};
   if (useCache) {
     // Call-level `providerOptions.anthropic.cacheControl` is NOT a no-op:
     // @ai-sdk/anthropic 3.0.47+ passes it through as a top-level
@@ -3719,6 +3820,8 @@ export async function chat(opts: ChatOpts): Promise<ChatResult> {
     if (promptCacheKey) providerOptions.openai = { promptCacheKey };
   }
   applyConfiguredChatProviderOptions(providerOptions, cfg, recipe.id, modelId);
+  // Call-scoped options merge last so they win over configured siblings.
+  providerOptions = deepMergeRecords(providerOptions, opts.providerOptions);
 
   // Derive ONE canonical cache-control value AFTER config merging and reuse
   // it for every breakpoint (system block, last tool def, call-level). If
@@ -3812,7 +3915,7 @@ export async function chat(opts: ChatOpts): Promise<ChatResult> {
         else if (part.type === 'tool-call') {
           blocks.push({
             type: 'tool-call',
-            toolCallId: part.toolCallId,
+            toolCallId: ensureToolCallId(part.toolCallId, part.toolName),
             toolName: part.toolName,
             input: part.input ?? part.args,
             ...partMeta,
@@ -3827,7 +3930,7 @@ export async function chat(opts: ChatOpts): Promise<ChatResult> {
       for (const tc of (result as any).toolCalls ?? []) {
         blocks.push({
           type: 'tool-call',
-          toolCallId: tc.toolCallId,
+          toolCallId: ensureToolCallId(tc.toolCallId, tc.toolName),
           toolName: tc.toolName,
           input: tc.input ?? tc.args,
         });

@@ -161,6 +161,7 @@ export const OPS_CHECK_NAMES: ReadonlySet<string> = new Set([
   'bootstrap_harness_health',
   'bootstrap_hooks_heartbeat',
   'bootstrap_last_verify',
+  'backup_coverage',
   'bootstrap_push_health',
   'bootstrap_durability_job',
   'bootstrap_runbook_skew',
@@ -172,6 +173,7 @@ export const OPS_CHECK_NAMES: ReadonlySet<string> = new Set([
   'connection',
   'db_only_collector_collision',
   'federation_health',
+  'google_oauth',
   'home_dir_in_worktree',
   'index_audit',
   'npm_squat',
@@ -180,6 +182,9 @@ export const OPS_CHECK_NAMES: ReadonlySet<string> = new Set([
   'orphan_clones',
   'pgbouncer_prepare',
   'pglite_data_dir',
+  // db-availability loop: engine-fit + repair-recurrence signals.
+  'pglite_scale',
+  'db_repair_recurrence',
   'pglite_leftovers',
   'pgvector',
   'plugin_lane_collision',
@@ -220,6 +225,7 @@ export const META_CHECK_NAMES: ReadonlySet<string> = new Set([
   // coherence healed by `gbrain apply-migrations` (sibling of
   // timeline_dedup_index / schema_version).
   'pages_upsert_arbiter',
+  'schema_columns',
   'schema_pack_active',
   'schema_pack_consistency',
   'schema_pack_source_drift',
