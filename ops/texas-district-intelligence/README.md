@@ -7,10 +7,14 @@ Take Back the Classroom (TBTC) campus-level scrape.
 **Status 2026-08-27:** the district-level contact load is **COMPLETE**. All
 35,043 district-scope AskTED personnel rows (elected trustees + district-office
 staff) are live in `district_contacts` against `fdnncloyxjsxwdhpfkjj`, zero
-rejects. Campus principals (9,461 rows) and ESC staff (2,576 rows) are
-deliberately not loaded yet — see "Import scope" below. Findings from the real
-artifacts are in [FINDINGS.md](FINDINGS.md); how the bulk load actually moved
-data is in "How the 2026-08-27 load actually moved data" below.
+rejects. The `districts` org-file backfill is **also COMPLETE** —
+phone/email/mailing address/website/NCES id, previously 0-of-1,219 populated,
+now match the source file's own coverage exactly (see "Districts org-file
+backfill" below). Campus principals (9,461 rows) and ESC staff (2,576 rows)
+are deliberately not loaded yet — see "Import scope" below. Findings from the
+real artifacts are in [FINDINGS.md](FINDINGS.md); how the bulk loads actually
+moved data is in "How the 2026-08-27 load actually moved data" and "Districts
+org-file backfill" below.
 
 ---
 
@@ -233,6 +237,7 @@ The sweep needs an environment with egress to it.
 | `001b_staging_table.sql` | `district_contacts_staging` DDL + RLS. **Applied** 2026-08-27 (was applied ahead of being committed — see its header comment). |
 | `002_role_taxonomy_seed.sql` | 20 role codes + 137 AskTED-role → role_code mappings. **Applied.** |
 | `003_promote_staging.sql` | Staging → `district_contacts` promote, reject report, reconcile. **Run**, zero rejects. |
+| `004_widen_districts_phone.sql` | Widens `districts.phone` to `varchar(40)` — the org-file backfill found real phone numbers with extensions that didn't fit `varchar(20)`. **Applied.** |
 | `FINDINGS.md` | Source-data findings from the real AskTED artifacts (header SHA verification, no-district-library-role, duplicate rows, nameless rows). |
 | `loader/` | CSV emission + FK pre-check scripts (`askted_emit_csv.py`, `askted_check_fk.py`, `askted_role_map.json`) run on the machine holding the source export. |
 | `README.md` | This document. |
@@ -388,12 +393,46 @@ exist in `districts`. The 3 live districts with no AskTED personnel are
 `130-801`, `220-814`, `246-802` — the same three the 2026-08-21 audit identified
 as frozen-only, confirmed independently here.
 
+## Districts org-file backfill (2026-08-27)
+
+**Done.** `districts.phone/email/mailing_address/web_address/nces_district_id`
+were 0-of-1,219 populated; now `phone` 1,216, `email` 1,216, `mailing_address`
+1,216, `web_address` 1,213, `nces_district_id` 1,211 — matching the source
+file's own coverage exactly, verified live.
+
+Source: `askted_school_district_2026-08-19.csv` (9,726 rows — one row per
+**campus**, with district-level columns repeated across every campus row for
+that district). Verified byte-identical across 3 copies on disk
+(`sha256:55cf702e...`), registered as `source_runs.source_name =
+'askted_school_district'`.
+
+Two things worth carrying forward:
+
+- **`districts.phone` was too narrow for the real data.** 250 of 1,216
+  districts (20%) have a phone number with an extension
+  (`"(432) 523-3640 ext:1756"`, up to 23 chars) that didn't fit the original
+  `varchar(20)`. Widened to `varchar(40)` in `004_widen_districts_phone.sql`
+  rather than truncating — a pure widen, so it couldn't invalidate any
+  existing value.
+- **The 5 districts still missing `nces_district_id`** (`015-847`, `031-505`,
+  `061-501`, `123-503`, `240-503`) are university-affiliated lab
+  schools/charters — verified against the raw source rows that every single
+  row for each of them carries only the bare Excel-forcing marker with no
+  digits after it, not a row my picker missed. Genuinely absent from AskTED,
+  not a bug.
+
+Before loading, verified every campus row for a given district agrees exactly
+on that district's phone/email/address/website/NCES-id (zero inconsistency
+across all 1,216 districts), so taking any one row per district is safe — no
+staging table needed for an update this size. Moved over the same Edge
+Function relay pattern as the contact load (a temporary, token-gated function
+holding the service-role key server-side, decommissioned immediately after).
+
 ## Follow-ups
 
-- Load the organization file (`askted_school_district_2026-08-19.csv`, 9,726 rows)
-  to backfill the `districts` contact columns that are still 0-of-1,219 populated
-  (phone, email, mailing address, website, NCES id).
-- No campus table yet: `district_contacts.campus_id` / `campus_name` carry campus
-  identity inline for the 9,896 principal rows. A real `campuses` table is the
-  right home once the organization file lands.
+- No campus table yet: `district_contacts.campus_id` / `campus_name` carry
+  campus identity inline for the 9,896 principal rows, and the org file's
+  own campus-level columns (school phone/email/address/NCES school ID) were
+  not extracted anywhere. A real `campuses` table is the right home for both
+  once campus-scope contacts are loaded.
 - 36 TBTC districts still have no `tea_district_id`.
