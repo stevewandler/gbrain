@@ -34,6 +34,37 @@ export interface GBrainConfig {
    * `gbrain config set` routes these two dotted keys here, not to the DB. */
   push?: { allow_unverified_remote?: boolean };
   hooks?: { stop_push_debounce_min?: number | string };
+  /** Ambient-writeback MIRROR of the DB-plane `memory.*` keys — `gbrain
+   * config set memory.*` dual-writes both planes so the engine-free Stop-hook
+   * child and the stdio boot resolve see the same truth the serve does. The
+   * DB plane stays authoritative (the serve-side harvest gate re-checks it).
+   * Resolved by src/core/facts/writeback-config.ts. */
+  /** Declared brain audience MIRROR (WP8; DB plane authoritative like
+   * `memory.*`): the engine-free bootstrap-harness lane gates its
+   * ambient-writeback enable-nudge on it — a shared-declared brain is never
+   * nudged. Written by `gbrain config set brain.audience personal|shared`. */
+  brain?: { audience?: string };
+  memory?: {
+    auto_writeback?: string;
+    auto_writeback_transient_ttl?: string;
+    /** Visibility POSTURE cache stamped by `config set memory.*` (which has
+     * the engine to resolve the DB-plane facts.default_visibility) so the
+     * engine-free bootstrap-harness renderer can embed it. Doctor's
+     * block-drift check catches staleness against DB truth. */
+    visibility_posture?: string;
+  };
+  /**
+   * Third-party integration gates, file-plane (read by engine-free hook
+   * children). `integrations.memorable.enabled` gates the optional
+   * session-end relay to a locally-installed `memorable` CLI — absent or
+   * anything other than literal `true` means OFF (fail-closed). The boolean
+   * alone is NOT sufficient: the gate also requires the gbrain-authored
+   * consent stamp (`~/.gbrain/integrations/hooks/memorable-consent.json`,
+   * written only by `gbrain config set`'s disclosure flow — deliberately
+   * outside this file, which the external CLI rewrites). See
+   * memorableGateAllowed in core/context/hook-heartbeat.ts.
+   */
+  integrations?: { memorable?: { enabled?: boolean } };
   /** Monthly backup-coverage check (src/core/backup/). File-plane: read by
    * engine-free render sites (hook children, the cli.ts startup rail). */
   backup?: { check_enabled?: boolean | string; check_interval_days?: number | string };
@@ -1164,6 +1195,8 @@ export const KNOWN_CONFIG_KEYS: readonly string[] = [
   'chat_model',
   'chat_fallback_chain',
   'provider_base_urls',
+  // Integration gates (file-plane, hook-lane)
+  'integrations.memorable.enabled',
   // MEMORY_VERBS v1 (Cathedral 1)
   'mcp_surface',
   'protocol_installed_at',
@@ -1272,6 +1305,25 @@ export const KNOWN_CONFIG_KEYS: readonly string[] = [
   // didn't specify one: 'private' (default) | 'world'. Resolved by
   // src/core/facts/visibility.ts; explicit caller values always win.
   'facts.default_visibility',
+  // Ambient memory writeback (opt-in, default OFF): 'off' | 'salient' | 'all'.
+  // DUAL-PLANE: `gbrain config set` writes the DB plane (authoritative — the
+  // serve-side harvest gate re-checks it) AND mirrors into the file plane's
+  // `memory` slot (read by the engine-free Stop-hook child and the stdio
+  // serve's boot resolve). Resolved by src/core/facts/writeback-config.ts.
+  'memory.auto_writeback',
+  // TTL the instruction template tells agents to pass on TRANSIENT facts
+  // (health/location/travel/mood/near-term schedule). Duration shorthand
+  // only ('3d', '12h'), positive, capped at 365d; default '3d'.
+  'memory.auto_writeback_transient_ttl',
+  // Fire-once sentinel for the ambient-writeback consent nudge (WP8):
+  // stamped 'true' after the init/post-upgrade ask has been shown once.
+  'memory.auto_writeback_notice_shown',
+  // Declared brain audience: 'personal' | 'shared'. Set by the operator, by
+  // company-brainify's Phase-5 handoff (shared), or from the bootstrap
+  // interview. Declaration beats the conservative client-count heuristic in
+  // src/core/facts/writeback-audience.ts; the consent nudge fires only on
+  // personal brains and never auto-enables anything.
+  'brain.audience',
   // Conversation parser LLM fallback. Deliberately register the exact key,
   // not a conversation_parser.* prefix: fallback is the only live opt-in
   // consumer, while the polish scaffold remains unwired.
@@ -1297,11 +1349,15 @@ export const KNOWN_CONFIG_KEYS: readonly string[] = [
   // and inline-drain concurrency (default 1; clamped [1,8]; PGLite forced 1).
   'dream.synthesize.mode',
   'dream.synthesize.link_manifest',
+  'dream.synthesize.quote_verify',
   'dream.synthesize.inline_concurrency',
   // #4152 triage knobs. The triage model's preferred key is
   // `models.dream.triage` (models.* prefix, registered via the models.dream.*
   // family); these tune the gate + sampling + pass budget.
   'dream.triage.threshold',
+  'dream.triage.rescue_floor',
+  'dream.triage.rescue_min_segments',
+  'dream.triage.rescue_content_types',
   'dream.triage.max_chars',
   'dream.triage.max_tokens',
   'dream.triage.max_ms',
@@ -1366,6 +1422,7 @@ export const KNOWN_CONFIG_KEYS: readonly string[] = [
   // operator had to discover these by reading source. Registered so `config
   // set` accepts them directly. See docs/operations/spend-controls.md.
   'spend.posture',
+  'pricing.overrides',
   // Life Chronicle (v0.42.56.0, #2390). The release notes' enable command is
   // `gbrain config set auto_chronicle true`, but the key was never registered
   // — so the documented command failed with "Unknown config key" and the
@@ -1398,6 +1455,13 @@ export const KNOWN_CONFIG_KEYS: readonly string[] = [
   'sync.cost_gate_min_usd',
   'sync.federated_v2',
   'sync.include_working_tree',
+  // Persisted indexing scope (comma/newline-separated glob list; trailing '/'
+  // normalizes to a '/**' subtree glob). Read best-effort at the top of
+  // performSyncInner and UNIONED with any per-call --exclude so internal
+  // callers (autopilot, minion sync jobs, dream cycle) honor the same scope.
+  // Registering it here is what makes `gbrain config set sync.exclude ...`
+  // work — the operator path to the feature (unregistered-key class).
+  'sync.exclude',
   // #2179: clamp window for DCR-requested per-client token TTLs. Read by
   // `gbrain serve --http` at startup; unset min defaults to 300s, unset max
   // defaults fail-closed to max(--token-ttl, min).

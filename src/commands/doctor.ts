@@ -28,8 +28,12 @@ import { zeroTotalContradictionsCheck } from '../core/eval-contradictions/run-he
 // original name so existing importers (tests, scripts/live-brain-first-check.ts,
 // the run_doctor op's dynamic import of doctorReportRemote) keep working
 // unchanged.
-import { multiSourceDriftAdvice } from './doctor/schema-pack-checks.ts';
+import { multiSourceDriftAdvice, multiSourceDriftGitRootSkipNote } from './doctor/schema-pack-checks.ts';
 import { bootstrapDoctorChecks } from './doctor/bootstrap-checks.ts';
+import { buildMemorableRelayCheck } from './doctor/checks/integrations-memorable.ts';
+export { buildMemorableRelayCheck } from './doctor/checks/integrations-memorable.ts';
+import { buildMemoryWritebackCheck } from './doctor/checks/memory-writeback.ts';
+export { buildMemoryWritebackCheck } from './doctor/checks/memory-writeback.ts';
 import {
   skillConformanceCheck,
   skillsManifestIntegrityCheck,
@@ -39,6 +43,7 @@ import {
 } from './doctor/skill-checks.ts';
 export {
   multiSourceDriftAdvice,
+  multiSourceDriftGitRootSkipNote,
   bootstrapDoctorChecks,
   skillConformanceCheck,
   skillsManifestIntegrityCheck,
@@ -832,7 +837,20 @@ export async function buildChecks(
   // brains keep a clean doctor.
   checks.push(...(await bootstrapDoctorChecks(engine)));
 
-  // 2e. Chat-connector health (D3.2): re-auth-needed / stalled-sync / drift.
+  // 2e. Memorable relay health — engine-free, file-plane only, so it runs
+  // unconditionally (survives --fast and every --scope). Gate off = one quiet
+  // ok row; the states it exists to catch are enabled-without-disclosure and
+  // enabled-but-never-actually-relaying.
+  checks.push(await buildMemorableRelayCheck());
+
+  // 2e-bis. Ambient-writeback health (WP6): resolved mode/TTL/visibility +
+  // brain audience, installed instruction blocks (receipt vs live probe vs
+  // drift), validity-lapsed count, and the 7d local counters. Off = one
+  // quiet ok row (opt-in convention).
+  progress.heartbeat('memory_writeback');
+  checks.push(await buildMemoryWritebackCheck(engine));
+
+  // 2f. Chat-connector health (D3.2): re-auth-needed / stalled-sync / drift.
   // Credential-gated + auto_sync-gated — emits a plain "ok" (no nag) on brains
   // with no connectors or a manual-only user.
   if (engine) {
@@ -1700,16 +1718,32 @@ export async function buildChecks(
         });
       } else if (result.count > 0) {
         const sampleStr = result.sample.map(s => `${s.slug} (intended=${s.intended_source})`).join(', ');
+        const skipNote = result.git_root_skipped.length > 0
+          ? multiSourceDriftGitRootSkipNote(result.git_root_skipped)
+          : '';
         checks.push({
           name: 'multi_source_drift',
           status: 'warn',
-          message: multiSourceDriftAdvice(result.count, sampleStr),
+          message: multiSourceDriftAdvice(result.count, sampleStr) + skipNote,
         });
       } else {
+        // #4712: if EVERY candidate source was skipped as git-root-pinned,
+        // no walk actually ran — 'ok' would misreport "verified clean" when
+        // nothing was checked at all. 'warn' only in that all-skipped case;
+        // a partial skip alongside real, clean coverage stays 'ok'.
+        const allSkipped =
+          result.git_root_skipped.length > 0 &&
+          result.git_root_skipped.length >= nonDefaultWithPath.length;
         checks.push({
           name: 'multi_source_drift',
-          status: 'ok',
-          message: 'No cross-source slug drift detected.',
+          status: allSkipped ? 'warn' : 'ok',
+          message: allSkipped
+            ? `Multi-source drift check performed no verification` +
+              multiSourceDriftGitRootSkipNote(result.git_root_skipped)
+            : result.git_root_skipped.length > 0
+              ? `No cross-source slug drift detected among checked sources.` +
+                multiSourceDriftGitRootSkipNote(result.git_root_skipped)
+              : 'No cross-source slug drift detected.',
         });
       }
     }
