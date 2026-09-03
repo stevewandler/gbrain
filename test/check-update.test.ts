@@ -142,20 +142,41 @@ describe('check-update CLI', () => {
   });
 
   test('--json returns valid JSON with required fields', async () => {
+    // GBRAIN_SKIP_STARTUP_HOOKS removes the one part of this path that depends on
+    // the machine rather than on the code under test: the startup hook's detached
+    // `spawn('gbrain', ...)`, which resolves a binary that is on PATH for a
+    // developer and is not on PATH on a CI runner.
     const proc = Bun.spawn(['bun', 'run', 'src/cli.ts', 'check-update', '--json'], {
       cwd: new URL('..', import.meta.url).pathname,
       stdout: 'pipe',
       stderr: 'pipe',
+      env: { ...process.env, GBRAIN_SKIP_STARTUP_HOOKS: '1' },
     });
-    const stdout = await new Response(proc.stdout).text();
-    const exitCode = await proc.exited;
-    expect(exitCode).toBe(0);
+    const [stdout, stderr, exitCode] = await Promise.all([
+      new Response(proc.stdout).text(),
+      new Response(proc.stderr).text(),
+      proc.exited,
+    ]);
 
-    const output = JSON.parse(stdout);
-    expect(output).toHaveProperty('current_version');
-    expect(output).toHaveProperty('update_available');
-    expect(output).toHaveProperty('upgrade_command');
-    expect(output).toHaveProperty('current_source', 'package-json');
-    expect(typeof output.update_available).toBe('boolean');
+    // Every failure below reports what the CLI actually did. Without this the
+    // test says only "1 fail" and the cause is unreachable from the log — which
+    // is how this test stayed red on every PR for two weeks without a diagnosis.
+    const context = `exit=${exitCode}\n--- stdout ---\n${stdout}\n--- stderr ---\n${stderr}`;
+    expect(exitCode, context).toBe(0);
+
+    let output: unknown;
+    try {
+      output = JSON.parse(stdout);
+    } catch (err) {
+      throw new Error(`--json did not emit parseable JSON: ${String(err)}\n${context}`);
+    }
+
+    expect(output, context).toHaveProperty('current_version');
+    expect(output, context).toHaveProperty('update_available');
+    expect(output, context).toHaveProperty('upgrade_command');
+    expect(output, context).toHaveProperty('current_source', 'package-json');
+    expect(typeof (output as { update_available: unknown }).update_available, context).toBe(
+      'boolean',
+    );
   });
 });
