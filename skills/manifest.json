@@ -273,6 +273,16 @@
       "name": "skill-optimizer",
       "path": "skill-optimizer/SKILL.md",
       "description": "Self-evolving skill optimization via gbrain skillopt — SkillOpt-paper-grounded text-space optimizer with validation gating (median-of-3 + epsilon=0.05), bundled-skill safety, bootstrap review sentinel, per-skill DB lock, and atomic versioned writes."
+    },
+    {
+      "name": "isbn",
+      "path": "isbn/SKILL.md",
+      "description": "ISO 2108 identifier logistics: anatomy and check digits, the new-vs-same-ISBN trigger matrix, sets/ebooks/ISLI, ONIX feed coding, and dirty-ISBN triage"
+    },
+    {
+      "name": "marc-records",
+      "path": "marc-records/SKILL.md",
+      "description": "MARC 21 / RDA record architecture: Leader, Directory, 008, content designators, authority control, Field 020 subfield routing, Tag 264"
     }
   ],
   "dependencies": {

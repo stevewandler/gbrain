@@ -1424,6 +1424,21 @@ This is the dispatcher. Skills are the implementation. **Read the skill file bef
 | "Spawn agent", "background task", "parallel tasks", "steer agent", "pause/resume agent", "gbrain jobs submit", "submit a gbrain job", "submit a shell job", "shell job" | `skills/minion-orchestrator/SKILL.md` |
 | "present options", "ask before proceeding", "choice gate", "user decision" | `skills/ask-user/SKILL.md` |
 
+## Book identifiers & cataloging
+
+| Trigger | Skill |
+|---------|-------|
+| "isbn", "isbn-10 vs isbn-13", "check digit", "is this a valid isbn", "why did this isbn fail", "979 prefix", "sbn" | `skills/isbn/SKILL.md` |
+| "does this need a new isbn", "new edition or same isbn", "set isbn", "box set isbn", "ebook isbn", "translation isbn", "trim size change" | `skills/isbn/SKILL.md` |
+| "onix", "product relation code", "ean-13 barcode", "bisg title rule", "isli" | `skills/isbn/SKILL.md` |
+| "this isbn looks wrong", "duplicate isbns", "concatenated isbn", "placeholder isbn", "one isbn on many titles" | `skills/isbn/SKILL.md` (dirty-data triage) |
+| "marc record", "marc 21", "marc tag", "what does field 245 mean", "indicators", "subfield", "the leader", "008 field", "marcxml" | `skills/marc-records/SKILL.md` |
+| "lccn", "oclc number", "authority control", "established heading", "lcsh", "sears", "catalog card to marc", "ils export" | `skills/marc-records/SKILL.md` |
+
+> The two chain: `isbn` owns **the number**, `marc-records` owns **how the number is
+> cataloged** (Field 020 `$a`/`$q`/`$z`). Read both when a question spans them. Both are
+> mirrors of an upstream canonical copy and carry the standards only.
+
 ## Setup & migration
 
 | Trigger | Skill |
