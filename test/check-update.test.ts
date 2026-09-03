@@ -1,6 +1,31 @@
 import { describe, test, expect } from 'bun:test';
 import { parseSemver, isMinorOrMajorBump, extractChangelogBetween } from '../src/commands/check-update.ts';
 
+/**
+ * Emit a GitHub Actions error annotation.
+ *
+ * Annotations appear at the top of the job page AND are exposed through the
+ * checks API, so unlike ordinary test output they survive log truncation and are
+ * readable by tooling rather than only by a human with a browser.
+ *
+ * That is not a theoretical benefit here. GitHub's job-log API caps at roughly
+ * 386 KB, which for the Test shards is about the last 74 seconds of a 140-second
+ * run. This test executes in the first half, so its failure output has been past
+ * the cap on every red run — which is a large part of why it stayed red for two
+ * weeks without anyone being able to say what was wrong.
+ *
+ * No-op outside GitHub Actions, so local runs stay clean.
+ */
+function annotateCI(title: string, body: string): void {
+  if (process.env.GITHUB_ACTIONS !== 'true') return;
+  // Annotation messages are size-capped; keep well under it and keep the head of
+  // the output, which is where a stray banner or stack trace would appear.
+  const clipped = body.length > 3000 ? `${body.slice(0, 3000)}\n…truncated` : body;
+  const escape = (v: string) =>
+    v.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A');
+  process.stdout.write(`::error title=${escape(title)}::${escape(clipped)}\n`);
+}
+
 describe('parseSemver', () => {
   test('parses standard version', () => {
     expect(parseSemver('0.4.0')).toEqual([0, 4, 0]);
@@ -142,10 +167,11 @@ describe('check-update CLI', () => {
   });
 
   test('--json returns valid JSON with required fields', async () => {
-    // GBRAIN_SKIP_STARTUP_HOOKS removes the one part of this path that depends on
-    // the machine rather than on the code under test: the startup hook's detached
-    // `spawn('gbrain', ...)`, which resolves a binary that is on PATH for a
-    // developer and is not on PATH on a CI runner.
+    // GBRAIN_SKIP_STARTUP_HOOKS drops the startup hook's detached
+    // `spawn('gbrain', ...)`, which resolves a binary that is on a developer's
+    // PATH and not on a runner's. That is NOT the cause of the CI failure — it
+    // was ruled out by running with this set and seeing the same red — but a
+    // unit test should not depend on it either way.
     const proc = Bun.spawn(['bun', 'run', 'src/cli.ts', 'check-update', '--json'], {
       cwd: new URL('..', import.meta.url).pathname,
       stdout: 'pipe',
@@ -158,25 +184,38 @@ describe('check-update CLI', () => {
       proc.exited,
     ]);
 
-    // Every failure below reports what the CLI actually did. Without this the
-    // test says only "1 fail" and the cause is unreachable from the log — which
-    // is how this test stayed red on every PR for two weeks without a diagnosis.
     const context = `exit=${exitCode}\n--- stdout ---\n${stdout}\n--- stderr ---\n${stderr}`;
-    expect(exitCode, context).toBe(0);
 
-    let output: unknown;
+    // Collect every problem before asserting, so the annotation below carries the
+    // whole picture rather than only whichever expect() happened to fire first.
+    const problems: string[] = [];
+    if (exitCode !== 0) problems.push(`exit code was ${exitCode}, expected 0`);
+
+    let output: Record<string, unknown> | undefined;
     try {
-      output = JSON.parse(stdout);
+      output = JSON.parse(stdout) as Record<string, unknown>;
     } catch (err) {
-      throw new Error(`--json did not emit parseable JSON: ${String(err)}\n${context}`);
+      problems.push(`stdout is not parseable JSON: ${String(err)}`);
     }
 
-    expect(output, context).toHaveProperty('current_version');
-    expect(output, context).toHaveProperty('update_available');
-    expect(output, context).toHaveProperty('upgrade_command');
-    expect(output, context).toHaveProperty('current_source', 'package-json');
-    expect(typeof (output as { update_available: unknown }).update_available, context).toBe(
-      'boolean',
-    );
+    if (output) {
+      for (const key of ['current_version', 'update_available', 'upgrade_command']) {
+        if (!(key in output)) problems.push(`missing required field: ${key}`);
+      }
+      if (output.current_source !== 'package-json') {
+        problems.push(`current_source was ${JSON.stringify(output.current_source)}`);
+      }
+      if (typeof output.update_available !== 'boolean') {
+        problems.push(`update_available was ${typeof output.update_available}, expected boolean`);
+      }
+    }
+
+    if (problems.length > 0) {
+      annotateCI('check-update --json failed', `${problems.join('; ')}\n${context}`);
+    }
+
+    // The assertions themselves. Each carries the context too, for a local run
+    // where the annotation is a no-op.
+    expect(problems, context).toEqual([]);
   });
 });
