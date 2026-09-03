@@ -19,6 +19,7 @@ import {
   normalize,
   sbnToIsbn10,
   splitConcatenated,
+  splitIsbnRun,
   transpositionRisk,
   validateIsbn10,
   validateIsbn13,
@@ -149,6 +150,14 @@ describe('splitConcatenated', () => {
     expect(b[1].length).toBe(10);
   });
 
+  test('refuses a run that is not exactly one 13 and one 10', () => {
+    // Four ISBNs, not a pair — splitIsbnRun handles it, splitConcatenated will not
+    // pretend it is a pair.
+    expect(() =>
+      splitConcatenated('0525476881978052547688797801424107070142410705'),
+    ).toThrow(IsbnError);
+  });
+
   test('the naive-978-prefix form raises with the repair named', () => {
     expect(() => splitConcatenated('04522644649780452264464')).toThrow(/naive-978-prefix/);
   });
@@ -212,8 +221,8 @@ describe('classify', () => {
     ['9780452264464', 'naive_978_prefix'],
     ['04522644649780452264464', 'naive_978_prefix'],
     ['0688054553', 'bad_check_digit'],
-    ['97816819180991681918099', 'concatenated_13_10'],
-    ['00624458209780062445827', 'concatenated_13_10'],
+    ['97816819180991681918099', 'concatenated_isbns'],
+    ['00624458209780062445827', 'concatenated_isbns'],
     ['', 'not_an_isbn'],
     ['not a number at all', 'not_an_isbn'],
     ['12345', 'not_an_isbn'],
@@ -252,6 +261,50 @@ describe('classify', () => {
       expect(classify(v)).toBe('naive_978_prefix');
       expect(naive978PrefixRepair(v)).not.toBeNull();
     }
+  });
+});
+
+describe('splitIsbnRun', () => {
+  // Concatenations are runs of N ISBNs, not only pairs. Values holding 2 to 14 ISBNs occur
+  // in real data; a parser that only handles the 23-character pair reports the rest as junk.
+  test.each([
+    ['97816819180991681918099', ['9781681918099', '1681918099']],
+    ['00624458209780062445827', ['0062445820', '9780062445827']],
+    [
+      '0525476881978052547688797801424107070142410705',
+      ['0525476881', '9780525476887', '9780142410707', '0142410705'],
+    ],
+  ])('parses the run in %p', (glued, expected) => {
+    expect(splitIsbnRun(glued as string)).toEqual(expected as string[]);
+  });
+
+  test('every recovered pair in a run is the same book', () => {
+    const parts = splitIsbnRun('0525476881978052547688797801424107070142410705');
+    const tens = parts.filter(p => p.length === 10).map(isbn10ToIsbn13);
+    const thirteens = parts.filter(p => p.length === 13);
+    expect(new Set(tens)).toEqual(new Set(thirteens));
+  });
+
+  test('a single ISBN is a run of one', () => {
+    expect(splitIsbnRun('9780306406157')).toEqual(['9780306406157']);
+  });
+
+  test('a stall names the offset and the remainder', () => {
+    // The parser never guesses past a stall — it says where it stopped so a person can
+    // decide what the leftover is.
+    expect(() => splitIsbnRun('978030640615700')).toThrow(/stalling at offset 13/);
+  });
+
+  test('allowPartial returns what was recovered', () => {
+    expect(splitIsbnRun('978030640615700', true)).toEqual(['9780306406157']);
+  });
+
+  test('allowPartial on an unparseable head returns empty', () => {
+    expect(splitIsbnRun('067187036067187229X', true)).toEqual([]);
+  });
+
+  test('empty input throws', () => {
+    expect(() => splitIsbnRun('')).toThrow(IsbnError);
   });
 });
 

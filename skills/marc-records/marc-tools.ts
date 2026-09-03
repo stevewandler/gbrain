@@ -106,8 +106,8 @@ export function routeIsbnSubfield(
     naive_978_prefix: 'z',
     placeholder_888: null,
     not_an_isbn: null,
-    // split first, then route each half
-    concatenated_13_10: null,
+    // split the run first, then route each ISBN it yields
+    concatenated_isbns: null,
   };
   return isbnClass in map ? map[isbnClass] : null;
 }

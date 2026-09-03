@@ -234,7 +234,7 @@ failed write — and any bulk 020 edit must be planned in 10-and-13 pairs.
 | `978` + a valid ISBN-10 with the wrong check digit | `$z` **as stored**. Accepting the derived correction is a separate, deliberate decision; the corrected value then goes to `$a` and the malformed one stays in `$z` as transcribed. |
 | set ISBN on a volume record | `$z` with a `$q` qualifier |
 | placeholder prefix | **neither** — it means "no ISBN". Omit the field. |
-| concatenated pair | split first, then route each half |
+| a run of concatenated ISBNs | split the run first, then route each ISBN it yields |
 | not an ISBN at all | **neither.** Do not transcribe junk into `$z` to make it disappear. |
 
 ## Imprint — Tag 264, not legacy 260

@@ -187,7 +187,7 @@ Codes outside this list exist. Do not guess one — the complete list is at EDIT
 | Pattern | What it means | What to do |
 |---|---|---|
 | **Placeholder prefixes** (a repeated-digit prefix used by bulk imports with no ISBN) | "no ISBN", not an identifier and not a barcode | Exclude from matching, enrichment, and dedup; fall back to title+author |
-| **23-character values** | two ISBNs concatenated by an import that failed to split a separator — **both orders occur**, 13-then-10 and 10-then-13 | Split; do not discard. Never assume one order. |
+| **Values longer than 13 characters** | a **run** of ISBNs concatenated by an import that failed to split a separator. Not always a pair — runs of 2 to 14 occur, alternating 13- and 10-digit forms in either order | Parse the run greedily; do not discard. Never assume a pair, and never assume an order. Stop at the first thing you cannot consume rather than guessing past it. |
 | **`978` + a valid ISBN-10, failing validation** | someone prefixed `978` and kept the ISBN-10's Mod-11 check digit instead of recomputing | The correct ISBN-13 is derivable from the intact ISBN-10 — a conversion, not a mint. Make the repair opt-in. |
 | **Failed check digit** | legacy data, or a path that bypassed validation | **Never write it.** In an append-only store it is permanent, and vendor APIs answer it with a permanent error, so the loop re-asks forever. |
 | **One ISBN under many title+author keys** | overwhelmingly title-string variance (subtitle present/absent, series prefix, truncation) | Do not assume contamination. A genuinely wrong minority exists; if string heuristics cannot size it, **say so instead of quoting a number**. |
@@ -206,21 +206,24 @@ Two matching traps worth carrying:
 ## Validators
 
 `isbn-tools.ts` is the reference implementation. `classify()` returns exactly one of eight
-classes — `valid_isbn13`, `valid_isbn10`, `sbn9`, `placeholder_888`, `concatenated_13_10`,
+classes — `valid_isbn13`, `valid_isbn10`, `sbn9`, `placeholder_888`, `concatenated_isbns`,
 `naive_978_prefix`, `bad_check_digit`, `not_an_isbn`.
 
 **`classify()` alone is enough to decide whether to write a value, and never enough to
 decide to discard one.** Three classes are recoverable rather than junk:
-`concatenated_13_10` (split it), `naive_978_prefix` (repairable), and `sbn9` (zero-pads).
+`concatenated_isbns` (split the run), `naive_978_prefix` (repairable), and `sbn9` (zero-pads).
 Only `not_an_isbn` and `placeholder_888` mean there is no number here.
 
 ```ts
 import { classify, normalize, isbn10ToIsbn13, splitConcatenated } from './isbn-tools.ts';
 ```
 
-`splitConcatenated()` handles both storage orders and always returns `[isbn13, isbn10]`.
-`naive978PrefixRepair()` handles both the bare and concatenated forms and is opt-in —
-nothing in the module silently corrects a value.
+**A concatenation is a run of N ISBNs, not a pair.** `splitIsbnRun()` is the general parser
+— real runs hold 2 to 14 ISBNs and alternate 13- and 10-digit forms in either order.
+`splitConcatenated()` is the pair convenience and refuses anything longer. Neither guesses
+past a stall: `splitIsbnRun()` throws with the offset and remainder, and `allowPartial`
+reports what was recovered, for triage only. `naive978PrefixRepair()` handles both the bare
+and concatenated forms and is opt-in — nothing silently corrects a value.
 
 ## Anti-Patterns
 

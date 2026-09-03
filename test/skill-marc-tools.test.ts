@@ -118,7 +118,7 @@ describe('routeIsbnSubfield', () => {
     ['naive_978_prefix', 'z'],
     ['placeholder_888', null],
     ['not_an_isbn', null],
-    ['concatenated_13_10', null],
+    ['concatenated_isbns', null],
   ])('%p routes to %p', (cls, expected) => {
     expect(routeIsbnSubfield(cls)).toBe(expected as 'a' | 'z' | null);
   });
