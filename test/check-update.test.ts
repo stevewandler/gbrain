@@ -1,5 +1,57 @@
 import { describe, test, expect } from 'bun:test';
-import { parseSemver, isMinorOrMajorBump, extractChangelogBetween } from '../src/commands/check-update.ts';
+import {
+  CHANGELOG_DIFF_MAX_CHARS,
+  capChangelogDiff,
+  extractChangelogBetween,
+  isMinorOrMajorBump,
+  parseSemver,
+} from '../src/commands/check-update.ts';
+
+describe('capChangelogDiff — the CI failure this test file exists to catch', () => {
+  // CHANGELOG.md is ~2 MB and extractChangelogBetween captures every entry newer
+  // than the running version, so a stale install produced a diff of hundreds of
+  // kilobytes emitted as ONE JSON string on stdout. That payload truncated
+  // mid-string in CI: exit code 0, unparseable JSON. Locally the upstream release
+  // fetch returns nothing, changelog_diff is '', and the failure never appeared.
+  test('leaves a normal diff untouched', () => {
+    const small = '## [0.42.55.0] - 2026-09-04\n\n- something changed\n';
+    expect(capChangelogDiff(small)).toBe(small);
+  });
+
+  test('a diff at exactly the cap is not truncated', () => {
+    const exact = 'x'.repeat(CHANGELOG_DIFF_MAX_CHARS);
+    expect(capChangelogDiff(exact)).toBe(exact);
+  });
+
+  test('an oversized diff is bounded and says so', () => {
+    const huge = 'x'.repeat(500_000);
+    const capped = capChangelogDiff(huge);
+    expect(capped.length).toBeLessThan(huge.length);
+    expect(capped).toContain('truncated');
+    expect(capped).toContain('release_url');
+  });
+
+  test('the bound keeps a full --json payload comfortably parseable', () => {
+    // The regression in one assertion: a payload built from a capped diff stays
+    // small enough that stdout capture cannot truncate it mid-string.
+    const payload = JSON.stringify(
+      {
+        current_version: '0.42.54.0',
+        current_source: 'package-json',
+        latest_version: '0.43.0.0',
+        update_available: true,
+        upgrade_command: 'gbrain upgrade',
+        release_url: 'https://example.invalid/releases/latest',
+        changelog_diff: capChangelogDiff('x'.repeat(2_000_000)),
+        published_at: '2026-09-04T00:00:00Z',
+      },
+      null,
+      2,
+    );
+    expect(payload.length).toBeLessThan(64_000);
+    expect(() => JSON.parse(payload)).not.toThrow();
+  });
+});
 
 describe('parseSemver', () => {
   test('parses standard version', () => {

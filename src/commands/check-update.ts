@@ -67,6 +67,28 @@ export async function fetchLatestRelease(): Promise<{ tag: string; published_at:
   }
 }
 
+/**
+ * Upper bound on `changelog_diff`, in characters.
+ *
+ * CHANGELOG.md is ~2 MB and `extractChangelogBetween` captures every entry newer
+ * than the running version, so a sufficiently stale install produces a diff of
+ * hundreds of kilobytes — emitted as ONE JSON string on stdout. That payload has
+ * been truncating mid-string in CI, which yields exit code 0 and unparseable
+ * JSON: `gbrain check-update --json | jq` breaks for the caller, and `--json`
+ * exists precisely for machine consumption.
+ *
+ * A status answer to "is there an update?" has no business carrying an unbounded
+ * blob regardless of that bug, so it is bounded here. The release URL is already
+ * in the payload for anyone who wants the full text.
+ */
+export const CHANGELOG_DIFF_MAX_CHARS = 16_000;
+
+/** Bound a changelog diff, marking the truncation rather than silently cutting. */
+export function capChangelogDiff(diff: string): string {
+  if (diff.length <= CHANGELOG_DIFF_MAX_CHARS) return diff;
+  return `${diff.slice(0, CHANGELOG_DIFF_MAX_CHARS)}\n\n[…truncated at ${CHANGELOG_DIFF_MAX_CHARS} characters — see release_url for the full changelog]`;
+}
+
 export async function fetchChangelog(currentVersion: string, latestVersion: string): Promise<string> {
   try {
     const res = await fetch('https://raw.githubusercontent.com/garrytan/gbrain/master/CHANGELOG.md', {
@@ -199,7 +221,7 @@ export async function runCheckUpdate(args: string[]) {
 
   let changelogDiff = '';
   if (updateAvailable) {
-    changelogDiff = await fetchChangelog(VERSION, latestVersion);
+    changelogDiff = capChangelogDiff(await fetchChangelog(VERSION, latestVersion));
   }
 
   const result: CheckUpdateResult = {
