@@ -1,0 +1,7 @@
+{
+  "canonical_repo": "BookmarkED-Corp/bookmarked-book-intelligence",
+  "canonical_path": ".claude/skills/marc-records/",
+  "canonical_digest": "5a7fb56edbd3beab",
+  "canonical_commit": "f11764d664a9fa9fddb1653ba1f04e1e60b69ba1",
+  "note": "Changes start at the canonical copy, never here. Verify with `python3 scripts/check-mirrors.py <path-to-this-repo>` run from the canonical repo."
+}
