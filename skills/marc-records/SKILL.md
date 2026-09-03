@@ -18,11 +18,15 @@ triggers:
   - "subfield"
   - "the leader"
   - "008 field"
-  - "authority control"
+  - "marcxml"
   - "lccn"
   - "oclc number"
+  - "authority control"
+  - "established heading"
+  - "lcsh"
+  - "sears"
   - "catalog card to marc"
-  - "marcxml"
+  - "ils export"
 tools:
   - shell
 mutating: false
