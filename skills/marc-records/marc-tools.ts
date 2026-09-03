@@ -101,6 +101,9 @@ export function routeIsbnSubfield(
     // only after zero-padding, and only for English-speaking territories
     sbn9: 'a',
     bad_check_digit: 'z',
+    // As stored it is invalid, so $z. Accepting the repair is a separate decision; the
+    // corrected value is then routed as valid_isbn13.
+    naive_978_prefix: 'z',
     placeholder_888: null,
     not_an_isbn: null,
     // split first, then route each half

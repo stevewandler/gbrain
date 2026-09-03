@@ -115,6 +115,7 @@ describe('routeIsbnSubfield', () => {
     ['valid_isbn10', 'a'],
     ['sbn9', 'a'],
     ['bad_check_digit', 'z'],
+    ['naive_978_prefix', 'z'],
     ['placeholder_888', null],
     ['not_an_isbn', null],
     ['concatenated_13_10', null],

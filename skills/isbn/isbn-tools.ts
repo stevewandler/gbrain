@@ -4,7 +4,7 @@
  * Behavioural twin of the upstream canonical isbn_tools.py. The two are tested against the
  * same cases so the ports cannot drift silently.
  *
- * `classify()` is the entry point: it returns exactly one of seven classes, which is
+ * `classify()` is the entry point: it returns exactly one of eight classes, which is
  * every shape a real value in a book catalog takes.
  *
  * Standards: ISO 2108.
@@ -22,6 +22,7 @@ export const CLASSES = [
   'sbn9',
   'placeholder_888',
   'concatenated_13_10',
+  'naive_978_prefix',
   'bad_check_digit',
   'not_an_isbn',
 ] as const;
@@ -182,11 +183,18 @@ export function splitConcatenated(value: string): [string, string] {
  * so the correct ISBN-13 is derivable by the standard conversion — this is converting a
  * number we hold, not minting one.
  *
+ * Handles both the bare 13-character form and the 23-character concatenated form.
  * Returns null when the value is not this defect, including a wrong ISBN-13 with no
  * recoverable ISBN-10 inside it.
  */
 export function naive978PrefixRepair(value: string): string | null {
   const s = normalize(value);
+  if (s.length === 23 && /^\d{23}$/.test(s)) {
+    // The concatenated form of the same defect.
+    const ten = s.slice(0, 10);
+    if (validateIsbn10(ten) && s.slice(10) === '978' + ten) return isbn10ToIsbn13(ten);
+    return null;
+  }
   if (s.length !== 13 || !/^\d{13}$/.test(s) || !s.startsWith('978')) return null;
   if (validateIsbn13(s)) return null; // already valid; nothing to repair
   const ten = s.slice(3);
@@ -211,11 +219,14 @@ export function transpositionRisk(value: string): boolean {
 }
 
 /**
- * Return exactly one of the seven classes in {@link CLASSES}.
+ * Return exactly one of the eight classes in {@link CLASSES}.
  *
- * Order matters: placeholder and concatenation are recognised before check-digit
- * validation, because those values are structurally not ISBNs and reporting them as
- * "bad check digit" loses the information the caller needs to handle them.
+ * Order matters. Placeholder, concatenation and the naive-978 defect are all recognised
+ * BEFORE plain check-digit validation, because each carries information the caller needs
+ * in order to act — collapsing them into "bad check digit" or "not an ISBN" throws away a
+ * repairable value. That is not hypothetical: an earlier revision returned `not_an_isbn`
+ * for a naive-978 concatenation, so a caller that stopped at classify() would have
+ * discarded a value whose correct ISBN-13 was fully derivable.
  */
 export function classify(value: string | null | undefined): IsbnClass {
   const s = normalize(value);
@@ -228,6 +239,10 @@ export function classify(value: string | null | undefined): IsbnClass {
       splitConcatenated(s);
       return 'concatenated_13_10';
     } catch {
+      // A concatenation whose 13-digit half is a naive-978 defect still splits into
+      // something usable; it is not junk.
+      const ten = s.slice(0, 10);
+      if (validateIsbn10(ten) && s.slice(10) === '978' + ten) return 'naive_978_prefix';
       return 'not_an_isbn';
     }
   }
@@ -235,7 +250,8 @@ export function classify(value: string | null | undefined): IsbnClass {
     if (!/^\d{13}$/.test(s) || (!s.startsWith('978') && !s.startsWith('979'))) {
       return 'not_an_isbn';
     }
-    return validateIsbn13(s) ? 'valid_isbn13' : 'bad_check_digit';
+    if (validateIsbn13(s)) return 'valid_isbn13';
+    return naive978PrefixRepair(s) ? 'naive_978_prefix' : 'bad_check_digit';
   }
   if (s.length === 10) {
     if (!/^\d{9}$/.test(s.slice(0, 9))) return 'not_an_isbn';

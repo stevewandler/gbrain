@@ -205,16 +205,22 @@ Two matching traps worth carrying:
 
 ## Validators
 
-`isbn-tools.ts` is the reference implementation. `classify()` returns exactly one of seven
+`isbn-tools.ts` is the reference implementation. `classify()` returns exactly one of eight
 classes — `valid_isbn13`, `valid_isbn10`, `sbn9`, `placeholder_888`, `concatenated_13_10`,
-`bad_check_digit`, `not_an_isbn`.
+`naive_978_prefix`, `bad_check_digit`, `not_an_isbn`.
+
+**`classify()` alone is enough to decide whether to write a value, and never enough to
+decide to discard one.** Three classes are recoverable rather than junk:
+`concatenated_13_10` (split it), `naive_978_prefix` (repairable), and `sbn9` (zero-pads).
+Only `not_an_isbn` and `placeholder_888` mean there is no number here.
 
 ```ts
 import { classify, normalize, isbn10ToIsbn13, splitConcatenated } from './isbn-tools.ts';
 ```
 
 `splitConcatenated()` handles both storage orders and always returns `[isbn13, isbn10]`.
-`naive978PrefixRepair()` is opt-in — nothing in the module silently corrects a value.
+`naive978PrefixRepair()` handles both the bare and concatenated forms and is opt-in —
+nothing in the module silently corrects a value.
 
 ## Anti-Patterns
 

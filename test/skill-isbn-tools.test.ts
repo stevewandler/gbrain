@@ -174,6 +174,14 @@ describe('naive978PrefixRepair', () => {
     expect(naive978PrefixRepair('9780306406158')).toBeNull();
   });
 
+  test('repairs the concatenated form too', () => {
+    expect(naive978PrefixRepair('04522644649780452264464')).toBe('9780452264465');
+  });
+
+  test('a clean concatenation is not this defect', () => {
+    expect(naive978PrefixRepair('00624458209780062445827')).toBeNull();
+  });
+
   test('979 is never this defect', () => {
     expect(naive978PrefixRepair('9791234567890')).toBeNull();
   });
@@ -201,6 +209,8 @@ describe('classify', () => {
     ['080442957X', 'valid_isbn10'],
     ['688054552', 'sbn9'],
     ['9780306406158', 'bad_check_digit'],
+    ['9780452264464', 'naive_978_prefix'],
+    ['04522644649780452264464', 'naive_978_prefix'],
     ['0688054553', 'bad_check_digit'],
     ['97816819180991681918099', 'concatenated_13_10'],
     ['00624458209780062445827', 'concatenated_13_10'],
@@ -221,16 +231,27 @@ describe('classify', () => {
   );
 
   test('every declared class is reachable', () => {
+    // The taxonomy must have a slot for every shape, or classify() silently discards
+    // repairable values. An earlier revision returned not_an_isbn for a naive-978
+    // concatenation; a caller stopping at classify() would have binned it.
     const samples = [
       '9780306406157',
       '0688054552',
       '688054552',
       '8881234567890',
       '97816819180991681918099',
+      '04522644649780452264464',
       '9780306406158',
       '',
     ];
     expect(new Set(samples.map(classify))).toEqual(new Set(CLASSES));
+  });
+
+  test('a repairable value is never reported as junk', () => {
+    for (const v of ['9780452264464', '9780688170528', '04522644649780452264464']) {
+      expect(classify(v)).toBe('naive_978_prefix');
+      expect(naive978PrefixRepair(v)).not.toBeNull();
+    }
   });
 });
 
