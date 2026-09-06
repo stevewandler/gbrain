@@ -1,5 +1,82 @@
 import { describe, test, expect } from 'bun:test';
-import { parseSemver, isMinorOrMajorBump, extractChangelogBetween } from '../src/commands/check-update.ts';
+import {
+  CHANGELOG_DIFF_MAX_CHARS,
+  capChangelogDiff,
+  extractChangelogBetween,
+  isMinorOrMajorBump,
+  parseSemver,
+} from '../src/commands/check-update.ts';
+
+/**
+ * Emit a GitHub Actions error annotation.
+ *
+ * Annotations appear at the top of the job page AND are exposed through the
+ * checks API, so unlike ordinary test output they survive log truncation and are
+ * readable by tooling rather than only by a human with a browser.
+ *
+ * That is not a theoretical benefit here. GitHub's job-log API caps at roughly
+ * 386 KB, which for the Test shards is about the last 74 seconds of a 140-second
+ * run. This test executes in the first half, so its failure output has been past
+ * the cap on every red run — which is a large part of why it stayed red for two
+ * weeks without anyone being able to say what was wrong.
+ *
+ * No-op outside GitHub Actions, so local runs stay clean.
+ */
+function annotateCI(title: string, body: string): void {
+  if (process.env.GITHUB_ACTIONS !== 'true') return;
+  // Annotation messages are size-capped; keep well under it and keep the head of
+  // the output, which is where a stray banner or stack trace would appear.
+  const clipped = body.length > 3000 ? `${body.slice(0, 3000)}\n…truncated` : body;
+  const escape = (v: string) =>
+    v.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A');
+  process.stdout.write(`::error title=${escape(title)}::${escape(clipped)}\n`);
+}
+
+describe('capChangelogDiff — the CI failure this test file exists to catch', () => {
+  // CHANGELOG.md is ~2 MB and extractChangelogBetween captures every entry newer
+  // than the running version, so a stale install produced a diff of hundreds of
+  // kilobytes emitted as ONE JSON string on stdout. That payload truncated
+  // mid-string in CI: exit code 0, unparseable JSON. Locally the upstream release
+  // fetch returns nothing, changelog_diff is '', and the failure never appeared.
+  test('leaves a normal diff untouched', () => {
+    const small = '## [0.42.55.0] - 2026-09-04\n\n- something changed\n';
+    expect(capChangelogDiff(small)).toBe(small);
+  });
+
+  test('a diff at exactly the cap is not truncated', () => {
+    const exact = 'x'.repeat(CHANGELOG_DIFF_MAX_CHARS);
+    expect(capChangelogDiff(exact)).toBe(exact);
+  });
+
+  test('an oversized diff is bounded and says so', () => {
+    const huge = 'x'.repeat(500_000);
+    const capped = capChangelogDiff(huge);
+    expect(capped.length).toBeLessThan(huge.length);
+    expect(capped).toContain('truncated');
+    expect(capped).toContain('release_url');
+  });
+
+  test('the bound keeps a full --json payload comfortably parseable', () => {
+    // The regression in one assertion: a payload built from a capped diff stays
+    // small enough that stdout capture cannot truncate it mid-string.
+    const payload = JSON.stringify(
+      {
+        current_version: '0.42.54.0',
+        current_source: 'package-json',
+        latest_version: '0.43.0.0',
+        update_available: true,
+        upgrade_command: 'gbrain upgrade',
+        release_url: 'https://example.invalid/releases/latest',
+        changelog_diff: capChangelogDiff('x'.repeat(2_000_000)),
+        published_at: '2026-09-04T00:00:00Z',
+      },
+      null,
+      2,
+    );
+    expect(payload.length).toBeLessThan(64_000);
+    expect(() => JSON.parse(payload)).not.toThrow();
+  });
+});
 
 describe('parseSemver', () => {
   test('parses standard version', () => {
@@ -142,20 +219,55 @@ describe('check-update CLI', () => {
   });
 
   test('--json returns valid JSON with required fields', async () => {
+    // GBRAIN_SKIP_STARTUP_HOOKS drops the startup hook's detached
+    // `spawn('gbrain', ...)`, which resolves a binary that is on a developer's
+    // PATH and not on a runner's. That is NOT the cause of the CI failure — it
+    // was ruled out by running with this set and seeing the same red — but a
+    // unit test should not depend on it either way.
     const proc = Bun.spawn(['bun', 'run', 'src/cli.ts', 'check-update', '--json'], {
       cwd: new URL('..', import.meta.url).pathname,
       stdout: 'pipe',
       stderr: 'pipe',
+      env: { ...process.env, GBRAIN_SKIP_STARTUP_HOOKS: '1' },
     });
-    const stdout = await new Response(proc.stdout).text();
-    const exitCode = await proc.exited;
-    expect(exitCode).toBe(0);
+    const [stdout, stderr, exitCode] = await Promise.all([
+      new Response(proc.stdout).text(),
+      new Response(proc.stderr).text(),
+      proc.exited,
+    ]);
 
-    const output = JSON.parse(stdout);
-    expect(output).toHaveProperty('current_version');
-    expect(output).toHaveProperty('update_available');
-    expect(output).toHaveProperty('upgrade_command');
-    expect(output).toHaveProperty('current_source', 'package-json');
-    expect(typeof output.update_available).toBe('boolean');
+    const context = `exit=${exitCode}\n--- stdout ---\n${stdout}\n--- stderr ---\n${stderr}`;
+
+    // Collect every problem before asserting, so the annotation below carries the
+    // whole picture rather than only whichever expect() happened to fire first.
+    const problems: string[] = [];
+    if (exitCode !== 0) problems.push(`exit code was ${exitCode}, expected 0`);
+
+    let output: Record<string, unknown> | undefined;
+    try {
+      output = JSON.parse(stdout) as Record<string, unknown>;
+    } catch (err) {
+      problems.push(`stdout is not parseable JSON: ${String(err)}`);
+    }
+
+    if (output) {
+      for (const key of ['current_version', 'update_available', 'upgrade_command']) {
+        if (!(key in output)) problems.push(`missing required field: ${key}`);
+      }
+      if (output.current_source !== 'package-json') {
+        problems.push(`current_source was ${JSON.stringify(output.current_source)}`);
+      }
+      if (typeof output.update_available !== 'boolean') {
+        problems.push(`update_available was ${typeof output.update_available}, expected boolean`);
+      }
+    }
+
+    if (problems.length > 0) {
+      annotateCI('check-update --json failed', `${problems.join('; ')}\n${context}`);
+    }
+
+    // The assertions themselves. Each carries the context too, for a local run
+    // where the annotation is a no-op.
+    expect(problems, context).toEqual([]);
   });
 });
