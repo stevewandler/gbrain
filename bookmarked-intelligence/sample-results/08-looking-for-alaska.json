@@ -1,0 +1,161 @@
+{
+  "book": {
+    "title": "Looking for Alaska",
+    "author": "John Green",
+    "isbn": "unknown",
+    "publication_year": 2005,
+    "audience_reported": "Young adult / high school (publisher and professional-review classification; input audience_shelf: high)"
+  },
+  "known_list_flags": [
+    {
+      "list": "PEN America Index of School Book Bans / Top 52 Banned Books report",
+      "scope": "national, U.S. public school districts, 2021–2025 reporting period",
+      "claim": "appeared on PEN America's index of school book bans as of the 2024–2025 report, cited as the most-banned title tracked since 2021 (147 documented instances)",
+      "url": "https://pen.org/top-52-banned-books-since-2021/",
+      "independence_group": "pen_america"
+    },
+    {
+      "list": "ALA Office for Intellectual Freedom — Top 10 Most Frequently Challenged Books",
+      "scope": "national library/school challenge reporting; listed 2012 and 2013, ranked #1 in 2015",
+      "claim": "appeared on ALA's Top 10 Most Frequently Challenged Books list as of 2012, 2013, and 2015 (#1 in 2015)",
+      "url": "https://www.ala.org/bbooks/frequentlychallengedbooks/top10",
+      "independence_group": "ala_oif"
+    },
+    {
+      "list": "Utah State Board of Education statewide removal list",
+      "scope": "Utah public schools, statewide removal, added 2026-03-02",
+      "claim": "appeared on Utah's statewide list of books removed from all public school student access as of 2026-03-02 (28th title added to the list)",
+      "url": "https://www.sltrib.com/news/education/2026/03/17/utah-book-bans-looking-alaska-is/",
+      "independence_group": "state_record_ut"
+    },
+    {
+      "list": "Florida Department of Education removed/discontinued instructional materials list",
+      "scope": "Florida public school districts, 2023–2024 statewide reporting cycle",
+      "claim": "appeared on Florida Department of Education's list of books removed or discontinued from school districts as of the 2023–2024 reporting cycle",
+      "url": "https://www.cfpublic.org/education/2024-11-11/florida-list-banned-books-schools",
+      "independence_group": "state_record_fl"
+    },
+    {
+      "list": "Moms for Liberty (Williamson County, TN chapter) book rating",
+      "scope": "chapter-level content-rating page",
+      "claim": "appeared on Moms for Liberty Williamson County's rated-book page as of 2026-08-20, rated 3/5",
+      "url": "https://momsforlibertywc.org/books/looking-for-alaska/",
+      "independence_group": "moms_for_liberty"
+    }
+  ],
+  "categories": {
+    "sexually_explicit": {
+      "verdict": "RED",
+      "findings": "Independent sources describe one specific, on-the-page scene in which two secondary characters (Lara and Miles/'Pudge') engage in oral sex — this is the historically cited passage behind the bulk of challenges to the book. The author has stated in press interviews that he wrote the scene in deliberately clinical, non-erotic language and adjectives like 'weird' and 'nervous,' placed immediately before a later, non-sexual but emotionally intimate scene between the protagonist and the title character, to contrast physical intimacy without connection against real intimacy. Sources agree the scene is rendered on the page rather than merely referenced, but is a single, short passage rather than pervasive content.",
+      "claim_types": [
+        "content_description",
+        "challenge_record"
+      ],
+      "sources": [
+        {
+          "name": "ALA Office for Intellectual Freedom — Intellectual Freedom Blog, 'Spotlight on Censorship: Looking for Alaska'",
+          "url": "https://www.oif.ala.org/spotlight-censorship-looking-alaska/",
+          "type": "advocacy_rationale",
+          "date_or_year": "2015",
+          "quote": "Miles and his girlfriend-of-one-day Lara engage in oral sex",
+          "independence_group": "ala_oif"
+        },
+        {
+          "name": "PEN America — 'John Green, Author of Most Banned Book, Says It's No Badge of Honor'",
+          "url": "https://pen.org/john-green-interview/",
+          "type": "advocacy_rationale",
+          "date_or_year": "2024",
+          "quote": "bad-faith readings that look for something pornographic in a book about grief and loss",
+          "independence_group": "pen_america"
+        },
+        {
+          "name": "Moms for Liberty — Williamson County chapter book page",
+          "url": "https://momsforlibertywc.org/books/looking-for-alaska/",
+          "type": "advocacy_rationale",
+          "date_or_year": "2026",
+          "quote": "",
+          "independence_group": "moms_for_liberty"
+        }
+      ]
+    },
+    "sustained_nudity": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "extreme_violence": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "profane_content": {
+      "verdict": "YELLOW",
+      "findings": "Multiple independent sources note strong/offensive language as part of the book's content profile, but admissible sources describe this only in general terms — no specific quoted passage, word, or frequency count was found. ALA's challenge documentation lists 'offensive language' among recorded reasons the book was challenged (2012, 2013, 2015 top-ten listings); Moms for Liberty's chapter rating page separately names 'strong language' as part of its content rationale.",
+      "claim_types": [
+        "challenge_record",
+        "content_description"
+      ],
+      "sources": [
+        {
+          "name": "ALA Office for Intellectual Freedom — Top 10 Most Frequently Challenged Books",
+          "url": "https://www.ala.org/bbooks/frequentlychallengedbooks/top10",
+          "type": "advocacy_rationale",
+          "date_or_year": "2012, 2013, 2015",
+          "quote": "offensive language",
+          "independence_group": "ala_oif"
+        },
+        {
+          "name": "Moms for Liberty — Williamson County chapter book page",
+          "url": "https://momsforlibertywc.org/books/looking-for-alaska/",
+          "type": "advocacy_rationale",
+          "date_or_year": "2026",
+          "quote": "",
+          "independence_group": "moms_for_liberty"
+        }
+      ]
+    },
+    "indecent_content": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "patently_vulgar": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "prohibited_website_referral": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    }
+  },
+  "legal_lenses": {
+    "prurient_theme": {
+      "evidence_found": false,
+      "basis": "Admissible sources consistently frame the novel's overall theme as grief, loss, and the search for meaning after a friend's death — not sexual content. The author, quoted by PEN America, has characterized readings that treat the book as pornographic as 'bad-faith readings.' Sources describe the sexual content as a single isolated passage, not as establishing the work as a whole appealing to prurient interest."
+    },
+    "onpage_explicit_scenes": {
+      "evidence_found": true,
+      "basis": "ALA's Office for Intellectual Freedom and the pattern of challenge documentation describe a specific on-the-page scene between two secondary characters (Lara and Miles) involving oral sex. The author has confirmed in press interviews (via PEN America and other coverage) that the scene is intentionally written in clinical, unerotic language, but multiple sources agree the scene itself is depicted on the page rather than merely implied or referenced."
+    }
+  },
+  "synopsis": "Looking for Alaska is the most-challenged/banned title tracked by PEN America since 2021 (147 documented instances) and topped ALA's national most-challenged list in 2015, with historical challenges citing 'offensive language' and a sexually explicit scene. Credible sources — ALA's Office for Intellectual Freedom, PEN America's reporting, and the author's own public statements — consistently point to one specific on-the-page scene involving oral sex between two secondary characters, which the author says he wrote in deliberately clinical, unerotic language to contrast physical intimacy against a later, more emotionally intimate (non-sexual) scene; sources treat this as a single passage rather than pervasive sexual content, and do not support the book's theme as a whole appealing to prurient interest. General 'strong/offensive language' is documented across advocacy-rationale sources without a specific quoted passage or count, so profanity is rated YELLOW. No admissible source was found describing sustained nudity, extreme violence, additional indecent content, patently vulgar material, or prohibited website referrals in this title. Separately, the book carries known-list/removal records in Utah (statewide, added 2026-03-02) and on Florida's 2023–24 statewide removed/discontinued list, plus a Moms for Liberty chapter rating — these are list-appearance and challenge records, distinct from the content findings above.",
+  "review_priority": "LOOK_CLOSER",
+  "provenance": {
+    "model": "Claude research agent (stop-gap run)",
+    "prompt_version": "1.0",
+    "run_date": "2026-08-20",
+    "sources_reviewed_count": 8,
+    "disclaimer": "This summary is AI generated and unverified. Confirm findings against the cited sources before acting."
+  },
+  "feedback": {
+    "thumbs": null,
+    "note": null
+  }
+}

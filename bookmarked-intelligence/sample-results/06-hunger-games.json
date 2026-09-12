@@ -1,0 +1,117 @@
+{
+  "book": {
+    "title": "The Hunger Games",
+    "author": "Suzanne Collins",
+    "isbn": "unknown",
+    "publication_year": 2008,
+    "audience_reported": "middle"
+  },
+  "known_list_flags": [
+    {
+      "list": "ALA Office for Intellectual Freedom — Top Ten Most Challenged Books",
+      "scope": "2011 list (published April 2012); The Hunger Games trilogy ranked #3",
+      "claim": "appeared on ALA OIF's Top Ten Most Challenged Books list as of 2011 (announced April 2012), with cited complaints including anti-ethnic, anti-family, insensitivity, offensive language, occult/satanic content, and violence",
+      "url": "https://www.cnn.com/2012/04/09/showbiz/movies/hunger-games-ala-challenged-books-ew",
+      "independence_group": "ala_oif"
+    }
+  ],
+  "categories": {
+    "sexually_explicit": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "sustained_nudity": {
+      "verdict": "YELLOW",
+      "findings": "A 2025 South Carolina district reconsideration review (Lexington School District One), reported by Post and Courier, noted the book 'includes a reference to nudity' without further detail. This is reported as a single, brief reference rather than depiction at length or repeated occurrence, so it falls short of this category's sustained threshold.",
+      "claim_types": [
+        "content_description",
+        "challenge_record"
+      ],
+      "sources": [
+        {
+          "name": "Post and Courier",
+          "url": "https://www.postandcourier.com/columbia/education/hunger-games-ban-lexington-school-district-one-middle-school/article_4419d976-f390-11ef-8db4-63851f56a9e4.html",
+          "type": "news",
+          "date_or_year": "2025",
+          "quote": "",
+          "independence_group": "lexington_sc_district_review_2025"
+        }
+      ]
+    },
+    "extreme_violence": {
+      "verdict": "RED",
+      "findings": "Admissible sources describe a plot centered on children killing other children in a staged arena competition. A 2010 New Hampshire parent's challenge, per school-board minutes quoted by School Library Journal, described the book as one in which 'children are being killed for entertainment, pitted one against the other in a game.' A 2025 formal reconsideration complaint in a South Carolina district (Lexington School District One) cited depictions of violence, murder, and child sacrifice within the book; the district's review committee, per Post and Courier, affirmed that the book does depict violence. Sources reviewed do not specify further granular detail (e.g., named weapons, page-level gore descriptions) beyond this level.",
+      "claim_types": [
+        "content_description",
+        "challenge_record"
+      ],
+      "sources": [
+        {
+          "name": "School Library Journal — \"New Hampshire Parent Challenges 'The Hunger Games'\"",
+          "url": "https://www.slj.com/story/new-hampshire-parent-challenges-the-hunger-games",
+          "type": "professional_review",
+          "date_or_year": "2010",
+          "quote": "children are being killed for entertainment, pitted one against the other in a game",
+          "independence_group": "goffstown_nh_school_board_2010"
+        },
+        {
+          "name": "Post and Courier — \"Lexington school district declines mom's request to ban 'The Hunger Games'\"",
+          "url": "https://www.postandcourier.com/columbia/education/hunger-games-ban-lexington-school-district-one-middle-school/article_4419d976-f390-11ef-8db4-63851f56a9e4.html",
+          "type": "news",
+          "date_or_year": "2025",
+          "quote": "",
+          "independence_group": "lexington_sc_district_review_2025"
+        }
+      ]
+    },
+    "profane_content": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "indecent_content": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "patently_vulgar": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "prohibited_website_referral": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    }
+  },
+  "legal_lenses": {
+    "prurient_theme": {
+      "evidence_found": false,
+      "basis": "No admissible source characterizes the work as a whole as appealing to prurient interest or having a sexual theme. The book's extensive challenge and review history centers on violence and dystopian themes, and a 2025 South Carolina district reconsideration committee (per Post and Courier) explicitly found the book contains no sexual content violating state policy."
+    },
+    "onpage_explicit_scenes": {
+      "evidence_found": false,
+      "basis": "No admissible source reports any detailed, on-the-page explicit sexual scene in this book. The one admissible official review that addressed the question directly — the 2025 South Carolina district (Lexington School District One) reconsideration committee, per Post and Courier — found the book contains no explicit sexual content."
+    }
+  },
+  "synopsis": "This book's admissible evidence centers almost entirely on violence: reviewed sources describe a plot in which children are made to kill each other in an arena, and both a 2010 New Hampshire school-board record and a 2025 South Carolina district reconsideration review confirm the presence of violent content, including references to murder. The book appeared on the ALA Office for Intellectual Freedom's Top Ten Most Challenged Books list in 2011 (ranked #3 as a trilogy), per contemporaneous news coverage; no confirmed match was found in sources reviewed on PEN America's Index of School Book Bans, on Utah, South Carolina, or Florida statewide removal lists, or on any Moms for Liberty/BookLooks or Take Back the Classroom list. Sexual content comes back essentially empty: no admissible source describes sexually explicit, indecent, or prurient-themed content, and the one district review that addressed the question directly found no explicit sexual content. A single brief reference to nudity was noted by that same district review but does not rise to sustained or repeated depiction. No admissible evidence was found for profanity, patently vulgar content, or prohibited website referrals in sources reviewed as of this run.",
+  "review_priority": "LOOK_CLOSER",
+  "provenance": {
+    "model": "Claude research agent (stop-gap run)",
+    "prompt_version": "1.0",
+    "run_date": "2026-08-20",
+    "sources_reviewed_count": 14,
+    "disclaimer": "This summary is AI generated and unverified. Confirm findings against the cited sources before acting."
+  },
+  "feedback": {
+    "thumbs": null,
+    "note": null
+  }
+}

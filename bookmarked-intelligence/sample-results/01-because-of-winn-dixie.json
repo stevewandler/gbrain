@@ -1,0 +1,85 @@
+{
+  "book": {
+    "title": "Because of Winn-Dixie",
+    "author": "Kate DiCamillo",
+    "isbn": "unknown",
+    "publication_year": 2000,
+    "audience_reported": "elementary"
+  },
+  "known_list_flags": [
+    {
+      "list": "ALA Office for Intellectual Freedom — Top 100 Most Frequently Challenged Books",
+      "scope": "2000-2009 decade retrospective",
+      "claim": "Appeared on ALA OIF's Top 100 Most Frequently Challenged Books list as of the 2000-2009 decade retrospective.",
+      "url": "https://www.ala.org/bbooks/frequentlychallengedbooks/decade2009",
+      "independence_group": "ALA_OIF"
+    }
+  ],
+  "categories": {
+    "sexually_explicit": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "sustained_nudity": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "extreme_violence": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "profane_content": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "indecent_content": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "patently_vulgar": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "prohibited_website_referral": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    }
+  },
+  "legal_lenses": {
+    "prurient_theme": {
+      "evidence_found": false,
+      "basis": "No admissible source indicates the work as a whole appeals to prurient interest or that its theme solicits sexual interest. Professional review coverage (Kirkus) describes it as a realistic middle-grade story of friendship, grief, and community with no sexual theming noted."
+    },
+    "onpage_explicit_scenes": {
+      "evidence_found": false,
+      "basis": "No admissible source reports any detailed, on-the-page explicit scene in this book. No professional review, state record, or news source names a specific passage of this kind."
+    }
+  },
+  "synopsis": "Because of Winn-Dixie is a Newbery Honor-winning middle-grade novel about a ten-year-old girl and her dog in small-town Florida; admissible professional review coverage (a starred Kirkus review) describes it as a warm, family-friendly story of community and grief, with no content cautions noted. No admissible source reviewed — professional review journal, state record, advocacy-rationale document, or news report — describes on-the-page sexual content, sustained nudity, extreme violence, indecent content, patently vulgar material, or prohibited website referrals in this book, so all seven content categories return no evidence. Secondary, non-admissible commentary (blogs and book-list aggregator sites) attributes past objections to mild language and the words \"stupid\"/\"retard,\" but no admissible source corroborates this with a specific passage or count, so profanity does not rise to a category finding here. The title does appear, as a challenge record only, on the ALA Office for Intellectual Freedom's retrospective Top 100 Most Frequently Challenged Books list for 2000-2009 — this documents that the book was challenged somewhere in that decade, not what the book contains. Neither legal lens (prurient theme; on-page explicit scenes) is supported by any source reviewed.",
+  "review_priority": "NO_ACTION_INDICATED",
+  "provenance": {
+    "model": "Claude research agent (stop-gap run)",
+    "prompt_version": "1.0",
+    "run_date": "2026-08-20",
+    "sources_reviewed_count": 2,
+    "disclaimer": "This summary is AI generated and unverified. Confirm findings against the cited sources before acting."
+  },
+  "feedback": {
+    "thumbs": null,
+    "note": null
+  }
+}

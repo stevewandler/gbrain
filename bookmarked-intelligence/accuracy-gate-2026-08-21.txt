@@ -1,0 +1,83 @@
+==========================================================================
+CHANNEL 1 — known-list flag citation quality
+35 flags; 9 of 10 sampled titles carry at least one flag
+==========================================================================
+check                                                     this run        baseline
+Known-A  award/booklist/ethics page as ban evidence    0/35 (0.0%)    6/109 (5.5%)
+Known-B  live/rotating URL cited for a dated claim     3/35 (8.6%)    7/109 (6.4%)
+New-1/2/6  junk-tier / retail / tertiary-only          0/35 (0.0%)  55/109 (50.5%)
+New-3    display / LibGuide / catalog genre            1/35 (2.9%)   folded into ^
+
+Claim carries a date                                 32/35 (91.4%)    not measured
+Claim carries a jurisdiction / place                 18/35 (51.4%)    not measured
+Carries Texas-specific evidence                        3/35 (8.6%)    3/109 (2.8%)
+
+Advocacy rating site (labelled, not a fail)            2/35 (5.7%)     tier-capped
+
+--------------------------------------------------------------------------
+FLAGS FAILING A MECHANICAL CHECK: 4
+--------------------------------------------------------------------------
+  [known_b] To Kill a Mockingbird
+    https://www.ala.org/bbooks/frequentlychallengedbooks/top10
+    claim: appeared on ALA's Frequently Challenged Books lists as of 2011, 2017 (Top Ten), and the 2010-2019 decade Top 100 list
+  [known_b] Looking for Alaska
+    https://www.ala.org/bbooks/frequentlychallengedbooks/top10
+    claim: appeared on ALA's Top 10 Most Frequently Challenged Books list as of 2012, 2013, and 2015 (#1 in 2015)
+  [new_3] Drama
+    https://libguides.columbiasc.edu/Weboflies/SCreg
+    claim: appeared among titles referred to South Carolina's Regulation 43-170 statewide review process as of the 2024-2025 review
+  [known_b] The Absolutely True Diary of a Part-Time Indian
+    https://www.ala.org/bbooks/frequentlychallengedbooks/top10
+    claim: appeared on ALA's Top Ten Most Challenged Books list as of multiple years including 2010-2014, 2017, 2018, 2020, and 202
+
+--------------------------------------------------------------------------
+SAME DEFECT IN THE CONTENT-EVIDENCE LAYER: 5 sources
+--------------------------------------------------------------------------
+  To Kill a Mockingbird / profane_content
+    https://www.ala.org/bbooks/frequentlychallengedbooks/top10
+  Looking for Alaska / profane_content
+    https://www.ala.org/bbooks/frequentlychallengedbooks/top10
+  The Absolutely True Diary of a Part-Time Indian / sexually_explicit
+    https://www.ala.org/bbooks/frequentlychallengedbooks/top10
+  The Absolutely True Diary of a Part-Time Indian / extreme_violence
+    https://www.ala.org/bbooks/frequentlychallengedbooks/top10
+  The Absolutely True Diary of a Part-Time Indian / profane_content
+    https://www.ala.org/bbooks/frequentlychallengedbooks/top10
+
+--------------------------------------------------------------------------
+OVERLAP WITH THE REFERENCE AUDIT
+--------------------------------------------------------------------------
+  5 of 9 sampled titles appear in the audited set
+
+  Because of Winn-Dixie
+    audit verdict on the production flag: CONFIRMED FALSE POSITIVE
+      production flag cited an ALA Newbery Honor award page as ban evidence (Known-A)
+    this run: 1 flag(s), 0 failing a mechanical check
+  The Absolutely True Diary of a Part-Time Indian
+    audit verdict on the production flag: CATASTROPHIC SILENT FALSE NEGATIVE
+      customer typo defeated exact-match lookup; the most ban-relevant title on the list returned no data
+    this run: 2 flag(s), 1 failing a mechanical check
+  The Hunger Games
+    audit verdict on the production flag: LEGITIMATE — minor repair
+      ALA Top 10 2010/2011/2013 documented; upgrade citation to the static decade list
+    this run: 1 flag(s), 0 failing a mechanical check
+  The Perks of Being a Wallflower
+    audit verdict on the production flag: LEGITIMATE — under-cited
+      verified #2 on the ALA 2025 list; production flag cited less than the record supports
+    this run: 7 flag(s), 0 failing a mechanical check
+  To Kill a Mockingbird
+    audit verdict on the production flag: LEGITIMATE — citation repair needed
+      claim iron-clad; production flag cited the live rotating top-10 URL (Known-B)
+    this run: 2 flag(s), 1 failing a mechanical check
+
+  Not in the audited set (4): All Boys Aren't Blue, Drama, Gender Queer: A Memoir, Looking for Alaska
+
+==========================================================================
+CHANNEL 2 — content evidence per statutory question
+==========================================================================
+  NOT MEASURABLE. The reference audit's 126 verdicts all answer
+  'does this citation substantiate a ban/challenge event.' None answers
+  'does this book contain indecent content under TEC 33.020(2).'
+  No ground truth exists for Q1-Q7. See the write-up for what building
+  one requires.
+

@@ -1,0 +1,206 @@
+{
+  "book": {
+    "title": "The Perks of Being a Wallflower",
+    "author": "Stephen Chbosky",
+    "isbn": "unknown",
+    "publication_year": 1999,
+    "audience_reported": "young adult / high school (platform-supplied shelf: high; professional review coverage frames it generally as YA/teen fiction)"
+  },
+  "known_list_flags": [
+    {
+      "list": "PEN America Index of School Book Bans",
+      "scope": "2022–23 school year",
+      "claim": "appeared on PEN America's Index of School Book Bans as of the 2022–23 school year (25 challenges recorded)",
+      "url": "https://pen.org/wish-you-were-here-the-perks-of-being-banned/",
+      "independence_group": "pen_america_lineage"
+    },
+    {
+      "list": "PEN America Index of School Book Bans / \"Banned in the USA: Beyond the Shelves\"",
+      "scope": "2024–25 school year",
+      "claim": "appeared on PEN America's Index of School Book Bans as of the 2024–25 school year (recorded as banned in 17 school districts)",
+      "url": "https://pen.org/report/beyond-the-shelves/",
+      "independence_group": "pen_america_lineage"
+    },
+    {
+      "list": "ALA Office for Intellectual Freedom — Top Ten Most Challenged Books",
+      "scope": "2004, 2006, 2007, 2008, 2009, 2013, 2014",
+      "claim": "appeared on ALA's Top Ten Most Challenged Books list as of multiple years (2004, 2006–2009, 2013, 2014)",
+      "url": "https://www.oif.ala.org/tag/the-perks-of-being-a-wallflower/",
+      "independence_group": "ala_oif"
+    },
+    {
+      "list": "ALA Office for Intellectual Freedom — Most Challenged Books",
+      "scope": "2025 (list released April 2026)",
+      "claim": "appeared on ALA's most-challenged-books list as of 2025, ranked near the top of the 11-title list released April 2026",
+      "url": "https://www.wrvo.org/2026-04-20/the-11-most-challenged-books-of-2025-according-to-the-american-library-association",
+      "independence_group": "ala_oif"
+    },
+    {
+      "list": "South Carolina State Board of Education — Final Order (Regulation 43-170)",
+      "scope": "statewide SC public schools, as of Feb. 4, 2025",
+      "claim": "appeared on South Carolina's State Board of Education final-order removal list as of Feb. 4, 2025 (SBE Order 2025-0003), following board review of reported sexual content",
+      "url": "https://ed.sc.gov/state-board/state-board-of-education/uniform-procedure-for-selection-or-reconsideration-of-instructional-materials/books-reviewed/final-orders/sbe-order-2025-0003-perks-of-being-a-wallflower/",
+      "independence_group": "state_record_sc"
+    },
+    {
+      "list": "Utah statewide public-school instructional-materials ban list",
+      "scope": "statewide UT public schools, as of January 2026",
+      "claim": "appeared on Utah's statewide instructional-materials ban list as of January 2026, after three school districts (Davis, Tooele, Washington County) removed it, triggering the state's automatic statewide-removal threshold",
+      "url": "https://www.kuer.org/education/2026-01-05/utah-school-book-bans-wicked-perks-of-being-a-wallflower-nineteen-minutes",
+      "independence_group": "state_record_ut"
+    },
+    {
+      "list": "Escambia County School District (FL) — Board removal action",
+      "scope": "Escambia County, FL public schools, as of November 2022",
+      "claim": "appeared on Escambia County School District's removal list as of November 2022, following a 4-1 board vote on a formal challenge alleging sexual content",
+      "url": "https://www.wkrg.com/northwest-florida/escambia-county/the-perks-of-being-a-wallflower-removed-from-escambia-county-school-district/",
+      "independence_group": "district_record_fl_escambia"
+    }
+  ],
+  "categories": {
+    "sexually_explicit": {
+      "verdict": "RED",
+      "findings": "Multiple government bodies removed this book specifically citing sexual content after formal review of specific material: South Carolina's State Board of Education (SBE Order 2025-0003, Feb. 4, 2025) removed it statewide after a committee presented the board with reviewed examples described as developmentally inappropriate sexual content; Escambia County, FL removed it in Nov. 2022 after a department-chair challenger characterized the book as containing 'a lot of oral sex, bestiality and things of that nature' (an attributed challenger claim, not independently confirmed by an admissible source describing the actual passage). PEN America and NCAC document the book's recurring national challenge rationale as sexually explicit content, masturbation, and a childhood-sexual-abuse (incest) storyline. A 2016 Dubuque, IA challenge alleging 'graphic sex scenes' was reviewed and the district's committee voted 10-0 to retain the book, showing the finding is disputed between sources. Kirkus's professional review notes only that 'some might object to the sexuality, drinking, and dope-smoking' — a mild, non-specific caution, not a scene description.",
+      "claim_types": [
+        "content_description",
+        "challenge_record"
+      ],
+      "sources": [
+        {
+          "name": "South Carolina Dept. of Education — SBE Order 2025-0003",
+          "url": "https://ed.sc.gov/state-board/state-board-of-education/uniform-procedure-for-selection-or-reconsideration-of-instructional-materials/books-reviewed/final-orders/sbe-order-2025-0003-perks-of-being-a-wallflower/",
+          "type": "state_record",
+          "date_or_year": "2025-02-04",
+          "quote": "",
+          "independence_group": "state_record_sc"
+        },
+        {
+          "name": "WIS-TV — \"SC board of education removes handful of books from public schools for sexual content\"",
+          "url": "https://www.wistv.com/2025/02/04/sc-board-education-removes-handful-books-public-schools-sexual-content/",
+          "type": "news",
+          "date_or_year": "2025-02-04",
+          "quote": "",
+          "independence_group": "news_sc"
+        },
+        {
+          "name": "NorthEscambia.com — \"Challenged Book 'Perks Of Being A Wallflower' Removed From Escambia Schools For Sexual Content\"",
+          "url": "http://www.northescambia.com/2022/11/challenged-book-perks-of-being-a-wallflower-removed-from-escambia-schools-for-sexual-content",
+          "type": "news",
+          "date_or_year": "2022-11",
+          "quote": "extreme sexual content descriptions, bestiality and a language alert",
+          "independence_group": "news_fl_escambia"
+        },
+        {
+          "name": "PEN America — \"Wish You Were Here: The Perks of Being Banned\"",
+          "url": "https://pen.org/wish-you-were-here-the-perks-of-being-banned/",
+          "type": "advocacy_rationale",
+          "date_or_year": "2024-25 school year",
+          "quote": "",
+          "independence_group": "pen_america_lineage"
+        },
+        {
+          "name": "NCAC — \"Iowa Parents Argue The Perks of Being A Wallflower Potentially Harmful for Students\"",
+          "url": "https://ncac.org/news/blog/iowa-parents-argue-the-perks-of-being-a-wallflower-potentially-harmful-for-students",
+          "type": "advocacy_rationale",
+          "date_or_year": "2016",
+          "quote": "",
+          "independence_group": "ncac"
+        },
+        {
+          "name": "NCAC — \"NCAC Defends Place of The Perks of Being a Wallflower In Iowa Classrooms\" (committee retained book 10-0)",
+          "url": "https://ncac.org/news/blog/ncac-defends-place-of-the-perks-of-being-a-wallflower-in-iowa-classrooms",
+          "type": "advocacy_rationale",
+          "date_or_year": "2016",
+          "quote": "",
+          "independence_group": "ncac"
+        },
+        {
+          "name": "Kirkus Reviews",
+          "url": "https://www.kirkusreviews.com/book-reviews/stephen-chbosky/the-perks-of-being-a-wallflower/?page=2",
+          "type": "professional_review",
+          "date_or_year": "",
+          "quote": "though some might object to the sexuality, drinking, and dope-smoking",
+          "independence_group": "kirkus"
+        }
+      ]
+    },
+    "sustained_nudity": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "extreme_violence": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "profane_content": {
+      "verdict": "YELLOW",
+      "findings": "Evidence is general and unspecific rather than instance-level: an Escambia County, FL challenger's complaint (reported by regional news) cited a general 'language alert' without describing frequency or specific words, and ALA OIF's challenge-reason tracking lists 'profane language' among cited reasons for challenges to this title. No admissible source reviewed described specific instances, counts, or severity (e.g., a specific word and its frequency), so this stays at the general/secondhand level rather than a confirmed specific finding.",
+      "claim_types": [
+        "challenge_record"
+      ],
+      "sources": [
+        {
+          "name": "NorthEscambia.com — Escambia County challenge report",
+          "url": "http://www.northescambia.com/2022/11/challenged-book-perks-of-being-a-wallflower-removed-from-escambia-schools-for-sexual-content",
+          "type": "news",
+          "date_or_year": "2022-11",
+          "quote": "a language alert",
+          "independence_group": "news_fl_escambia"
+        },
+        {
+          "name": "ALA Office for Intellectual Freedom — challenge-reason tracking",
+          "url": "https://www.oif.ala.org/tag/the-perks-of-being-a-wallflower/",
+          "type": "advocacy_rationale",
+          "date_or_year": "",
+          "quote": "",
+          "independence_group": "ala_oif"
+        }
+      ]
+    },
+    "indecent_content": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "patently_vulgar": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    },
+    "prohibited_website_referral": {
+      "verdict": "NO_EVIDENCE_FOUND",
+      "findings": "No content evidence found in sources reviewed as of 2026-08-20.",
+      "claim_types": [],
+      "sources": []
+    }
+  },
+  "legal_lenses": {
+    "prurient_theme": {
+      "evidence_found": false,
+      "basis": "Sources describe discrete challenged passages and topics (sexual content, drug/alcohol references, profanity) rather than framing the book AS A WHOLE as appealing to prurient interest or as a work whose overriding theme solicits sexual interest. Isolated-passage objections do not, by themselves, establish this lens, and no admissible source made the whole-work claim."
+    },
+    "onpage_explicit_scenes": {
+      "evidence_found": true,
+      "basis": "South Carolina's State Board of Education formally reviewed specific excerpts before voting to remove the book statewide (SBE Order 2025-0003, Feb. 2025), and Escambia County's school board acted on a challenge that specifically alleged on-page sexual content ('oral sex, bestiality' — the challenger's characterization). Neither admissible source reviewed supplied the verbatim on-page text or page numbers, so the finding rests on the boards' own specific-content review actions and the challenger's specific (but unverified-by-us) characterization, not on a directly quoted passage."
+    }
+  },
+  "synopsis": "This title's evidence trail is dominated by formal government and district actions naming sexual content as the specific cause: South Carolina's State Board of Education removed it statewide in February 2025 after reviewing specific excerpts, Utah added it to its statewide ban list in January 2026 after three districts removed it, and Escambia County, FL removed it in 2022 following a challenge alleging explicit sexual content. National trackers (PEN America, ALA OIF) place it consistently among the most banned/challenged titles from 2022 through 2025, with sexual content, a childhood-abuse storyline, LGBTQ content, and profanity as the recurring cited reasons. Profanity evidence stays general — sources note it was a factor without describing specific words, counts, or frequency, so it sits at YELLOW rather than RED. No admissible source described sustained nudity, extreme/gratuitous violence, statutorily indecent content distinct from the sexual-content finding, patently vulgar material, or prohibited website referrals. The on-page-explicit-scenes lens is supported by boards acting on specifically reviewed material, though no admissible source supplied verbatim quoted text; the prurient-theme lens is not supported, since objections target discrete passages rather than the work as a whole.",
+  "review_priority": "LOOK_CLOSER",
+  "provenance": {
+    "model": "Claude research agent (stop-gap run)",
+    "prompt_version": "1.0",
+    "run_date": "2026-08-20",
+    "sources_reviewed_count": 12,
+    "disclaimer": "This summary is AI generated and unverified. Confirm findings against the cited sources before acting."
+  },
+  "feedback": {
+    "thumbs": null,
+    "note": null
+  }
+}

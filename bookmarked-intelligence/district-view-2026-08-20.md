@@ -1,0 +1,84 @@
+# Book list evidence review — district view
+
+**AI generated and unverified.** Confirm findings against the cited sources before acting. This report surfaces evidence; it does not determine whether a book complies with, or violates, any statute or district policy — that determination belongs to the district.
+
+Run date: 2026-08-20 · 10 titles · full list, no batching
+
+Legend: ● evidence found · ◐ partial or implied · — no content evidence found in sources reviewed as of 2026-08-20. An em dash is a statement about the sources reviewed, not a rating of the book.
+
+**Sexually explicit** and **Obscenity** are Texas statutory gates. **Nudity** and **Extreme violence** are district criteria — neither term appears in Texas statute, the Education Code, or 13 TAC §4.2, so they are reported as this district's own criteria rather than as state requirements.
+
+| Title | Author | Sexually explicit | Obscenity | Nudity | Extreme violence | Known lists | Priority |
+|---|---|---|---|---|---|---|---|
+| **Because of Winn-Dixie** | Kate DiCamillo | — | — | — | — | 1 | No evidence found |
+| **Diary of a Wimpy Kid: Old School** | Jeff Kinney | — | — | — | — | — | No evidence found |
+| **All Boys Aren't Blue** | George M. Johnson | ● | ◐ | — | — | 5 | Look closer |
+| **Gender Queer: A Memoir** | Maia Kobabe | ● | ◐ | ● | — | 3 | Look closer |
+| **To Kill a Mockingbird** | Harper Lee | — | ◐ | — | ◐ | 2 | Look closer |
+| **The Hunger Games** | Suzanne Collins | — | — | ◐ | ● | 1 | Look closer |
+| **The Perks of Being a Wallflower** | Stephen Chbosky | ● | ◐ | — | — | 7 | Look closer |
+| **Looking for Alaska** | John Green | ● | ◐ | — | — | 5 | Look closer |
+| **Drama** | Raina Telgemeier | — | — | — | — | 9 | No evidence found |
+| **The Absolutely True Diary of a Part-Time Indian** | Sherman Alexie | ◐ | ◐ | — | ◐ | 2 | Look closer |
+
+## What this chart is measured to support
+
+Calibrated to the accuracy gate run on 2026-08-21 (`accuracy-gate-2026-08-21.md`), so the chart carries only claims that have a measurement behind them.
+
+**Measured.** The known-list layer — whether a flag's citation holds up. On the sample set, scored against an independent citation-credibility rubric: zero award or booklist pages cited as ban evidence, zero junk-tier or retail sources, a date on 91% of flags and a jurisdiction on 51%. Ten titles and 35 flags, so those are proportions of a small sample, not rates.
+
+**Not measured.** The accuracy of the content evidence itself, per statutory question. No adjudicated ground truth for that exists yet, so no accuracy claim is made about the ● ◐ — marks in the four columns above. Read them as what the cited sources say, and check the sources.
+
+**Known defect, marked inline.** Some citations point at a rotating index whose contents are replaced each cycle, so a claim about a specific past year may land on a page that no longer shows it. Those carry a repointing note beside the link. The claims are documented elsewhere; the citations need repointing to dated or archived pages before this chart goes to a board.
+
+
+## What the evidence says
+
+- **All Boys Aren't Blue** · Sexually explicit (statutory gate) — ● RED
+  A starred Kirkus Reviews notice for this memoir identifies childhood sexual abuse and, separately, a consensual sexual encounter as content the book depicts. South Carolina's State Board of Education cited sexual content as grounds for its Feb. 2025 statewide removal order — regional press reported the board's action as following 'sex complaints.' Multiple district-level reconsideration proceeding
+  Sources: [Kirkus Reviews](https://www.kirkusreviews.com/book-reviews/george-m-johnson/all-boys-arent-blue/); [South Carolina State Board of Education, Order 2025-0004](https://ed.sc.gov/state-board/state-board-of-education/uniform-procedure-for-selection-or-reconsideration-of-instructional-materials/books-reviewed/final-orders/sbe-order-2025-0004-all-boys-arent-blue/); [The Post and Courier](https://www.postandcourier.com/education-lab/sc-book-bans-state-board-perks-wallflower/article_c46c30c6-e33a-11ef-be16-cfbe54870a54.html)
+- **All Boys Aren't Blue** · Obscenity (statutory gate) — ◐ YELLOW
+  NPR's 2022 reporting on this book's bans states it was 'banned and challenged for LGBTQIA+ content, profanity, and because it was considered sexually explicit' — profanity named as one of the challengers' stated reasons, in general terms, without specific instances, frequency, or severity documented by an admissible source in this pass. This is a challenge-record-level finding, not a content descr
+  Sources: [NPR](https://www.npr.org/2022/10/25/1130433140/banned-books-all-boys-arent-blue-george-johnson-lgbtq-ya)
+- **Gender Queer: A Memoir** · Sexually explicit (statutory gate) — ● RED
+  Multiple independent sources describe specific on-the-page sexual content in this book. School Library Journal's professional review (Dec. 2019) says the memoir 'examines everything from pap smears gone wrong to experiments with sex toys.' Staff-reported news (WAFB, a Louisiana CBS affiliate) documents a September 2023 U.S. Senate Judiciary hearing at which Sen. John Kennedy read aloud on camera a
+  Sources: [School Library Journal, book review](https://www.slj.com/review/gender-queer-a-memoir); [WAFB (CBS affiliate), Senate hearing coverage](https://www.wafb.com/2023/09/15/sen-kennedy-reads-graphic-excerpts-novels-during-discussion-book-bans-senate-committee/); [ACLU, press release on Virginia obscenity ruling](https://www.aclu.org/press-releases/virginia-judge-rejects-obscenity-proceedings-against-gender-queer-and-court-mist-and)
+- **Gender Queer: A Memoir** · Obscenity (statutory gate) — ◐ YELLOW
+  Evidence is secondhand and general. An ALA journal analysis of BookLooks' report card on this title notes the report includes a 'profanity counter' among its cataloged concerns, but no admissible, book-specific verbatim examples or counts were found in the professional-review, state-record, or staff-reported-news sources reviewed for this run.
+  Sources: [Journal of Intellectual Freedom & Privacy (ALA), analysis of BookLooks report card](https://journals.ala.org/index.php/jifp/article/view/8142)
+- **Gender Queer: A Memoir** · Nudity (district criterion) — ● RED
+  As an illustrated, full-color graphic memoir, sources describe nudity as drawn on the page, not merely narrated. Fox News coverage of the controversy characterizes the contested illustrations as 'extremely graphic images' of sex acts. BookLooks' report card on this title, as analyzed by an ALA journal article, lists sexual nudity among its cataloged concerns and cites specific panels. School Libra
+  Sources: [Fox News, coverage of author's response to controversy](https://noticias.foxnews.com/media/gender-queer-author-defends-extremely-graphic-images-sex-acts-memoir-could-have-been-worse); [Journal of Intellectual Freedom & Privacy (ALA), analysis of BookLooks report card](https://journals.ala.org/index.php/jifp/article/view/8142); [School Library Journal, book review](https://www.slj.com/review/gender-queer-a-memoir)
+- **To Kill a Mockingbird** · Obscenity (statutory gate) — ◐ YELLOW
+  Multiple national news organizations report that Biloxi, Mississippi's school district removed the novel from 8th-grade classroom curriculum in October 2017 over discomfort with its language, specifically repeated use of a racial slur, after a parent complaint (the book remained available in the school library). Coverage quotes a school board official describing the concern only in general terms (
+  Sources: [The Washington Post](https://www.washingtonpost.com/news/retropolis/wp/2017/10/15/the-ironic-enduring-legacy-of-banning-to-kill-a-mockingbird-for-racist-language/); [U.S. News & World Report](https://www.usnews.com/news/education-news/articles/2017-10-16/biloxi-school-district-pulls-to-kill-a-mockingbird-from-8th-grade-classes); [Time](https://time.com/5138752/mockingbird-huckleberry-finn-racial-slurs-racism/)
+- **To Kill a Mockingbird** · Extreme violence (district criterion) — ◐ YELLOW
+  Kirkus Reviews' capsule review describes the novel's climax: Boo Radley kills Bob Ewell as Ewell attempts to attack Scout and Jem. This is the single specific violent scene named by an admissible source in sources reviewed; the review frames it as the plot's resolving action (defense of the children), not as gratuitous or extended violence, and no source reviewed adds further graphic detail, a cou
+  Sources: [Kirkus Reviews](https://www.kirkusreviews.com/book-reviews/harper-lee/to-kill-a-mockingbird/)
+- **The Hunger Games** · Nudity (district criterion) — ◐ YELLOW
+  A 2025 South Carolina district reconsideration review (Lexington School District One), reported by Post and Courier, noted the book 'includes a reference to nudity' without further detail. This is reported as a single, brief reference rather than depiction at length or repeated occurrence, so it falls short of this category's sustained threshold.
+  Sources: [Post and Courier](https://www.postandcourier.com/columbia/education/hunger-games-ban-lexington-school-district-one-middle-school/article_4419d976-f390-11ef-8db4-63851f56a9e4.html)
+- **The Hunger Games** · Extreme violence (district criterion) — ● RED
+  Admissible sources describe a plot centered on children killing other children in a staged arena competition. A 2010 New Hampshire parent's challenge, per school-board minutes quoted by School Library Journal, described the book as one in which 'children are being killed for entertainment, pitted one against the other in a game.' A 2025 formal reconsideration complaint in a South Carolina district
+  Sources: [School Library Journal — "New Hampshire Parent Challenges 'The Hunger Games'"](https://www.slj.com/story/new-hampshire-parent-challenges-the-hunger-games); [Post and Courier — "Lexington school district declines mom's request to ban 'The Hunger Games'"](https://www.postandcourier.com/columbia/education/hunger-games-ban-lexington-school-district-one-middle-school/article_4419d976-f390-11ef-8db4-63851f56a9e4.html)
+- **The Perks of Being a Wallflower** · Sexually explicit (statutory gate) — ● RED
+  Multiple government bodies removed this book specifically citing sexual content after formal review of specific material: South Carolina's State Board of Education (SBE Order 2025-0003, Feb. 4, 2025) removed it statewide after a committee presented the board with reviewed examples described as developmentally inappropriate sexual content; Escambia County, FL removed it in Nov. 2022 after a departm
+  Sources: [South Carolina Dept. of Education — SBE Order 2025-0003](https://ed.sc.gov/state-board/state-board-of-education/uniform-procedure-for-selection-or-reconsideration-of-instructional-materials/books-reviewed/final-orders/sbe-order-2025-0003-perks-of-being-a-wallflower/); [WIS-TV — "SC board of education removes handful of books from public schools for sexual content"](https://www.wistv.com/2025/02/04/sc-board-education-removes-handful-books-public-schools-sexual-content/); [NorthEscambia.com — "Challenged Book 'Perks Of Being A Wallflower' Removed From Escambia Schools For Sexual Content"](http://www.northescambia.com/2022/11/challenged-book-perks-of-being-a-wallflower-removed-from-escambia-schools-for-sexual-content)
+- **The Perks of Being a Wallflower** · Obscenity (statutory gate) — ◐ YELLOW
+  Evidence is general and unspecific rather than instance-level: an Escambia County, FL challenger's complaint (reported by regional news) cited a general 'language alert' without describing frequency or specific words, and ALA OIF's challenge-reason tracking lists 'profane language' among cited reasons for challenges to this title. No admissible source reviewed described specific instances, counts,
+  Sources: [NorthEscambia.com — Escambia County challenge report](http://www.northescambia.com/2022/11/challenged-book-perks-of-being-a-wallflower-removed-from-escambia-schools-for-sexual-content); [ALA Office for Intellectual Freedom — challenge-reason tracking](https://www.oif.ala.org/tag/the-perks-of-being-a-wallflower/)
+- **Looking for Alaska** · Sexually explicit (statutory gate) — ● RED
+  Independent sources describe one specific, on-the-page scene in which two secondary characters (Lara and Miles/'Pudge') engage in oral sex — this is the historically cited passage behind the bulk of challenges to the book. The author has stated in press interviews that he wrote the scene in deliberately clinical, non-erotic language and adjectives like 'weird' and 'nervous,' placed immediately bef
+  Sources: [ALA Office for Intellectual Freedom — Intellectual Freedom Blog, 'Spotlight on Censorship: Looking for Alaska'](https://www.oif.ala.org/spotlight-censorship-looking-alaska/); [PEN America — 'John Green, Author of Most Banned Book, Says It's No Badge of Honor'](https://pen.org/john-green-interview/); [Moms for Liberty — Williamson County chapter book page](https://momsforlibertywc.org/books/looking-for-alaska/)
+- **Looking for Alaska** · Obscenity (statutory gate) — ◐ YELLOW
+  Multiple independent sources note strong/offensive language as part of the book's content profile, but admissible sources describe this only in general terms — no specific quoted passage, word, or frequency count was found. ALA's challenge documentation lists 'offensive language' among recorded reasons the book was challenged (2012, 2013, 2015 top-ten listings); Moms for Liberty's chapter rating p
+  Sources: [ALA Office for Intellectual Freedom — Top 10 Most Frequently Challenged Books](https://www.ala.org/bbooks/frequentlychallengedbooks/top10) _(⚠ citation needs repointing to a dated or archived page)_; [Moms for Liberty — Williamson County chapter book page](https://momsforlibertywc.org/books/looking-for-alaska/)
+- **The Absolutely True Diary of a Part-Time Indian** · Sexually explicit (statutory gate) — ◐ YELLOW
+  ALA OIF's own reason-tags for this book's repeated Top Ten Most Challenged Books appearances (2010-2020, 2022) include 'sexually explicit' and 'sex education' among cited grounds, and ALA OIF's write-up of the 2017 #2 ranking attributes the challenge to profanity plus situations 'deemed sexually explicit.' These are categorical reasons attributed to challengers, not a specific quoted scene, passag
+  Sources: [ALA Office for Intellectual Freedom — Most Challenged Books list](https://www.ala.org/bbooks/frequentlychallengedbooks/top10) _(⚠ citation needs repointing to a dated or archived page)_; [ALA OIF — "Top Ten Banned Book: Absolutely True Diary of a Part Time Indian"](https://www.oif.ala.org/top-ten-banned-book-absolutely-true-diary-of-a-part-time-indian/)
+- **The Absolutely True Diary of a Part-Time Indian** · Obscenity (statutory gate) — ◐ YELLOW
+  'Offensive language' / profanity recurs as a cited reason across ALA OIF's tracking of this book's many challenges (2010-2020, 2022), and ALA OIF attributes the book's 2017 #2 most-challenged ranking specifically to profanity. Sources reviewed characterize this only in general terms (frequency/severity not specified) — no source quotes a specific word, passage, or count.
+  Sources: [ALA Office for Intellectual Freedom — Most Challenged Books list](https://www.ala.org/bbooks/frequentlychallengedbooks/top10) _(⚠ citation needs repointing to a dated or archived page)_; [ALA OIF — "Top Ten Banned Book: Absolutely True Diary of a Part Time Indian"](https://www.oif.ala.org/top-ten-banned-book-absolutely-true-diary-of-a-part-time-indian/)
+- **The Absolutely True Diary of a Part-Time Indian** · Extreme violence (district criterion) — ◐ YELLOW
+  ALA OIF's reason-tags for this book's multiple Top Ten Most Challenged Books appearances include 'violence' alongside offensive language and sexual content. Sources reviewed give this as a categorical challenge reason, not a description of a specific violent scene, who it happens to, or how it is rendered on the page.
+  Sources: [ALA Office for Intellectual Freedom — Most Challenged Books list](https://www.ala.org/bbooks/frequentlychallengedbooks/top10) _(⚠ citation needs repointing to a dated or archived page)_
