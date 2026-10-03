@@ -9,9 +9,9 @@ import { digest, sha256 } from './digest.ts';
 import { getWriteRequest, admitWriteInTransaction, receiptFor } from './journal.ts';
 import { retryWriteAdmission } from './admission-retry.ts';
 import { assertPersistenceAccepting, foregroundWriteCompletions, startPersistenceConsumer, waitForWrite } from './service.ts';
-import { assertSyncEntryOrigin, discoverManagedSync, resolveManagedSyncContext, readSyncContent, readSyncFile, syncGit, type SyncDiscovery } from './sync-discovery.ts';
+import { assertSyncEntryOrigin, discoverManagedSync, resolveManagedSyncContext, readSyncContent, readSyncFile, syncGit, syncGitPath, type SyncDiscovery } from './sync-discovery.ts';
 import { assertSyncPageOrigin, syncOriginPath } from './sync-origin.ts';
-import { assertManagedSyncActive, assertSyncDispatchActive, managedSyncAuthority, validateSyncAuthority, validateManagedSyncOptions, syncProcessingOptions, type SyncAuthority, type SyncProcessingOptions } from './sync-authority.ts';
+import { assertManagedSyncActive, assertSyncDispatchActive, managedSyncAuthority, validateSyncAuthority, validateManagedSyncOptions, syncProcessingOptions, SYNC_PROCESSING_KEYS, type SyncAuthority, type SyncProcessingOptions } from './sync-authority.ts';
 import type { SyncIntent } from './sync-prepare.ts';
 import { currentCompanyBrainSync, getCompanyBrainProfile, readCompanyBrainPlan } from '../company-brain/profile.ts';
 import { readCommittedBlob } from '../company-brain/revision.ts';
@@ -101,6 +101,56 @@ async function replaceCursor(engine: BrainEngine, key: string, before: CursorHea
     const current = (await readCursor(tx, key, next))!;
     assertActive();
     return current;
+  });
+}
+function processingOptionsConflict(stored: SyncProcessingOptions | undefined, caller: SyncProcessingOptions, explicit: ReadonlyArray<keyof SyncProcessingOptions> | undefined): boolean {
+  if (!stored || digest(stored) === digest(caller)) return false;
+  return (explicit ?? SYNC_PROCESSING_KEYS).some(key => stored[key] !== caller[key]);
+}
+function entryKey(entry: { action: string; path: string }): string {
+  return `${entry.action}\0${entry.path}`;
+}
+function gitPathsChanged(gitRoot: string, from: string, to: string): Set<string> {
+  const parts = syncGit(gitRoot, ['diff-tree', '-r', '--name-status', '--no-commit-id', '-z', from, to]).split('\0').filter(Boolean);
+  const changed = new Set<string>();
+  for (let i = 0; i < parts.length; i++) {
+    const status = parts[i] ?? '';
+    if (status.startsWith('R') || status.startsWith('C')) {
+      const oldPath = parts[++i];
+      const newPath = parts[++i];
+      if (oldPath) changed.add(oldPath);
+      if (newPath) changed.add(newPath);
+    } else {
+      const path = parts[++i];
+      if (path) changed.add(path);
+    }
+  }
+  return changed;
+}
+function skipCompletedEntries(cursor: Cursor, discovery: SyncDiscovery, includePending: boolean): SyncDiscovery {
+  const completed = cursor.entries.slice(0, cursor.index);
+  if (includePending) {
+    const current = cursor.entries[cursor.index];
+    if (current) completed.push(current);
+  }
+  if (!completed.length) return discovery;
+  const done = new Set(completed.map(entryKey));
+  if (discovery.target === cursor.target) {
+    return { ...discovery, entries: discovery.entries.filter(entry => !done.has(entryKey(entry))) };
+  }
+  // HEAD moved. A full rediscovery lists every file from the old bookmark.
+  // Drop a path this run already committed unless its git blob changed.
+  // Working-tree bytes are not that blob, so those entries stay eligible.
+  const changed = gitPathsChanged(cursor.gitRoot, cursor.target, discovery.target);
+  const unchanged = new Set(completed.filter(entry => !entry.working && !changed.has(syncGitPath(cursor, entry.path))).map(entryKey));
+  return { ...discovery, entries: discovery.entries.filter(entry => !unchanged.has(entryKey(entry))) };
+}
+async function noteQuietSyncFresh(engine: BrainEngine, sourceId: string): Promise<void> {
+  const { withCoordinatedWrite } = await import('./context.ts');
+  await engine.transaction(async tx => {
+    await withCoordinatedWrite(tx, [sourceId], async () => {
+      await tx.executeRaw('UPDATE sources SET last_sync_at=now() WHERE id=$1', [sourceId]);
+    });
   });
 }
 function result(cursor: Cursor | CursorHeader, status: SyncResult['status'], reason?: SyncResult['reason']): SyncResult {
@@ -236,10 +286,16 @@ export async function performManagedSync(engine: BrainEngine, opts: SyncOpts, sl
         const failed = cursor.pending ? await getWriteRequest(engine, cursor.authority.writer.principal, cursor.pending.requestId) : null;
         const recorded = await engine.executeRaw("SELECT 1 FROM op_checkpoints WHERE op='managed-sync-failure' AND fingerprint=$1 AND completed_keys->0->>'run_id'=$2", [key, cursor.runId]);
         assertActive();
-        if ((failed && ['failed', 'conflict', 'cancelled'].includes(failed.state)) || (recorded.length && (failed?.state === 'committed' || !failed))) {
+        const optionsConflict = processingOptionsConflict(cursor.processingOptions, processingOptions, opts.explicitProcessing);
+        const pendingDead = !!failed && ['failed', 'conflict', 'cancelled'].includes(failed.state);
+        // A recorded failure must not rediscover a resumable cursor. That reset
+        // rewound already-committed files to index 0. Rediscover only a dead
+        // request, or an explicit options conflict, and keep completed paths
+        // even when HEAD moved, unless that path's blob changed.
+        if (pendingDead || (recorded.length > 0 && optionsConflict && (!failed || failed.state === 'committed'))) {
           phase = 'discovery';
           discoveryTarget = syncGit(context.gitRoot, ['rev-parse', 'HEAD']).trim();
-          const discovery = await discoverManagedSync(engine, opts, context);
+          const discovery = skipCompletedEntries(cursor, await discoverManagedSync(engine, opts, context), failed?.state === 'committed');
           assertActive();
           cursor = await replaceCursor(engine, key, header(cursor), { ...discovery, authority, processingOptions, runId: discoveryRun, index: 0, counts: { added: 0, modified: 0, deleted: 0, chunks: 0 } }, assertActive);
         }
@@ -274,6 +330,7 @@ export async function performManagedSync(engine: BrainEngine, opts: SyncOpts, sl
       if (!fresh.entries.length && fresh.from === fresh.target) {
         await clearManagedSyncFailureAfterSuccess(engine, key);
         assertActive();
+        if (!opts.dryRun) await noteQuietSyncFresh(engine, fresh.sourceId);
         return result(fresh, 'up_to_date');
       }
       if (company) await company.protect([{ op: OP, fingerprint: key, kind: 'managed_cursor' }, { op: `${OP}-manifest`, fingerprint: fresh.runId, kind: 'manifest' }]);
@@ -286,7 +343,7 @@ export async function performManagedSync(engine: BrainEngine, opts: SyncOpts, sl
         String(cursor.binding.owner_epoch) !== String(context.binding.owner_epoch) || cursor.root !== context.root) {
       throw new OperationError('source_changed', 'The unfinished sync cursor belongs to an older source binding.');
     }
-    if (cursor.processingOptions ? digest(cursor.processingOptions) !== digest(processingOptions) : !cursor.pending) {
+    if (cursor.processingOptions ? processingOptionsConflict(cursor.processingOptions, processingOptions, opts.explicitProcessing) : !cursor.pending) {
       throw new OperationError('invalid_params', 'The unfinished sync has different or unknown processing options.',
         'Resume with the original --no-embed, --no-extract and --no-schema-pack options. After resolving pending requests, use --retry-failed for explicit rediscovery; existing requests are not rewritten.');
     }

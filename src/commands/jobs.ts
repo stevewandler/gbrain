@@ -2175,8 +2175,10 @@ export async function registerBuiltinHandlers(
         : undefined;
     let result;
     try {
+      const { explicitSyncProcessing } = await import('../core/persistence/sync-authority.ts');
       result = await performSync(engine, {
         repoPath, sourceId, noPull, noEmbed, noExtract, signal: job.signal,
+        explicitProcessing: explicitSyncProcessing(job.data as Record<string, unknown>),
         concurrency: concurrencyOverride,
         ...(githubItem ? { githubItem } : {}),
       });

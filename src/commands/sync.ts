@@ -347,6 +347,12 @@ export interface SyncOpts {
   /** Bug 9 — re-attempt unacknowledged failures explicitly (CLI --retry-failed). */
   retryFailed?: boolean;
   /**
+   * Processing flags the caller set itself. Absent means every flag is explicit
+   * (CLI). A job that only defaulted noExtract/noEmbed lists nothing here, so
+   * an unfinished cursor keeps the options it was enumerated with.
+   */
+  explicitProcessing?: Array<'noEmbed' | 'noExtract' | 'noSchemaPack'>;
+  /**
    * v0.41.37.0 #1569 — skip loading the active schema pack during sync. When set,
    * `loadActivePack` is not called, so no user-supplied pack page-type regex
    * (markdown.ts subtype path_pattern) runs during import. Pages fall back to
