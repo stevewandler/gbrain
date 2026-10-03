@@ -25,6 +25,7 @@ import type { BrainEngine } from '../core/engine.ts';
 import { setCliExitVerdict } from '../core/cli-force-exit.ts';
 import { MARKDOWN_CHUNKER_VERSION } from '../core/chunkers/recursive.ts';
 import { importFromContent, importFromFile } from '../core/import-file.ts';
+import { reindexStoredMarkdownChunks } from '../core/reindex-markdown.ts';
 import { serializeMarkdown } from '../core/markdown.ts';
 import { createProgress } from '../core/progress.ts';
 import { getCliOptions, cliOptsToProgressOptions } from '../core/cli-options.ts';
@@ -33,6 +34,7 @@ import { resolve } from 'path';
 // v0.41.15.0 (T10, D9): per-batch parallel workers.
 import { runSlidingPool } from '../core/worker-pool.ts';
 import { resolveWorkersWithClamp } from '../core/sync-concurrency.ts';
+import { refreshProjectionStatistics } from '../core/search/projection-statistics.ts';
 
 interface ReindexOpts {
   /** Cap total pages reindexed. Useful for triage runs on huge brains. */
@@ -412,6 +414,11 @@ export async function runReindex(engine: BrainEngine, args: string[]): Promise<R
               return;
             }
           }
+          if (opts.noEmbed) {
+            if (await reindexStoredMarkdownChunks(engine, row.slug, row.source_id)) reindexed++;
+            else skipped++;
+            return;
+          }
           // No source file on disk (DB-only page, or repo not available) —
           // re-chunk from the stored page. v0.41.37.0 #1621: reconstruct the
           // FULL markdown (frontmatter + body + timeline) via serializeMarkdown
@@ -456,6 +463,7 @@ export async function runReindex(engine: BrainEngine, args: string[]): Promise<R
 
   reporter.finish();
 
+  if (reindexed > 0) await refreshProjectionStatistics(engine);
   const pendingAfter = await countPending(engine, type, !!opts.noEmbed);
   if (failed > 0) setCliExitVerdict(1);
 
