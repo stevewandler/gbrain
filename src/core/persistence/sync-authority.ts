@@ -87,6 +87,10 @@ export async function validateSyncAuthority(engine: BrainEngine, authority: Sync
   }
 }
 
+/** Derived from job data by the worker. Not a wire field, and not a grant. */
+function remoteWorkerAnnotation(key: string, value: unknown): boolean {
+  return key === 'explicitProcessing' && Array.isArray(value) && value.every(item => typeof item === 'string' && (SYNC_PROCESSING_KEYS as readonly string[]).includes(item));
+}
 /** Worker runtime fields are not an avenue to enlarge the accepted wire payload. */
 export function validateManagedSyncOptions(opts: SyncOpts): void {
   assertDurableSyncCaller();
@@ -95,7 +99,7 @@ export function validateManagedSyncOptions(opts: SyncOpts): void {
   const allowed = new Set(['repoPath','sourceId','noPull','noEmbed','noExtract','signal','concurrency','onProgress','auto_embed_backfill']);
   if (current.grant.jobName !== 'sync' || opts.repoPath !== current.grant.canonicalRoot || opts.sourceId !== current.grant.sourceId ||
       opts.noPull !== true || opts.noEmbed !== true || opts.noExtract !== true ||
-      Object.entries(opts).some(([key,value]) => value !== undefined && !allowed.has(key)) ||
+      Object.entries(opts).some(([key,value]) => value !== undefined && !allowed.has(key) && !remoteWorkerAnnotation(key, value)) ||
       ((opts as Record<string,unknown>).auto_embed_backfill !== undefined && (opts as Record<string,unknown>).auto_embed_backfill !== false)) {
     throw new OperationError('permission_denied', 'Sync options exceed the originally accepted remote job.');
   }

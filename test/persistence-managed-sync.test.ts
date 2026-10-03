@@ -540,6 +540,116 @@ test('a defaulted job flag adopts the unfinished cursor instead of stranding it'
     }
   }), 120_000);
 
+test('retry-failed after a moved HEAD does not re-admit an unchanged committed file', async () =>
+  withEnv({ GBRAIN_HOME: home, GBRAIN_SYNC_FAILURES_DIR: home }, async () => {
+    for (const engine of engines) {
+      await disposePersistenceConsumer(engine);
+      const f = await fixture(engine, {
+        'a.md': 'First observation already committed before HEAD moved.\n',
+        'b.md': 'Second observation still waiting when HEAD moved.\n',
+      });
+      const abort = new AbortController();
+      const partial = await performManagedSync(engine, {
+        sourceId: f.id, noPull: true, noEmbed: true, noExtract: false,
+        signal: abort.signal,
+        onProgress: p => { if (p.phase === 'managed_sync.page_committed') abort.abort(); },
+      });
+      expect(partial.status).toBe('partial');
+      expect(partial.filesImported).toBe(1);
+      const runId = partial.runId!;
+      const [cursorRow] = await engine.executeRaw<{ fingerprint: string }>(
+        "SELECT fingerprint FROM op_checkpoints WHERE op='managed-sync' AND completed_keys->0->>'runId'=$1", [runId]);
+      await recordManagedSyncFailure(engine, {
+        source_id: f.id, source_incarnation: '',
+        path: 'b.md', code: 'invalid_params',
+        message: 'The unfinished sync has different or unknown processing options.',
+        request_id: null, run_id: runId, target: f.head,
+        cursor_key: cursorRow.fingerprint, phase: 'resume', state: 'failed',
+        observation_id: `${runId}:1:resume:invalid_params`,
+      });
+      writeFileSync(join(f.root, 'c.md'), 'Third observation added after the partial sync.\n');
+      commit(f.root, 'add a new file without touching the committed one');
+      const retried = await performManagedSync(engine, {
+        sourceId: f.id, noPull: true, noEmbed: true, noExtract: true, retryFailed: true,
+      });
+      expect(['first_sync', 'synced']).toContain(retried.status);
+      const imports = await engine.executeRaw<{ slug: string; n: number }>(
+        "SELECT slug, count(*)::int AS n FROM persistence_requests WHERE source_id=$1 AND intent->>'kind'='managed_sync_import' GROUP BY slug ORDER BY slug",
+        [f.id]);
+      expect(imports).toEqual([
+        { slug: 'a', n: 1 },
+        { slug: 'b', n: 1 },
+        { slug: 'c', n: 1 },
+      ]);
+      await disposePersistenceConsumer(engine);
+    }
+  }), 120_000);
+
+test('retry-failed after a moved HEAD re-admits a committed file whose blob changed', async () =>
+  withEnv({ GBRAIN_HOME: home, GBRAIN_SYNC_FAILURES_DIR: home }, async () => {
+    for (const engine of engines) {
+      await disposePersistenceConsumer(engine);
+      const f = await fixture(engine, {
+        'a.md': 'Original committed observation before the blob changed.\n',
+        'b.md': 'Second observation still waiting when the blob changed.\n',
+      });
+      const abort = new AbortController();
+      const partial = await performManagedSync(engine, {
+        sourceId: f.id, noPull: true, noEmbed: true, noExtract: false,
+        signal: abort.signal,
+        onProgress: p => { if (p.phase === 'managed_sync.page_committed') abort.abort(); },
+      });
+      expect(partial.filesImported).toBe(1);
+      const runId = partial.runId!;
+      const [cursorRow] = await engine.executeRaw<{ fingerprint: string }>(
+        "SELECT fingerprint FROM op_checkpoints WHERE op='managed-sync' AND completed_keys->0->>'runId'=$1", [runId]);
+      await recordManagedSyncFailure(engine, {
+        source_id: f.id, source_incarnation: '',
+        path: 'b.md', code: 'invalid_params',
+        message: 'The unfinished sync has different or unknown processing options.',
+        request_id: null, run_id: runId, target: f.head,
+        cursor_key: cursorRow.fingerprint, phase: 'resume', state: 'failed',
+        observation_id: `${runId}:1:resume:invalid_params`,
+      });
+      writeFileSync(join(f.root, 'a.md'), 'Revised observation after the committed blob changed.\n');
+      commit(f.root, 'change the already imported file');
+      const retried = await performManagedSync(engine, {
+        sourceId: f.id, noPull: true, noEmbed: true, noExtract: true, retryFailed: true,
+      });
+      expect(['first_sync', 'synced']).toContain(retried.status);
+      const imports = await engine.executeRaw<{ slug: string; n: number }>(
+        "SELECT slug, count(*)::int AS n FROM persistence_requests WHERE source_id=$1 AND intent->>'kind'='managed_sync_import' GROUP BY slug ORDER BY slug",
+        [f.id]);
+      expect(imports).toEqual([
+        { slug: 'a', n: 2 },
+        { slug: 'b', n: 1 },
+      ]);
+      expect((await engine.getPage('a', { sourceId: f.id }))?.compiled_truth).toContain('Revised observation');
+      await disposePersistenceConsumer(engine);
+    }
+  }), 120_000);
+
+test('remote sync accepts the worker explicitProcessing annotation without widening the grant', async () =>
+  withEnv({ GBRAIN_HOME: home, GBRAIN_SYNC_FAILURES_DIR: home }, async () => {
+    for (const engine of engines) {
+      await disposePersistenceConsumer(engine);
+      const f = await fixture(engine, { 'remote.md': 'A remote observation that must still publish.\n' });
+      const clientId = `sync-client-${randomUUID()}`;
+      await engine.executeRaw(`INSERT INTO oauth_clients(client_id,client_name,client_secret_hash,scope,source_id,allowed_operations)
+        VALUES($1,'fixture-client','test-only','admin',$2,ARRAY['submit_job'])`, [clientId, f.id]);
+      const ctx = { engine, remote: true, sourceId: f.id, auth: { clientId, principal: { kind: 'oauth_client', id: clientId }, scopes: ['admin'], sourceId: f.id, allowedOperations: ['submit_job'] } } as OperationContext;
+      const accepted = await prepareRemoteJob(ctx, 'sync', { noPull: true });
+      const published = await withSubmissionAuthority(accepted.authority, () =>
+        performManagedSync(engine, { ...accepted.data, explicitProcessing: [] }));
+      expect(published.status).toBe('first_sync');
+      await expect(withSubmissionAuthority(accepted.authority, () =>
+        performManagedSync(engine, { ...accepted.data, noExtract: false, explicitProcessing: [] }))).rejects.toMatchObject({ code: 'permission_denied' });
+      await expect(withSubmissionAuthority(accepted.authority, () =>
+        performManagedSync(engine, { ...accepted.data, explicitProcessing: ['noEmbed', 'not-a-flag'] as never }))).rejects.toMatchObject({ code: 'permission_denied' });
+      await disposePersistenceConsumer(engine);
+    }
+  }), 120_000);
+
 test('quiet managed sync refreshes source freshness without moving the commit bookmark', async () =>
   withEnv({ GBRAIN_HOME: home }, async () => {
     for (const engine of engines) {

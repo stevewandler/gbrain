@@ -9,7 +9,7 @@ import { digest, sha256 } from './digest.ts';
 import { getWriteRequest, admitWriteInTransaction, receiptFor } from './journal.ts';
 import { retryWriteAdmission } from './admission-retry.ts';
 import { assertPersistenceAccepting, foregroundWriteCompletions, startPersistenceConsumer, waitForWrite } from './service.ts';
-import { assertSyncEntryOrigin, discoverManagedSync, resolveManagedSyncContext, readSyncContent, readSyncFile, syncGit, type SyncDiscovery } from './sync-discovery.ts';
+import { assertSyncEntryOrigin, discoverManagedSync, resolveManagedSyncContext, readSyncContent, readSyncFile, syncGit, syncGitPath, type SyncDiscovery } from './sync-discovery.ts';
 import { assertSyncPageOrigin, syncOriginPath } from './sync-origin.ts';
 import { assertManagedSyncActive, assertSyncDispatchActive, managedSyncAuthority, validateSyncAuthority, validateManagedSyncOptions, syncProcessingOptions, SYNC_PROCESSING_KEYS, type SyncAuthority, type SyncProcessingOptions } from './sync-authority.ts';
 import type { SyncIntent } from './sync-prepare.ts';
@@ -107,15 +107,43 @@ function processingOptionsConflict(stored: SyncProcessingOptions | undefined, ca
   if (!stored || digest(stored) === digest(caller)) return false;
   return (explicit ?? SYNC_PROCESSING_KEYS).some(key => stored[key] !== caller[key]);
 }
+function entryKey(entry: { action: string; path: string }): string {
+  return `${entry.action}\0${entry.path}`;
+}
+function gitPathsChanged(gitRoot: string, from: string, to: string): Set<string> {
+  const parts = syncGit(gitRoot, ['diff-tree', '-r', '--name-status', '--no-commit-id', '-z', from, to]).split('\0').filter(Boolean);
+  const changed = new Set<string>();
+  for (let i = 0; i < parts.length; i++) {
+    const status = parts[i] ?? '';
+    if (status.startsWith('R') || status.startsWith('C')) {
+      const oldPath = parts[++i];
+      const newPath = parts[++i];
+      if (oldPath) changed.add(oldPath);
+      if (newPath) changed.add(newPath);
+    } else {
+      const path = parts[++i];
+      if (path) changed.add(path);
+    }
+  }
+  return changed;
+}
 function skipCompletedEntries(cursor: Cursor, discovery: SyncDiscovery, includePending: boolean): SyncDiscovery {
-  if (discovery.target !== cursor.target) return discovery;
-  const done = new Set(cursor.entries.slice(0, cursor.index).map(entry => `${entry.action}\0${entry.path}`));
+  const completed = cursor.entries.slice(0, cursor.index);
   if (includePending) {
     const current = cursor.entries[cursor.index];
-    if (current) done.add(`${current.action}\0${current.path}`);
+    if (current) completed.push(current);
   }
-  if (!done.size) return discovery;
-  return { ...discovery, entries: discovery.entries.filter(entry => !done.has(`${entry.action}\0${entry.path}`)) };
+  if (!completed.length) return discovery;
+  const done = new Set(completed.map(entryKey));
+  if (discovery.target === cursor.target) {
+    return { ...discovery, entries: discovery.entries.filter(entry => !done.has(entryKey(entry))) };
+  }
+  // HEAD moved. A full rediscovery lists every file from the old bookmark.
+  // Drop a path this run already committed unless its git blob changed.
+  // Working-tree bytes are not that blob, so those entries stay eligible.
+  const changed = gitPathsChanged(cursor.gitRoot, cursor.target, discovery.target);
+  const unchanged = new Set(completed.filter(entry => !entry.working && !changed.has(syncGitPath(cursor, entry.path))).map(entryKey));
+  return { ...discovery, entries: discovery.entries.filter(entry => !unchanged.has(entryKey(entry))) };
 }
 async function noteQuietSyncFresh(engine: BrainEngine, sourceId: string): Promise<void> {
   const { withCoordinatedWrite } = await import('./context.ts');
@@ -262,7 +290,8 @@ export async function performManagedSync(engine: BrainEngine, opts: SyncOpts, sl
         const pendingDead = !!failed && ['failed', 'conflict', 'cancelled'].includes(failed.state);
         // A recorded failure must not rediscover a resumable cursor. That reset
         // rewound already-committed files to index 0. Rediscover only a dead
-        // request, or an explicit options conflict, and keep completed paths.
+        // request, or an explicit options conflict, and keep completed paths
+        // even when HEAD moved, unless that path's blob changed.
         if (pendingDead || (recorded.length > 0 && optionsConflict && (!failed || failed.state === 'committed'))) {
           phase = 'discovery';
           discoveryTarget = syncGit(context.gitRoot, ['rev-parse', 'HEAD']).trim();
