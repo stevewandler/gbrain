@@ -469,3 +469,95 @@ test('retry-failed resets cursor when pending write is committed but failure rec
       await disposePersistenceConsumer(engine);
     }
   }), 120_000);
+
+test('retry-failed keeps a resumable cursor instead of reprocessing completed files', async () =>
+  withEnv({ GBRAIN_HOME: home, GBRAIN_SYNC_FAILURES_DIR: home }, async () => {
+    for (const engine of engines) {
+      await disposePersistenceConsumer(engine);
+      const f = await fixture(engine, {
+        'a.md': 'First observation already committed by this sync run.\n',
+        'b.md': 'Second observation already committed by this sync run.\n',
+        'c.md': 'Third observation still waiting when the failure was recorded.\n',
+      });
+      const abort = new AbortController();
+      let committed = 0;
+      const partial = await performManagedSync(engine, {
+        sourceId: f.id, noPull: true, noEmbed: true, noExtract: true,
+        signal: abort.signal,
+        onProgress: p => { if (p.phase === 'managed_sync.page_committed' && ++committed >= 2) abort.abort(); },
+      });
+      expect(partial.status).toBe('partial');
+      expect(partial.filesImported).toBe(2);
+      const runId = partial.runId;
+      expect(runId).toBeTruthy();
+      const [cursorRow] = await engine.executeRaw<{ fingerprint: string }>(
+        "SELECT fingerprint FROM op_checkpoints WHERE op='managed-sync' AND completed_keys->0->>'runId'=$1", [runId]);
+      await recordManagedSyncFailure(engine, {
+        source_id: f.id, source_incarnation: '',
+        path: 'c.md', code: 'invalid_params',
+        message: 'The unfinished sync has different or unknown processing options.',
+        request_id: null, run_id: runId!, target: f.head,
+        cursor_key: cursorRow.fingerprint, phase: 'resume', state: 'failed',
+        observation_id: `${runId}:2:resume:invalid_params`,
+      });
+      const retried = await performManagedSync(engine, {
+        sourceId: f.id, noPull: true, noEmbed: true, noExtract: true, retryFailed: true,
+      });
+      expect(retried.runId).toBe(runId);
+      expect(['first_sync', 'synced']).toContain(retried.status);
+      expect(retried.filesImported).toBe(3);
+      const imports = await engine.executeRaw<{ slug: string; n: number }>(
+        "SELECT slug, count(*)::int AS n FROM persistence_requests WHERE source_id=$1 AND intent->>'kind'='managed_sync_import' GROUP BY slug",
+        [f.id]);
+      expect(imports).toHaveLength(3);
+      for (const row of imports) expect(Number(row.n)).toBe(1);
+      await disposePersistenceConsumer(engine);
+    }
+  }), 120_000);
+
+test('a defaulted job flag adopts the unfinished cursor instead of stranding it', async () =>
+  withEnv({ GBRAIN_HOME: home, GBRAIN_SYNC_FAILURES_DIR: home }, async () => {
+    for (const engine of engines) {
+      await disposePersistenceConsumer(engine);
+      const f = await fixture(engine, {
+        'a.md': 'Cursor enumerated without extraction.\n',
+        'b.md': 'Autopilot must resume this file without a manual drain.\n',
+      });
+      const abort = new AbortController();
+      const partial = await performManagedSync(engine, {
+        sourceId: f.id, noPull: true, noEmbed: true, noExtract: false,
+        signal: abort.signal,
+        onProgress: p => { if (p.phase === 'managed_sync.page_committed') abort.abort(); },
+      });
+      expect(partial.filesImported).toBe(1);
+      const resumed = await performManagedSync(engine, {
+        sourceId: f.id, noPull: true, noEmbed: true, noExtract: true,
+        explicitProcessing: [],
+      });
+      expect(resumed.runId).toBe(partial.runId);
+      expect(['first_sync', 'synced']).toContain(resumed.status);
+      await disposePersistenceConsumer(engine);
+    }
+  }), 120_000);
+
+test('quiet managed sync refreshes source freshness without moving the commit bookmark', async () =>
+  withEnv({ GBRAIN_HOME: home }, async () => {
+    for (const engine of engines) {
+      await disposePersistenceConsumer(engine);
+      const f = await fixture(engine, { 'a.md': 'A page that is already at the commit bookmark.\n' });
+      const first = await performManagedSync(engine, { sourceId: f.id, noPull: true, noEmbed: true, noExtract: true });
+      expect(first.status).toBe('first_sync');
+      await engine.transaction(async tx => {
+        await withCoordinatedWrite(tx, [f.id], async () => {
+          await tx.executeRaw("UPDATE sources SET last_sync_at = now() - interval '3 hours' WHERE id=$1", [f.id]);
+        });
+      });
+      const quiet = await performManagedSync(engine, { sourceId: f.id, noPull: true, noEmbed: true, noExtract: true });
+      expect(quiet.status).toBe('up_to_date');
+      const [source] = await engine.executeRaw<{ last_commit: string; age_seconds: number }>(
+        'SELECT last_commit, EXTRACT(EPOCH FROM (now() - last_sync_at))::int AS age_seconds FROM sources WHERE id=$1', [f.id]);
+      expect(source.last_commit).toBe(f.head);
+      expect(Number(source.age_seconds)).toBeLessThan(60);
+      await disposePersistenceConsumer(engine);
+    }
+  }), 120_000);

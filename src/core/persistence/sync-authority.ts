@@ -23,6 +23,11 @@ export interface SyncProcessingOptions { noEmbed: boolean; noExtract: boolean; n
 export function syncProcessingOptions(opts: SyncOpts): SyncProcessingOptions {
   return { noEmbed: opts.noEmbed === true, noExtract: opts.noExtract === true, noSchemaPack: opts.noSchemaPack === true };
 }
+export const SYNC_PROCESSING_KEYS = ['noEmbed', 'noExtract', 'noSchemaPack'] as const;
+/** Options the caller set itself. An unfinished cursor supplies the rest, so a defaulted job flag cannot strand it. */
+export function explicitSyncProcessing(values: Record<string, unknown>): Array<keyof SyncProcessingOptions> {
+  return SYNC_PROCESSING_KEYS.filter(key => typeof values[key] === 'boolean');
+}
 export function assertSyncDispatchActive(): void {
   assertSourceFilesystemActive(true);
   throwIfAborted(currentJobSignal());
